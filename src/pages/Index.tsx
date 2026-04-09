@@ -1,14 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import WeatherAlertCard from "@/components/WeatherAlertCard";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import BottomNav, { type Tab } from "@/components/BottomNav";
-import { MapPin, Bell, LogOut } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { MapPin, Bell, User } from "lucide-react";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
-  const { signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background pb-24">
