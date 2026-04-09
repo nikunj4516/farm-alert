@@ -3,7 +3,8 @@ import WeatherAlertCard from "@/components/WeatherAlertCard";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import BottomNav, { type Tab } from "@/components/BottomNav";
-import { MapPin, Bell } from "lucide-react";
+import { MapPin, Bell, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
