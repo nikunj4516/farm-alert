@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
+  const { signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-background pb-24">
