@@ -26,10 +26,15 @@ const Index = () => {
               </span>
             </div>
           </div>
-          <button className="relative bg-primary-foreground/20 rounded-full p-3 active:scale-90 transition-transform touch-manipulation">
-            <Bell className="w-7 h-7 text-primary-foreground" />
-            <span className="absolute top-1 right-1 w-3 h-3 bg-alert-red rounded-full" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="relative bg-primary-foreground/20 rounded-full p-3 active:scale-90 transition-transform touch-manipulation">
+              <Bell className="w-7 h-7 text-primary-foreground" />
+              <span className="absolute top-1 right-1 w-3 h-3 bg-alert-red rounded-full" />
+            </button>
+            <button onClick={signOut} className="bg-primary-foreground/20 rounded-full p-3 active:scale-90 transition-transform touch-manipulation">
+              <LogOut className="w-6 h-6 text-primary-foreground" />
+            </button>
+          </div>
         </div>
       </header>
 
