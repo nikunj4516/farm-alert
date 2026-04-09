@@ -1,11 +1,8 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Loader2, Check } from "lucide-react";
 
 const ProfileSetup = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -18,23 +15,13 @@ const ProfileSetup = () => {
 
   const crops = ["ઘઉં", "ડાંગર", "કપાસ", "મગફળી", "શેરડી", "શાકભાજી", "અન્ય"];
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!form.name.trim()) return;
     setLoading(true);
-
-    await supabase
-      .from("profiles")
-      .update({
-        name: form.name.trim(),
-        village: form.village.trim() || null,
-        district: form.district.trim() || null,
-        crop_type: form.crop_type || null,
-        land_size: form.land_size ? parseFloat(form.land_size) : null,
-      })
-      .eq("user_id", user?.id ?? "");
-
-    setLoading(false);
-    navigate("/");
+    setTimeout(() => {
+      setLoading(false);
+      navigate("/");
+    }, 800);
   };
 
   return (
@@ -50,7 +37,6 @@ const ProfileSetup = () => {
         </div>
 
         <div className="space-y-4">
-          {/* Name */}
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
               👤 તમારું નામ *
@@ -64,7 +50,6 @@ const ProfileSetup = () => {
             />
           </div>
 
-          {/* Village */}
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
               🏘️ ગામ
@@ -78,7 +63,6 @@ const ProfileSetup = () => {
             />
           </div>
 
-          {/* District */}
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
               📍 જિલ્લો
@@ -92,7 +76,6 @@ const ProfileSetup = () => {
             />
           </div>
 
-          {/* Crop Type */}
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
               🌾 મુખ્ય પાક
@@ -114,7 +97,6 @@ const ProfileSetup = () => {
             </div>
           </div>
 
-          {/* Land Size */}
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
               📐 જમીન (એકર)

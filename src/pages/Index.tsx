@@ -1,14 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import WeatherAlertCard from "@/components/WeatherAlertCard";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import BottomNav, { type Tab } from "@/components/BottomNav";
-import { MapPin, Bell, LogOut } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { MapPin, Bell, User } from "lucide-react";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
-  const { signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -31,8 +31,8 @@ const Index = () => {
               <Bell className="w-7 h-7 text-primary-foreground" />
               <span className="absolute top-1 right-1 w-3 h-3 bg-alert-red rounded-full" />
             </button>
-            <button onClick={signOut} className="bg-primary-foreground/20 rounded-full p-3 active:scale-90 transition-transform touch-manipulation">
-              <LogOut className="w-6 h-6 text-primary-foreground" />
+            <button onClick={() => navigate("/login")} className="bg-primary-foreground/20 rounded-full p-3 active:scale-90 transition-transform touch-manipulation">
+              <User className="w-6 h-6 text-primary-foreground" />
             </button>
           </div>
         </div>

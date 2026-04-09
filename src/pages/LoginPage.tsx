@@ -1,59 +1,33 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Phone, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const formatPhone = (num: string) => {
-    const digits = num.replace(/\D/g, "");
-    if (digits.startsWith("91") && digits.length >= 12) return `+${digits}`;
-    if (digits.length === 10) return `+91${digits}`;
-    return `+${digits}`;
-  };
-
-  const handleSendOtp = async () => {
-    if (phone.replace(/\D/g, "").length < 10) {
+  const handleSendOtp = () => {
+    if (phone.length < 10) {
       setError("કૃપા કરીને 10 અંકનો મોબાઈલ નંબર નાખો");
       return;
     }
-    setLoading(true);
-    setError("");
-
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: formatPhone(phone),
-    });
-
-    if (error) {
-      setError("OTP મોકલવામાં ભૂલ થઈ. ફરી પ્રયાસ કરો.");
-    } else {
-      setStep("otp");
-    }
-    setLoading(false);
+    setStep("otp");
   };
 
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = () => {
     if (otp.length !== 6) {
       setError("કૃપા કરીને 6 અંકનો OTP નાખો");
       return;
     }
     setLoading(true);
-    setError("");
-
-    const { error } = await supabase.auth.verifyOtp({
-      phone: formatPhone(phone),
-      token: otp,
-      type: "sms",
-    });
-
-    if (error) {
-      setError("ખોટો OTP. ફરી પ્રયાસ કરો.");
-    }
-    setLoading(false);
+    setTimeout(() => {
+      setLoading(false);
+      navigate("/profile-setup");
+    }, 1000);
   };
 
   return (
@@ -102,16 +76,10 @@ const LoginPage = () => {
 
             <button
               onClick={handleSendOtp}
-              disabled={loading || phone.length < 10}
+              disabled={phone.length < 10}
               className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-lg py-5 text-farmer-lg font-bold active:scale-95 transition-transform touch-manipulation disabled:opacity-50"
             >
-              {loading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                <>
-                  OTP મોકલો <ArrowRight className="w-6 h-6" />
-                </>
-              )}
+              OTP મોકલો <ArrowRight className="w-6 h-6" />
             </button>
           </div>
         ) : (
