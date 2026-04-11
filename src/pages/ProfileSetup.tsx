@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Check } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
+  const { t, tArray } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -13,7 +15,7 @@ const ProfileSetup = () => {
     land_size: "",
   });
 
-  const crops = ["ઘઉં", "ડાંગર", "કપાસ", "મગફળી", "શેરડી", "શાકભાજી", "અન્ય"];
+  const crops = tArray("crops");
 
   const handleSave = () => {
     if (!form.name.trim()) return;
@@ -29,56 +31,56 @@ const ProfileSetup = () => {
       <div className="max-w-[400px] mx-auto space-y-6">
         <div className="text-center">
           <h1 className="text-farmer-xl font-extrabold text-primary">
-            👨‍🌾 તમારી માહિતી
+            {t("profile_title")}
           </h1>
           <p className="text-farmer-sm text-muted-foreground mt-1">
-            આ માહિતી તમને વધુ સારી ટિપ્સ આપવા માટે છે
+            {t("profile_subtitle")}
           </p>
         </div>
 
         <div className="space-y-4">
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              👤 તમારું નામ *
+              {t("profile_name")}
             </label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="દા.ત. રમેશભાઈ પટેલ"
+              placeholder={t("profile_name_placeholder")}
               className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-lg bg-card outline-none focus:border-primary"
             />
           </div>
 
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              🏘️ ગામ
+              {t("profile_village")}
             </label>
             <input
               type="text"
               value={form.village}
               onChange={(e) => setForm({ ...form, village: e.target.value })}
-              placeholder="દા.ત. વડગામ"
+              placeholder={t("profile_village_placeholder")}
               className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-lg bg-card outline-none focus:border-primary"
             />
           </div>
 
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              📍 જિલ્લો
+              {t("profile_district")}
             </label>
             <input
               type="text"
               value={form.district}
               onChange={(e) => setForm({ ...form, district: e.target.value })}
-              placeholder="દા.ત. અમદાવાદ"
+              placeholder={t("profile_district_placeholder")}
               className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-lg bg-card outline-none focus:border-primary"
             />
           </div>
 
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              🌾 મુખ્ય પાક
+              {t("profile_crop")}
             </label>
             <div className="grid grid-cols-2 gap-2">
               {crops.map((crop) => (
@@ -99,14 +101,14 @@ const ProfileSetup = () => {
 
           <div>
             <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              📐 જમીન (એકર)
+              {t("profile_land")}
             </label>
             <input
               type="tel"
               inputMode="decimal"
               value={form.land_size}
               onChange={(e) => setForm({ ...form, land_size: e.target.value })}
-              placeholder="દા.ત. 5"
+              placeholder={t("profile_land_placeholder")}
               className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-lg bg-card outline-none focus:border-primary"
             />
           </div>
@@ -121,7 +123,7 @@ const ProfileSetup = () => {
             <Loader2 className="w-6 h-6 animate-spin" />
           ) : (
             <>
-              સેવ કરો <Check className="w-6 h-6" />
+              {t("profile_save")} <Check className="w-6 h-6" />
             </>
           )}
         </button>
@@ -130,7 +132,7 @@ const ProfileSetup = () => {
           onClick={() => navigate("/")}
           className="w-full text-center text-farmer-sm text-muted-foreground font-semibold py-3 touch-manipulation"
         >
-          પછીથી ભરીશ →
+          {t("profile_skip")}
         </button>
       </div>
     </div>
