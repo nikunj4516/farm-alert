@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import logoWide from "@/assets/farmalert-logo-wide.png";
 
 const LoginPage = () => {
   const navigate = useNavigate();
