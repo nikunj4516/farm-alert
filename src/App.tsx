@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import ProfileSetup from "./pages/ProfileSetup.tsx";
+import SplashScreen from "./pages/SplashScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -17,6 +18,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/welcome" element={<SplashScreen />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/" element={<Index />} />
