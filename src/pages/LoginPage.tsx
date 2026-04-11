@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import logoWide from "@/assets/farmalert-logo-wide.png";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -35,10 +36,8 @@ const LoginPage = () => {
       <div className="w-full max-w-[400px] space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <h1 className="text-farmer-2xl font-extrabold text-primary">
-            🌾 FarmAlert
-          </h1>
-          <p className="text-farmer-base text-muted-foreground mt-2">
+          <img src={logoWide} alt="FarmAlert Solutions" className="h-16 mx-auto" />
+          <p className="text-farmer-base text-muted-foreground mt-3">
             હવામાન ચેતવણી • ખેતી ટિપ્સ • સમાચાર
           </p>
         </div>
