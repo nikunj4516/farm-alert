@@ -316,8 +316,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   const t = (key: TranslationKey): string => {
     const val = translations[key]?.[language];
-    if (Array.isArray(val)) return val.join(", ");
-    return val || key;
+    if (Array.isArray(val)) return (val as readonly string[]).join(", ");
+    return (val as string) || key;
   };
 
   const tArray = (key: TranslationKey): string[] => {
