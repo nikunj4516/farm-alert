@@ -13,12 +13,7 @@ const languages: { id: Language; flag: string }[] = [
 const SplashScreen = () => {
   const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
-  const [showLangPicker, setShowLangPicker] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowLangPicker(true), 1800);
-    return () => clearTimeout(timer);
-  }, []);
+  const [showLangPicker, setShowLangPicker] = useState(true);
 
   const handleContinue = () => {
     navigate("/login");
