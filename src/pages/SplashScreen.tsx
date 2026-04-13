@@ -15,6 +15,12 @@ const SplashScreen = () => {
   const { language, setLanguage, t } = useLanguage();
   const [showLangPicker, setShowLangPicker] = useState(true);
 
+  useEffect(() => {
+    if (localStorage.getItem("farmalert_onboarded") === "true") {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
   const handleContinue = () => {
     navigate("/login");
   };
