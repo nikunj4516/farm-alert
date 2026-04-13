@@ -4,6 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/farmalert-logo.png";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 
+const languages: { id: Language; flag: string }[] = [
+  { id: "gu", flag: "🇮🇳" },
+  { id: "hi", flag: "🇮🇳" },
+  { id: "en", flag: "🌐" },
+];
+
 const SplashScreen = () => {
   const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
@@ -14,15 +20,6 @@ const SplashScreen = () => {
       navigate("/dashboard", { replace: true });
     }
   }, [navigate]);
-  { id: "gu", flag: "🇮🇳" },
-  { id: "hi", flag: "🇮🇳" },
-  { id: "en", flag: "🌐" },
-];
-
-const SplashScreen = () => {
-  const navigate = useNavigate();
-  const { language, setLanguage, t } = useLanguage();
-  const [showLangPicker, setShowLangPicker] = useState(true);
 
   const handleContinue = () => {
     navigate("/login");
