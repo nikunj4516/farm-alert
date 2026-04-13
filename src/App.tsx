@@ -20,10 +20,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/welcome" element={<SplashScreen />} />
+            <Route path="/" element={<SplashScreen />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/profile-setup" element={<ProfileSetup />} />
-            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Index />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
