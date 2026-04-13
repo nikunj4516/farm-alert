@@ -22,6 +22,7 @@ const ProfileSetup = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      localStorage.setItem("farmalert_onboarded", "true");
       navigate("/dashboard");
     }, 800);
   };

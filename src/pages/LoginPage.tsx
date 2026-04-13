@@ -29,6 +29,7 @@ const LoginPage = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      localStorage.setItem("farmalert_logged_in", "true");
       navigate("/profile-setup");
     }, 1000);
   };
