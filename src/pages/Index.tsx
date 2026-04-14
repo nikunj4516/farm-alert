@@ -4,7 +4,7 @@ import WeatherAlertCard from "@/components/WeatherAlertCard";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import BottomNav, { type Tab } from "@/components/BottomNav";
-import { MapPin, Bell, User, Globe } from "lucide-react";
+import { MapPin, Bell, LogOut, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-logo.png";
 
