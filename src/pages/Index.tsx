@@ -6,6 +6,7 @@ import AgriNews from "@/components/AgriNews";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import { MapPin, Bell, User, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
+import logo from "@/assets/farmalert-logo.png";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
@@ -20,9 +21,12 @@ const Index = () => {
       <header className="bg-primary px-4 py-4 sticky top-0 z-40">
         <div className="max-w-[600px] mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-farmer-xl font-extrabold text-primary-foreground">
-              🌾 FarmAlert
-            </h1>
+            <div className="flex items-center gap-2">
+              <img src={logo} alt="FarmAlert" className="w-9 h-9" />
+              <h1 className="text-farmer-xl font-extrabold text-primary-foreground">
+                FarmAlert
+              </h1>
+            </div>
             <div className="flex items-center gap-1 mt-1">
               <MapPin className="w-4 h-4 text-primary-foreground/80" />
               <span className="text-farmer-sm text-primary-foreground/80">
