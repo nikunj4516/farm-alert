@@ -32,30 +32,30 @@ const WeatherAlertCard = ({ level, title, description, temperature, humidity, wi
   const WeatherIcon = level === "red" ? CloudRain : level === "orange" ? CloudSun : Sun;
 
   return (
-    <div className={`rounded-lg p-5 ${alertBg[level]} ${isUrgent ? "animate-pulse-alert" : ""}`}>
+    <div className={`rounded-2xl p-5 ${alertBg[level]} ${isUrgent ? "animate-pulse-alert" : ""} shadow-elevated`}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-farmer-lg font-bold text-primary-foreground">
+        <span className="text-farmer-sm font-bold text-primary-foreground/90 bg-primary-foreground/15 px-3 py-1 rounded-full">
           {t(alertKeys[level])}
         </span>
-        <WeatherIcon className="w-10 h-10 text-primary-foreground" />
+        <div className="w-12 h-12 rounded-full bg-primary-foreground/15 flex items-center justify-center">
+          <WeatherIcon className="w-7 h-7 text-primary-foreground" />
+        </div>
       </div>
 
-      <h2 className="text-farmer-xl font-extrabold text-primary-foreground mb-2">{title}</h2>
-      <p className="text-farmer-base text-primary-foreground/90 mb-4">{description}</p>
+      <h2 className="text-farmer-xl font-extrabold text-primary-foreground mb-1">{title}</h2>
+      <p className="text-farmer-sm text-primary-foreground/85 mb-4 leading-relaxed">{description}</p>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div className="flex flex-col items-center bg-primary-foreground/20 rounded-md p-3">
-          <Thermometer className="w-6 h-6 text-primary-foreground mb-1" />
-          <span className="text-farmer-sm font-bold text-primary-foreground">{temperature}</span>
-        </div>
-        <div className="flex flex-col items-center bg-primary-foreground/20 rounded-md p-3">
-          <Droplets className="w-6 h-6 text-primary-foreground mb-1" />
-          <span className="text-farmer-sm font-bold text-primary-foreground">{humidity}</span>
-        </div>
-        <div className="flex flex-col items-center bg-primary-foreground/20 rounded-md p-3">
-          <Wind className="w-6 h-6 text-primary-foreground mb-1" />
-          <span className="text-farmer-sm font-bold text-primary-foreground">{wind}</span>
-        </div>
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { icon: Thermometer, value: temperature, label: "°C" },
+          { icon: Droplets, value: humidity, label: "%" },
+          { icon: Wind, value: wind, label: "km/h" },
+        ].map(({ icon: Icon, value }) => (
+          <div key={value} className="flex flex-col items-center bg-primary-foreground/15 backdrop-blur-sm rounded-xl p-3">
+            <Icon className="w-5 h-5 text-primary-foreground/80 mb-1" />
+            <span className="text-farmer-sm font-bold text-primary-foreground">{value}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

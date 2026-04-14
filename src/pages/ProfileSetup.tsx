@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Check } from "lucide-react";
+import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Progress } from "@/components/ui/progress";
+
+const STEPS = 3;
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
   const { t, tArray } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "",
     village: "",
@@ -16,6 +20,13 @@ const ProfileSetup = () => {
   });
 
   const crops = tArray("crops");
+  const cropIcons = tArray("crop_icons");
+
+  const stepLabels = [
+    { label: t("profile_step_personal"), icon: User },
+    { label: t("profile_step_location"), icon: MapPin },
+    { label: t("profile_step_farming"), icon: Wheat },
+  ];
 
   const handleSave = () => {
     if (!form.name.trim()) return;
@@ -27,111 +38,185 @@ const ProfileSetup = () => {
     }, 800);
   };
 
+  const canGoNext = () => {
+    if (step === 0) return form.name.trim().length > 0;
+    return true;
+  };
+
+  const progress = ((step + 1) / STEPS) * 100;
+
   return (
     <div className="min-h-screen bg-background px-4 py-6">
       <div className="max-w-[400px] mx-auto space-y-6">
-        <div className="text-center">
-          <h1 className="text-farmer-xl font-extrabold text-primary">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <div className="text-5xl">👨‍🌾</div>
+          <h1 className="text-farmer-xl font-extrabold text-foreground">
             {t("profile_title")}
           </h1>
-          <p className="text-farmer-sm text-muted-foreground mt-1">
+          <p className="text-farmer-sm text-muted-foreground">
             {t("profile_subtitle")}
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              {t("profile_name")}
-            </label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder={t("profile_name_placeholder")}
-              className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-lg bg-card outline-none focus:border-primary"
-            />
+        {/* Stepper */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            {stepLabels.map((s, i) => {
+              const Icon = s.icon;
+              const isActive = i === step;
+              const isDone = i < step;
+              return (
+                <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    isDone ? "bg-primary text-primary-foreground" :
+                    isActive ? "bg-primary text-primary-foreground shadow-elevated" :
+                    "bg-muted text-muted-foreground"
+                  }`}>
+                    {isDone ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                  </div>
+                  <span className={`text-xs font-semibold ${isActive || isDone ? "text-primary" : "text-muted-foreground"}`}>
+                    {s.label}
+                  </span>
+                </div>
+              );
+            })}
           </div>
+          <Progress value={progress} className="h-2 bg-muted" />
+        </div>
 
-          <div>
-            <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              {t("profile_village")}
-            </label>
-            <input
-              type="text"
-              value={form.village}
-              onChange={(e) => setForm({ ...form, village: e.target.value })}
-              placeholder={t("profile_village_placeholder")}
-              className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-lg bg-card outline-none focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              {t("profile_district")}
-            </label>
-            <input
-              type="text"
-              value={form.district}
-              onChange={(e) => setForm({ ...form, district: e.target.value })}
-              placeholder={t("profile_district_placeholder")}
-              className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-lg bg-card outline-none focus:border-primary"
-            />
-          </div>
-
-          <div>
-            <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              {t("profile_crop")}
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {crops.map((crop) => (
-                <button
-                  key={crop}
-                  onClick={() => setForm({ ...form, crop_type: crop })}
-                  className={`py-3 px-4 rounded-lg text-farmer-sm font-semibold border-2 transition-colors touch-manipulation ${
-                    form.crop_type === crop
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card text-foreground border-border"
-                  }`}
-                >
-                  {crop}
-                </button>
-              ))}
+        {/* Step Content */}
+        <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4 min-h-[240px]">
+          {step === 0 && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <User className="w-5 h-5 text-primary" />
+                  {t("profile_name")}
+                </label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder={t("profile_name_placeholder")}
+                  className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
-          <div>
-            <label className="text-farmer-base font-semibold text-foreground block mb-2">
-              {t("profile_land")}
-            </label>
-            <input
-              type="tel"
-              inputMode="decimal"
-              value={form.land_size}
-              onChange={(e) => setForm({ ...form, land_size: e.target.value })}
-              placeholder={t("profile_land_placeholder")}
-              className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-lg bg-card outline-none focus:border-primary"
-            />
-          </div>
+          {step === 1 && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  {t("profile_village")}
+                </label>
+                <input
+                  type="text"
+                  value={form.village}
+                  onChange={(e) => setForm({ ...form, village: e.target.value })}
+                  placeholder={t("profile_village_placeholder")}
+                  className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  {t("profile_district")}
+                </label>
+                <input
+                  type="text"
+                  value={form.district}
+                  onChange={(e) => setForm({ ...form, district: e.target.value })}
+                  placeholder={t("profile_district_placeholder")}
+                  className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  🌾 {t("profile_crop")}
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {crops.map((crop, i) => (
+                    <button
+                      key={crop}
+                      onClick={() => setForm({ ...form, crop_type: crop })}
+                      className={`py-3 px-4 rounded-xl text-farmer-sm font-semibold border-2 transition-all touch-manipulation flex items-center gap-2 ${
+                        form.crop_type === crop
+                          ? "bg-primary text-primary-foreground border-primary shadow-soft"
+                          : "bg-background text-foreground border-border hover:border-primary/30"
+                      }`}
+                    >
+                      <span>{cropIcons[i]}</span>
+                      {crop}
+                      {form.crop_type === crop && <Check className="w-4 h-4 ml-auto" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  📐 {t("profile_land")}
+                </label>
+                <input
+                  type="tel"
+                  inputMode="decimal"
+                  value={form.land_size}
+                  onChange={(e) => setForm({ ...form, land_size: e.target.value })}
+                  placeholder={t("profile_land_placeholder")}
+                  className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex gap-3">
+          {step > 0 && (
+            <button
+              onClick={() => setStep(step - 1)}
+              className="flex items-center justify-center gap-2 bg-muted text-foreground rounded-2xl py-4 px-6 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              {t("profile_back")}
+            </button>
+          )}
+          {step < STEPS - 1 ? (
+            <button
+              onClick={() => setStep(step + 1)}
+              disabled={!canGoNext()}
+              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
+            >
+              {t("profile_next")} <ArrowRight className="w-5 h-5" />
+            </button>
+          ) : (
+            <button
+              onClick={handleSave}
+              disabled={loading || !form.name.trim()}
+              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
+            >
+              {loading ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : (
+                <>
+                  {t("profile_save")} <Check className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         <button
-          onClick={handleSave}
-          disabled={loading || !form.name.trim()}
-          className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-lg py-5 text-farmer-lg font-bold active:scale-95 transition-transform touch-manipulation disabled:opacity-50"
-        >
-          {loading ? (
-            <Loader2 className="w-6 h-6 animate-spin" />
-          ) : (
-            <>
-              {t("profile_save")} <Check className="w-6 h-6" />
-            </>
-          )}
-        </button>
-
-        <button
           onClick={() => { localStorage.setItem("farmalert_onboarded", "true"); navigate("/dashboard"); }}
-          className="w-full text-center text-farmer-sm text-muted-foreground font-semibold py-3 touch-manipulation"
+          className="w-full text-center text-farmer-sm text-muted-foreground font-semibold py-2 touch-manipulation"
         >
           {t("profile_skip")}
         </button>

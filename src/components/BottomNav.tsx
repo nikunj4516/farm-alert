@@ -1,7 +1,7 @@
-import { CloudSun, Lightbulb, Newspaper } from "lucide-react";
+import { CloudSun, Lightbulb, Newspaper, UserCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-type Tab = "weather" | "tips" | "news";
+type Tab = "weather" | "tips" | "news" | "profile";
 
 interface BottomNavProps {
   activeTab: Tab;
@@ -15,10 +15,11 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
     { id: "weather" as Tab, label: t("nav_weather"), icon: CloudSun },
     { id: "tips" as Tab, label: t("nav_tips"), icon: Lightbulb },
     { id: "news" as Tab, label: t("nav_news"), icon: Newspaper },
+    { id: "profile" as Tab, label: t("nav_profile"), icon: UserCircle },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t-2 border-border z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 shadow-[0_-2px_10px_0_hsl(0_0%_0%/0.04)]">
       <div className="max-w-[600px] mx-auto flex">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -27,12 +28,17 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex-1 flex flex-col items-center py-3 px-2 min-h-[64px] transition-colors touch-manipulation ${
-                isActive ? "text-primary bg-muted" : "text-muted-foreground"
+              className={`flex-1 flex flex-col items-center py-3 px-2 min-h-[64px] transition-all touch-manipulation relative ${
+                isActive ? "text-primary" : "text-muted-foreground"
               }`}
             >
-              <Icon className="w-7 h-7 mb-1" />
-              <span className="text-farmer-sm font-semibold">{tab.label}</span>
+              {isActive && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-b-full" />
+              )}
+              <div className={`p-1.5 rounded-xl transition-colors ${isActive ? "bg-primary/10" : ""}`}>
+                <Icon className="w-6 h-6" />
+              </div>
+              <span className={`text-xs font-semibold mt-0.5 ${isActive ? "text-primary" : ""}`}>{tab.label}</span>
             </button>
           );
         })}
