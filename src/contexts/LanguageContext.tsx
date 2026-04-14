@@ -19,12 +19,22 @@ const translations = {
     hi: "भाषा चुनें",
     en: "Choose Language",
   },
+  choose_language_subtitle: {
+    gu: "તમારી પસંદગીની ભાષા પસંદ કરો",
+    hi: "अपनी पसंदीदा भाषा चुनें",
+    en: "Choose your preferred language",
+  },
 
   // Login
   login_phone_label: {
-    gu: "📱 મોબાઈલ નંબર",
-    hi: "📱 मोबाइल नंबर",
-    en: "📱 Mobile Number",
+    gu: "મોબાઈલ નંબર",
+    hi: "मोबाइल नंबर",
+    en: "Mobile Number",
+  },
+  login_phone_helper: {
+    gu: "અમે તમારો નંબર ચકાસવા OTP મોકલીશું",
+    hi: "हम आपका नंबर सत्यापित करने के लिए OTP भेजेंगे",
+    en: "We will send an OTP to verify your number",
   },
   login_phone_error: {
     gu: "કૃપા કરીને 10 અંકનો મોબાઈલ નંબર નાખો",
@@ -47,9 +57,9 @@ const translations = {
     en: "OTP sent to",
   },
   login_otp_label: {
-    gu: "🔑 OTP નંબર",
-    hi: "🔑 OTP नंबर",
-    en: "🔑 OTP Number",
+    gu: "OTP નંબર",
+    hi: "OTP नंबर",
+    en: "OTP Number",
   },
   login_verify: {
     gu: "ચકાસો",
@@ -66,22 +76,47 @@ const translations = {
     hi: "🔒 आपका नंबर सुरक्षित है",
     en: "🔒 Your number is secure",
   },
+  login_welcome: {
+    gu: "ફરી આવો!",
+    hi: "वापस आइए!",
+    en: "Welcome back!",
+  },
+  login_subtitle: {
+    gu: "તમારા ખેતરની માહિતી મેળવવા લૉગિન કરો",
+    hi: "अपने खेत की जानकारी पाने के लिए लॉगिन करें",
+    en: "Login to get updates about your farm",
+  },
 
   // Profile Setup
   profile_title: {
-    gu: "👨‍🌾 તમારી માહિતી",
-    hi: "👨‍🌾 आपकी जानकारी",
-    en: "👨‍🌾 Your Information",
+    gu: "તમારી માહિતી",
+    hi: "आपकी जानकारी",
+    en: "Your Information",
   },
   profile_subtitle: {
     gu: "આ માહિતી તમને વધુ સારી ટિપ્સ આપવા માટે છે",
     hi: "यह जानकारी आपको बेहतर सुझाव देने के लिए है",
     en: "This information helps us give you better tips",
   },
+  profile_step_personal: {
+    gu: "વ્યક્તિગત",
+    hi: "व्यक्तिगत",
+    en: "Personal",
+  },
+  profile_step_location: {
+    gu: "સ્થાન",
+    hi: "स्थान",
+    en: "Location",
+  },
+  profile_step_farming: {
+    gu: "ખેતી",
+    hi: "खेती",
+    en: "Farming",
+  },
   profile_name: {
-    gu: "👤 તમારું નામ *",
-    hi: "👤 आपका नाम *",
-    en: "👤 Your Name *",
+    gu: "તમારું નામ *",
+    hi: "आपका नाम *",
+    en: "Your Name *",
   },
   profile_name_placeholder: {
     gu: "દા.ત. રમેશભાઈ પટેલ",
@@ -89,9 +124,9 @@ const translations = {
     en: "e.g. Ramesh Patel",
   },
   profile_village: {
-    gu: "🏘️ ગામ",
-    hi: "🏘️ गाँव",
-    en: "🏘️ Village",
+    gu: "ગામ",
+    hi: "गाँव",
+    en: "Village",
   },
   profile_village_placeholder: {
     gu: "દા.ત. વડગામ",
@@ -99,9 +134,9 @@ const translations = {
     en: "e.g. Vadgam",
   },
   profile_district: {
-    gu: "📍 જિલ્લો",
-    hi: "📍 जिला",
-    en: "📍 District",
+    gu: "જિલ્લો",
+    hi: "जिला",
+    en: "District",
   },
   profile_district_placeholder: {
     gu: "દા.ત. અમદાવાદ",
@@ -109,14 +144,14 @@ const translations = {
     en: "e.g. Ahmedabad",
   },
   profile_crop: {
-    gu: "🌾 મુખ્ય પાક",
-    hi: "🌾 मुख्य फसल",
-    en: "🌾 Main Crop",
+    gu: "મુખ્ય પાક",
+    hi: "मुख्य फसल",
+    en: "Main Crop",
   },
   profile_land: {
-    gu: "📐 જમીન (એકર)",
-    hi: "📐 ज़मीन (एकड़)",
-    en: "📐 Land (Acres)",
+    gu: "જમીન (એકર)",
+    hi: "ज़मीन (एकड़)",
+    en: "Land (Acres)",
   },
   profile_land_placeholder: {
     gu: "દા.ત. 5",
@@ -133,10 +168,25 @@ const translations = {
     hi: "बाद में भरूँगा →",
     en: "Fill Later →",
   },
+  profile_next: {
+    gu: "આગળ",
+    hi: "आगे",
+    en: "Next",
+  },
+  profile_back: {
+    gu: "પાછળ",
+    hi: "पीछे",
+    en: "Back",
+  },
   crops: {
     gu: ["ઘઉં", "ડાંગર", "કપાસ", "મગફળી", "શેરડી", "શાકભાજી", "અન્ય"],
     hi: ["गेहूँ", "धान", "कपास", "मूँगफली", "गन्ना", "सब्ज़ी", "अन्य"],
     en: ["Wheat", "Rice", "Cotton", "Groundnut", "Sugarcane", "Vegetables", "Other"],
+  },
+  crop_icons: {
+    gu: ["🌾", "🍚", "🧵", "🥜", "🎋", "🥬", "📦"],
+    hi: ["🌾", "🍚", "🧵", "🥜", "🎋", "🥬", "📦"],
+    en: ["🌾", "🍚", "🧵", "🥜", "🎋", "🥬", "📦"],
   },
 
   // Index / Dashboard
@@ -159,6 +209,31 @@ const translations = {
     gu: ["આજે", "કાલે", "ગુરુ", "શુક્ર", "શનિ"],
     hi: ["आज", "कल", "गुरु", "शुक्र", "शनि"],
     en: ["Today", "Tomorrow", "Thu", "Fri", "Sat"],
+  },
+  quick_actions_title: {
+    gu: "ઝડપી ક્રિયાઓ",
+    hi: "त्वरित कार्य",
+    en: "Quick Actions",
+  },
+  action_crop_tips: {
+    gu: "પાક ટિપ્સ",
+    hi: "फसल टिप्स",
+    en: "Crop Tips",
+  },
+  action_irrigation: {
+    gu: "સિંચાઈ",
+    hi: "सिंचाई",
+    en: "Irrigation",
+  },
+  action_pest_alert: {
+    gu: "જીવાત ચેતવણી",
+    hi: "कीट चेतावनी",
+    en: "Pest Alert",
+  },
+  action_buy_products: {
+    gu: "ઉત્પાદનો ખરીદો",
+    hi: "उत्पाद खरीदें",
+    en: "Buy Products",
   },
 
   // Weather Alert
@@ -208,6 +283,11 @@ const translations = {
     gu: "સમાચાર",
     hi: "समाचार",
     en: "News",
+  },
+  nav_profile: {
+    gu: "પ્રોફાઇલ",
+    hi: "प्रोफ़ाइल",
+    en: "Profile",
   },
 
   // Farming Tips
@@ -322,7 +402,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   const tArray = (key: TranslationKey): string[] => {
     const val = translations[key]?.[language];
-    if (Array.isArray(val)) return val;
+    if (Array.isArray(val)) return val as unknown as string[];
     return [];
   };
 

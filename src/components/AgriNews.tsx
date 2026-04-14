@@ -1,4 +1,5 @@
 import { useLanguage } from "@/contexts/LanguageContext";
+import { motion } from "framer-motion";
 
 const AgriNews = () => {
   const { t } = useLanguage();
@@ -12,19 +13,20 @@ const AgriNews = () => {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-farmer-lg font-bold text-foreground">{t("news_title")}</h2>
-      <div className="space-y-3">
+      <h2 className="text-farmer-base font-bold text-foreground">{t("news_title")}</h2>
+      <div className="space-y-2.5">
         {newsItems.map((item, index) => (
-          <button
+          <motion.button
             key={index}
-            className="w-full text-left bg-card border-2 border-border rounded-lg p-4 active:bg-muted transition-colors touch-manipulation"
+            whileTap={{ scale: 0.97 }}
+            className="w-full text-left bg-card border border-border rounded-2xl p-4 shadow-card touch-manipulation hover:shadow-soft transition-shadow"
           >
-            <p className="text-farmer-base font-semibold text-foreground mb-2">{item.title}</p>
+            <p className="text-farmer-sm font-semibold text-foreground mb-2 leading-relaxed">{item.title}</p>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground font-medium">{item.source}</span>
-              <span className="text-sm text-muted-foreground">{item.time}</span>
+              <span className="text-xs text-primary font-semibold bg-primary/10 px-2.5 py-1 rounded-full">{item.source}</span>
+              <span className="text-xs text-muted-foreground">{item.time}</span>
             </div>
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>

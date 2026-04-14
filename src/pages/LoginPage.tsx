@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { ArrowRight, Loader2, ShieldCheck, Phone } from "lucide-react";
 import logoWide from "@/assets/farmalert-logo-wide.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -35,23 +35,37 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5">
       <div className="w-full max-w-[400px] space-y-8">
-        <div className="text-center">
-          <img src={logoWide} alt="FarmAlert Solutions" className="h-16 mx-auto" />
-          <p className="text-farmer-base text-muted-foreground mt-3">
-            {t("splash_tagline")}
-          </p>
+        {/* Header */}
+        <div className="text-center space-y-3">
+          <div className="w-20 h-20 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center mb-2">
+            <img src={logoWide} alt="FarmAlert Solutions" className="h-12" />
+          </div>
+          <div>
+            <h1 className="text-farmer-xl font-extrabold text-foreground">
+              {t("login_welcome")}
+            </h1>
+            <p className="text-farmer-sm text-muted-foreground mt-1">
+              {t("login_subtitle")}
+            </p>
+          </div>
+        </div>
+
+        {/* Farmer Illustration */}
+        <div className="flex justify-center">
+          <div className="text-6xl">👨‍🌾</div>
         </div>
 
         {step === "phone" ? (
           <div className="space-y-5">
-            <div>
-              <label className="text-farmer-base font-semibold text-foreground block mb-2">
+            <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4">
+              <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2">
+                <Phone className="w-5 h-5 text-primary" />
                 {t("login_phone_label")}
               </label>
-              <div className="flex items-center border-2 border-border rounded-lg bg-card overflow-hidden focus-within:border-primary">
-                <span className="text-farmer-base font-bold text-muted-foreground px-4 bg-muted py-4">
+              <div className="flex items-center border-2 border-border rounded-xl bg-background overflow-hidden focus-within:border-primary transition-colors">
+                <span className="text-farmer-base font-bold text-muted-foreground px-4 py-4 bg-muted border-r border-border">
                   +91
                 </span>
                 <input
@@ -64,13 +78,16 @@ const LoginPage = () => {
                     setError("");
                   }}
                   placeholder="9876543210"
-                  className="flex-1 text-farmer-lg font-bold text-foreground py-4 px-3 bg-card outline-none"
+                  className="flex-1 text-farmer-lg font-bold text-foreground py-4 px-3 bg-transparent outline-none"
                 />
               </div>
+              <p className="text-sm text-muted-foreground">
+                {t("login_phone_helper")}
+              </p>
             </div>
 
             {error && (
-              <p className="text-destructive text-farmer-sm font-semibold">
+              <p className="text-destructive text-farmer-sm font-semibold text-center">
                 ⚠️ {error}
               </p>
             )}
@@ -78,23 +95,23 @@ const LoginPage = () => {
             <button
               onClick={handleSendOtp}
               disabled={phone.length < 10}
-              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-lg py-5 text-farmer-lg font-bold active:scale-95 transition-transform touch-manipulation disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
             >
-              {t("login_send_otp")} <ArrowRight className="w-6 h-6" />
+              {t("login_send_otp")} <ArrowRight className="w-5 h-5" />
             </button>
           </div>
         ) : (
           <div className="space-y-5">
-            <div className="bg-muted rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-primary/5 rounded-2xl p-4 flex items-center gap-3 border border-primary/20">
               <ShieldCheck className="w-6 h-6 text-primary flex-shrink-0" />
               <p className="text-farmer-sm text-foreground">
                 <strong>+91 {phone}</strong> {t("login_otp_sent")}
               </p>
             </div>
 
-            <div>
-              <label className="text-farmer-base font-semibold text-foreground block mb-2">
-                {t("login_otp_label")}
+            <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4">
+              <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2">
+                🔑 {t("login_otp_label")}
               </label>
               <input
                 type="tel"
@@ -106,12 +123,12 @@ const LoginPage = () => {
                   setError("");
                 }}
                 placeholder="● ● ● ● ● ●"
-                className="w-full text-center text-farmer-2xl font-bold text-foreground py-4 border-2 border-border rounded-lg bg-card outline-none tracking-[0.5em] focus:border-primary"
+                className="w-full text-center text-farmer-2xl font-bold text-foreground py-4 border-2 border-border rounded-xl bg-background outline-none tracking-[0.5em] focus:border-primary transition-colors"
               />
             </div>
 
             {error && (
-              <p className="text-destructive text-farmer-sm font-semibold">
+              <p className="text-destructive text-farmer-sm font-semibold text-center">
                 ⚠️ {error}
               </p>
             )}
@@ -119,13 +136,13 @@ const LoginPage = () => {
             <button
               onClick={handleVerifyOtp}
               disabled={loading || otp.length < 6}
-              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-lg py-5 text-farmer-lg font-bold active:scale-95 transition-transform touch-manipulation disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
             >
               {loading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
               ) : (
                 <>
-                  {t("login_verify")} <ShieldCheck className="w-6 h-6" />
+                  {t("login_verify")} <ShieldCheck className="w-5 h-5" />
                 </>
               )}
             </button>
