@@ -371,6 +371,101 @@ const translations = {
   },
   news_4_source: { gu: "કૃષિ કેન્દ્ર", hi: "कृषि केंद्र", en: "Agriculture Center" },
   news_4_time: { gu: "2 દિવસ પહેલા", hi: "2 दिन पहले", en: "2 days ago" },
+
+  // Subscription
+  sub_header_title: {
+    gu: "સુરક્ષિત રહો. માહિતગાર રહો 🌾",
+    hi: "सुरक्षित रहें। जानकार रहें 🌾",
+    en: "Stay Safe. Stay Informed 🌾",
+  },
+  sub_header_subtitle: {
+    gu: "રીઅલ-ટાઇમ હવામાન ચેતવણી, પાક ટિપ્સ અને ખેતી માર્ગદર્શન મેળવો",
+    hi: "रीयल-टाइम मौसम अलर्ट, फसल टिप्स और खेती गाइडेंस पाएं",
+    en: "Get real-time weather alerts, crop tips & farming guidance",
+  },
+  sub_day: { gu: "દિવસ", hi: "दिन", en: "day" },
+  sub_month: { gu: "મહિનો", hi: "महीना", en: "month" },
+  sub_just: { gu: "માત્ર", hi: "सिर्फ़", en: "Just" },
+  sub_emotional_line: {
+    gu: "કારણ કે તમારી મહેનત યોગ્ય સહારા લાયક છે",
+    hi: "क्योंकि आपकी मेहनत सही साथ की हकदार है",
+    en: "Because your hard work deserves the right support",
+  },
+  sub_best_value: {
+    gu: "ખેડૂતો માટે શ્રેષ્ઠ કિંમત",
+    hi: "किसानों के लिए सबसे अच्छी कीमत",
+    en: "Best value for farmers",
+  },
+  sub_benefits_title: {
+    gu: "તમને શું મળશે",
+    hi: "आपको क्या मिलेगा",
+    en: "What you get",
+  },
+  sub_benefit_1: {
+    gu: "તાત્કાલિક હવામાન ચેતવણી (વરસાદ, તોફાન, ગરમી)",
+    hi: "तुरंत मौसम अलर्ट (बारिश, तूफान, गर्मी)",
+    en: "Instant Weather Alerts (Rain, Storm, Heat)",
+  },
+  sub_benefit_2: {
+    gu: "પાક મુજબ સ્માર્ટ ખેતી ટિપ્સ",
+    hi: "फसल के अनुसार स्मार्ट खेती टिप्स",
+    en: "Crop-wise Smart Farming Tips",
+  },
+  sub_benefit_3: {
+    gu: "જીવાત અને રોગ ચેતવણી",
+    hi: "कीट और रोग अलर्ट",
+    en: "Pest & Disease Alerts",
+  },
+  sub_benefit_4: {
+    gu: "સ્થાન આધારિત સચોટ અપડેટ્સ",
+    hi: "लोकेशन आधारित सटीक अपडेट",
+    en: "Location-based accurate updates",
+  },
+  sub_benefit_5: {
+    gu: "ડાયરેક્ટ ખેડૂત હેલ્પલાઇન સપોર્ટ",
+    hi: "डायरेक्ट किसान हेल्पलाइन सपोर्ट",
+    en: "Direct Farmer Helpline Support",
+  },
+  sub_trusted: {
+    gu: "ભારતભરના હજારો ખેડૂતોનો વિશ્વાસ 🇮🇳",
+    hi: "भारत भर के हज़ारों किसानों का भरोसा 🇮🇳",
+    en: "Trusted by thousands of farmers across India 🇮🇳",
+  },
+  sub_testimonial_1_name: {
+    gu: "રમેશભાઈ, અમદાવાદ",
+    hi: "रमेश भाई, अहमदाबाद",
+    en: "Ramesh Bhai, Ahmedabad",
+  },
+  sub_testimonial_1_text: {
+    gu: "વરસાદની ચેતવણીથી મારો પાક બચી ગયો!",
+    hi: "बारिश की चेतावनी से मेरी फसल बच गई!",
+    en: "Rain alert saved my entire crop!",
+  },
+  sub_testimonial_2_name: {
+    gu: "જયાબેન, રાજકોટ",
+    hi: "जया बहन, राजकोट",
+    en: "Jaya Ben, Rajkot",
+  },
+  sub_testimonial_2_text: {
+    gu: "દરરોજ ₹2 માં આટલી મદદ - ખૂબ સારું!",
+    hi: "रोज़ ₹2 में इतनी मदद - बहुत बढ़िया!",
+    en: "So much help for just ₹2/day - amazing!",
+  },
+  sub_cancel_anytime: {
+    gu: "ગમે ત્યારે રદ કરો • કોઈ બંધન નહીં",
+    hi: "कभी भी रद्द करें • कोई बंधन नहीं",
+    en: "Cancel anytime • No commitment",
+  },
+  sub_cta: {
+    gu: "હવે સબ્સ્ક્રાઇબ કરો",
+    hi: "अभी सब्सक्राइब करें",
+    en: "Subscribe Now",
+  },
+  sub_secure_payment: {
+    gu: "સુરક્ષિત પેમેન્ટ • સરળ રદ",
+    hi: "सुरक्षित भुगतान • आसान रद्दीकरण",
+    en: "Secure payment • Easy cancellation",
+  },
 } as const;
 
 type TranslationKey = keyof typeof translations;

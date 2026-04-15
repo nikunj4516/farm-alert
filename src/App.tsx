@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import ProfileSetup from "./pages/ProfileSetup.tsx";
+import SubscriptionPage from "./pages/SubscriptionPage.tsx";
 import SplashScreen from "./pages/SplashScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -23,6 +24,7 @@ const App = () => (
             <Route path="/" element={<SplashScreen />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/profile-setup" element={<ProfileSetup />} />
+            <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/dashboard" element={<Index />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

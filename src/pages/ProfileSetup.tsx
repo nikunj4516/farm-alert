@@ -33,8 +33,7 @@ const ProfileSetup = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      localStorage.setItem("farmalert_onboarded", "true");
-      navigate("/dashboard");
+      navigate("/subscription");
     }, 800);
   };
 
@@ -215,7 +214,7 @@ const ProfileSetup = () => {
         </div>
 
         <button
-          onClick={() => { localStorage.setItem("farmalert_onboarded", "true"); navigate("/dashboard"); }}
+          onClick={() => { navigate("/subscription"); }}
           className="w-full text-center text-farmer-sm text-muted-foreground font-semibold py-2 touch-manipulation"
         >
           {t("profile_skip")}
