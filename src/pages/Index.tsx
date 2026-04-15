@@ -7,7 +7,7 @@ import QuickActions from "@/components/QuickActions";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import { MapPin, Bell, LogOut, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
-import logo from "@/assets/farmalert-logo.png";
+import logo from "@/assets/farmalert-fa.png";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
