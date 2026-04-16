@@ -5,7 +5,7 @@ import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import QuickActions from "@/components/QuickActions";
 import BottomNav, { type Tab } from "@/components/BottomNav";
-import { MapPin, Bell, LogOut, Globe } from "lucide-react";
+import { Bell, LogOut, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
 
@@ -31,7 +31,7 @@ const Index = () => {
                 FarmAlert
               </h1>
               <div className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-primary-foreground/70" />
+                <span className="text-sm">📍</span>
                 <span className="text-xs text-primary-foreground/70 font-medium">
                   {t("location")}
                 </span>
@@ -135,7 +135,7 @@ const Index = () => {
               href="tel:18001801551"
               className="flex items-center justify-center gap-3 bg-primary/10 text-primary rounded-2xl p-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation border border-primary/20"
             >
-              {t("helpline")}
+              📞 {t("helpline")}
             </a>
           </>
         )}
