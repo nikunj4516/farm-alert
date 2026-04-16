@@ -5,10 +5,10 @@ const AgriNews = () => {
   const { t } = useLanguage();
 
   const newsItems = [
-    { title: t("news_1_title"), source: t("news_1_source"), time: t("news_1_time") },
-    { title: t("news_2_title"), source: t("news_2_source"), time: t("news_2_time") },
-    { title: t("news_3_title"), source: t("news_3_source"), time: t("news_3_time") },
-    { title: t("news_4_title"), source: t("news_4_source"), time: t("news_4_time") },
+    { emoji: "📰", title: t("news_1_title"), source: t("news_1_source"), time: t("news_1_time") },
+    { emoji: "🏛️", title: t("news_2_title"), source: t("news_2_source"), time: t("news_2_time") },
+    { emoji: "🌾", title: t("news_3_title"), source: t("news_3_source"), time: t("news_3_time") },
+    { emoji: "💰", title: t("news_4_title"), source: t("news_4_source"), time: t("news_4_time") },
   ];
 
   return (
@@ -21,7 +21,7 @@ const AgriNews = () => {
             whileTap={{ scale: 0.97 }}
             className="w-full text-left bg-card border border-border rounded-2xl p-4 shadow-card touch-manipulation hover:shadow-soft transition-shadow"
           >
-            <p className="text-farmer-sm font-semibold text-foreground mb-2 leading-relaxed">{item.title}</p>
+            <p className="text-farmer-sm font-semibold text-foreground mb-2 leading-relaxed">{item.emoji} {item.title}</p>
             <div className="flex justify-between items-center">
               <span className="text-xs text-primary font-semibold bg-primary/10 px-2.5 py-1 rounded-full">{item.source}</span>
               <span className="text-xs text-muted-foreground">{item.time}</span>

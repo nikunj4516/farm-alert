@@ -37,8 +37,8 @@ const WeatherAlertCard = ({ level, title, description, temperature, humidity, wi
         <span className="text-farmer-sm font-bold text-primary-foreground/90 bg-primary-foreground/15 px-3 py-1 rounded-full">
           {t(alertKeys[level])}
         </span>
-        <div className="w-12 h-12 rounded-full bg-primary-foreground/15 flex items-center justify-center">
-          <WeatherIcon className="w-7 h-7 text-primary-foreground" />
+        <div className="w-12 h-12 rounded-full bg-primary-foreground/15 flex items-center justify-center text-2xl">
+          {level === "red" ? "🌧️" : level === "orange" ? "⛈️" : level === "yellow" ? "🌤️" : "☀️"}
         </div>
       </div>
 
@@ -47,12 +47,12 @@ const WeatherAlertCard = ({ level, title, description, temperature, humidity, wi
 
       <div className="grid grid-cols-3 gap-2">
         {[
-          { icon: Thermometer, value: temperature, label: "°C" },
-          { icon: Droplets, value: humidity, label: "%" },
-          { icon: Wind, value: wind, label: "km/h" },
-        ].map(({ icon: Icon, value }) => (
+          { emoji: "🌡️", value: temperature },
+          { emoji: "💧", value: humidity },
+          { emoji: "🌬️", value: wind },
+        ].map(({ emoji, value }) => (
           <div key={value} className="flex flex-col items-center bg-primary-foreground/15 backdrop-blur-sm rounded-xl p-3">
-            <Icon className="w-5 h-5 text-primary-foreground/80 mb-1" />
+            <span className="text-xl mb-1">{emoji}</span>
             <span className="text-farmer-sm font-bold text-primary-foreground">{value}</span>
           </div>
         ))}
