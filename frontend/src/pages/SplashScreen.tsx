@@ -6,8 +6,8 @@ import logo from "@/assets/farmalert-logo.png";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 
 const languages: { id: Language; flag: string; script: string }[] = [
-  { id: "gu", flag: "🇮🇳", script: "ક" },
-  { id: "hi", flag: "🇮🇳", script: "अ" },
+  { id: "gu", flag: "🌾", script: "ક" },
+  { id: "hi", flag: "🚜", script: "अ" },
   { id: "en", flag: "🌐", script: "A" },
 ];
 

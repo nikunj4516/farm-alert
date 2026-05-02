@@ -10,9 +10,9 @@ const translations = {
     en: "Weather Alerts • Farming Tips • News",
   },
   splash_footer: {
-    gu: "ખેડૂતો માટે બનાવેલ 🇮🇳",
-    hi: "किसानों के लिए बनाया गया 🇮🇳",
-    en: "Made for Farmers 🇮🇳",
+    gu: "ભારતના ખેડૂતો માટે બનાવેલ 🌾",
+    hi: "भारत के किसानों के लिए बनाया गया 🌾",
+    en: "Made for India's Farmers 🌾",
   },
   choose_language: {
     gu: "ભાષા પસંદ કરો",
@@ -196,14 +196,14 @@ const translations = {
     en: "Ahmedabad, Gujarat",
   },
   forecast_title: {
-    gu: "📅 5 દિવસ",
-    hi: "📅 5 दिन",
-    en: "📅 5 Days",
+    gu: "🌦️ 5 દિવસનું હવામાન",
+    hi: "🌦️ 5 दिन का मौसम",
+    en: "🌦️ 5 Days Weather",
   },
   helpline: {
-    gu: "📞 કિસાન હેલ્પલાઇન: 1800-180-1551",
-    hi: "📞 किसान हेल्पलाइन: 1800-180-1551",
-    en: "📞 Farmer Helpline: 1800-180-1551",
+    gu: "કિસાન હેલ્પલાઇન: 1800-180-1551",
+    hi: "किसान हेल्पलाइन: 1800-180-1551",
+    en: "Farmer Helpline: 1800-180-1551",
   },
   forecast_days: {
     gu: ["આજે", "કાલે", "ગુરુ", "શુક્ર", "શનિ"],
@@ -211,9 +211,9 @@ const translations = {
     en: ["Today", "Tomorrow", "Thu", "Fri", "Sat"],
   },
   quick_actions_title: {
-    gu: "ઝડપી ક્રિયાઓ",
-    hi: "त्वरित कार्य",
-    en: "Quick Actions",
+    gu: "🌾 ઝડપી ક્રિયાઓ",
+    hi: "🌾 त्वरित कार्य",
+    en: "🌾 Quick Actions",
   },
   action_crop_tips: {
     gu: "પાક ટિપ્સ",
@@ -427,9 +427,9 @@ const translations = {
     en: "Direct Farmer Helpline Support",
   },
   sub_trusted: {
-    gu: "ભારતભરના હજારો ખેડૂતોનો વિશ્વાસ 🇮🇳",
-    hi: "भारत भर के हज़ारों किसानों का भरोसा 🇮🇳",
-    en: "Trusted by thousands of farmers across India 🇮🇳",
+    gu: "ભારતભરના હજારો ખેડૂતોનો વિશ્વાસ 🌾",
+    hi: "भारत भर के हज़ारों किसानों का भरोसा 🌾",
+    en: "Trusted by thousands of farmers across India 🌾",
   },
   sub_testimonial_1_name: {
     gu: "રમેશભાઈ, અમદાવાદ",

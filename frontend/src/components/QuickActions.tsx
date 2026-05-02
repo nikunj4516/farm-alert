@@ -5,7 +5,7 @@ const QuickActions = () => {
   const { t } = useLanguage();
 
   const actions = [
-    { emoji: "🌾", label: t("action_crop_tips"), color: "bg-primary/10 text-primary" },
+    { emoji: "🚜", label: t("action_crop_tips"), color: "bg-primary/10 text-primary" },
     { emoji: "💧", label: t("action_irrigation"), color: "bg-blue-50 text-blue-700" },
     { emoji: "🐛", label: t("action_pest_alert"), color: "bg-red-50 text-red-700" },
     { emoji: "🛒", label: t("action_buy_products"), color: "bg-accent/10 text-accent" },

@@ -135,7 +135,8 @@ const Index = () => {
               href="tel:18001801551"
               className="flex items-center justify-center gap-3 bg-primary/10 text-primary rounded-2xl p-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation border border-primary/20"
             >
-              📞 {t("helpline")}
+              <span aria-hidden="true">📞</span>
+              <span>{t("helpline")}</span>
             </a>
           </>
         )}
