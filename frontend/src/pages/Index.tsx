@@ -5,6 +5,7 @@ import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import QuickActions from "@/components/QuickActions";
+import VoiceCommandButton from "@/components/VoiceCommandButton";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import { Bell, LogOut, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
@@ -19,6 +20,69 @@ const Index = () => {
 
   const forecastDays = tArray("forecast_days");
   const helplineText = t("helpline").replace(/^📞\s*/, "");
+
+  const handleVoiceCommand = (transcript: string) => {
+    const command = transcript.toLowerCase();
+
+    if (
+      command.includes("weather") ||
+      command.includes("મોસમ") ||
+      command.includes("હવામાન") ||
+      command.includes("मौसम")
+    ) {
+      setActiveTab("weather");
+      return;
+    }
+
+    if (
+      command.includes("tips") ||
+      command.includes("tip") ||
+      command.includes("ટિપ્સ") ||
+      command.includes("सलाह") ||
+      command.includes("टिप्स")
+    ) {
+      setActiveTab("tips");
+      return;
+    }
+
+    if (
+      command.includes("news") ||
+      command.includes("સમાચાર") ||
+      command.includes("न्यूज़") ||
+      command.includes("समाचार")
+    ) {
+      setActiveTab("news");
+      return;
+    }
+
+    if (
+      command.includes("profile") ||
+      command.includes("પ્રોફાઇલ") ||
+      command.includes("प्रोफाइल")
+    ) {
+      setActiveTab("profile");
+      return;
+    }
+
+    if (
+      command.includes("setup") ||
+      command.includes("edit profile") ||
+      command.includes("માહિતી") ||
+      command.includes("जानकारी")
+    ) {
+      navigate("/profile-setup");
+      return;
+    }
+
+    if (
+      command.includes("call") ||
+      command.includes("helpline") ||
+      command.includes("કોલ") ||
+      command.includes("हेल्पलाइन")
+    ) {
+      window.location.href = "tel:18001801551";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -74,6 +138,10 @@ const Index = () => {
               <Bell className="w-5 h-5 text-primary-foreground" />
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-alert-red rounded-full border-2 border-primary" />
             </button>
+            <VoiceCommandButton
+              onCommand={handleVoiceCommand}
+              className="rounded-xl bg-primary-foreground/15 text-primary-foreground"
+            />
             <button
               onClick={async () => {
                 await supabase.auth.signOut();

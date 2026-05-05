@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Shield, Phone, Mic } from "lucide-react";
+import { Check, ArrowRight, Shield, Phone } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
+import VoiceCommandButton from "@/components/VoiceCommandButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +15,60 @@ const SubscriptionPage = () => {
   const { t, language, setLanguage } = useLanguage();
   const [selectedPlan, setSelectedPlan] = useState<"daily" | "monthly">("daily");
   const [error, setError] = useState("");
+
+  const handleVoiceCommand = (transcript: string) => {
+    const command = transcript.toLowerCase();
+
+    if (
+      command.includes("gujarati") ||
+      command.includes("ગુજરાતી") ||
+      command.includes("gujarat")
+    ) {
+      setLanguage("gu");
+      return;
+    }
+
+    if (
+      command.includes("hindi") ||
+      command.includes("हिंदी") ||
+      command.includes("हिन्दी")
+    ) {
+      setLanguage("hi");
+      return;
+    }
+
+    if (command.includes("english") || command.includes("અંગ્રેજી")) {
+      setLanguage("en");
+      return;
+    }
+
+    if (
+      command.includes("daily") ||
+      command.includes("દિવસ") ||
+      command.includes("दिन")
+    ) {
+      setSelectedPlan("daily");
+      return;
+    }
+
+    if (
+      command.includes("monthly") ||
+      command.includes("month") ||
+      command.includes("મહિનો") ||
+      command.includes("महीना")
+    ) {
+      setSelectedPlan("monthly");
+      return;
+    }
+
+    if (
+      command.includes("subscribe") ||
+      command.includes("સબ્સ્ક્રાઇબ") ||
+      command.includes("सब्सक्राइब")
+    ) {
+      void handleSubscribe();
+    }
+  };
 
   const handleSubscribe = async () => {
     setError("");
@@ -91,9 +146,7 @@ const SubscriptionPage = () => {
         <img src={logo} alt="FarmAlert" className="h-8 w-8 rounded-lg" />
         <div className="flex items-center gap-2">
           {langToggle}
-          <button className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center touch-manipulation">
-            <Mic className="w-5 h-5 text-accent" />
-          </button>
+          <VoiceCommandButton onCommand={handleVoiceCommand} />
         </div>
       </div>
 
