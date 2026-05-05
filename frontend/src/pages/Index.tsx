@@ -12,6 +12,12 @@ import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext
 import logo from "@/assets/farmalert-fa.png";
 import { supabase } from "@/integrations/supabase/client";
 
+const voiceHelpText: Record<Language, string> = {
+  en: "Say: weather, tips, news, profile, call helpline",
+  hi: "बोलें: मौसम, टिप्स, समाचार, प्रोफ़ाइल, हेल्पलाइन",
+  gu: "બોલો: હવામાન, ટિપ્સ, સમાચાર, પ્રોફાઇલ, હેલ્પલાઇન",
+};
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
   const navigate = useNavigate();
@@ -139,7 +145,7 @@ const Index = () => {
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-alert-red rounded-full border-2 border-primary" />
             </button>
             <VoiceCommandButton
-              helpText="Say: weather, tips, news, profile, call helpline"
+              helpText={voiceHelpText[language]}
               onCommand={handleVoiceCommand}
               className="rounded-xl bg-primary-foreground/15 text-primary-foreground"
             />
