@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat } from "lucide-react";
+import FarmerEmojiImage from "@/components/FarmerEmojiImage";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/integrations/supabase/client";
 
 const STEPS = 3;
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { t, tArray } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "",
@@ -28,13 +33,54 @@ const ProfileSetup = () => {
     { label: t("profile_step_farming"), icon: Wheat },
   ];
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim()) return;
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    const isDevAuth = localStorage.getItem("farmalert_dev_auth") === "true";
+
+    if (!user) {
+      if (!isDevAuth) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      localStorage.setItem(
+        "farmalert_dev_profile",
+        JSON.stringify({
+          ...form,
+          phone: localStorage.getItem("farmalert_dev_phone"),
+          saved_at: new Date().toISOString(),
+        })
+      );
       navigate("/subscription");
-    }, 800);
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    const landSize = Number.parseFloat(form.land_size);
+    const { error } = await supabase
+      .from("profiles")
+      .upsert(
+        {
+          user_id: user.id,
+          name: form.name.trim(),
+          village: form.village.trim() || null,
+          district: form.district.trim() || null,
+          crop_type: form.crop_type || null,
+          land_size: Number.isFinite(landSize) ? landSize : null,
+        },
+        { onConflict: "user_id" }
+      );
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    navigate("/subscription");
   };
 
   const canGoNext = () => {
@@ -49,7 +95,7 @@ const ProfileSetup = () => {
       <div className="max-w-[400px] mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="text-5xl">👨‍🌾</div>
+          <FarmerEmojiImage className="mx-auto h-16 w-16" />
           <h1 className="text-farmer-xl font-extrabold text-foreground">
             {t("profile_title")}
           </h1>
@@ -212,6 +258,12 @@ const ProfileSetup = () => {
             </button>
           )}
         </div>
+
+        {error && (
+          <p className="text-destructive text-farmer-sm font-semibold text-center">
+            {error}
+          </p>
+        )}
 
         <button
           onClick={() => { navigate("/subscription"); }}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import WeatherAlertCard from "@/components/WeatherAlertCard";
+import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import QuickActions from "@/components/QuickActions";
@@ -8,6 +9,7 @@ import BottomNav, { type Tab } from "@/components/BottomNav";
 import { Bell, LogOut, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
@@ -16,6 +18,7 @@ const Index = () => {
   const [showLangMenu, setShowLangMenu] = useState(false);
 
   const forecastDays = tArray("forecast_days");
+  const helplineText = t("helpline").replace(/^📞\s*/, "");
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -72,7 +75,8 @@ const Index = () => {
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-alert-red rounded-full border-2 border-primary" />
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
+                await supabase.auth.signOut();
                 localStorage.removeItem("farmalert_onboarded");
                 localStorage.removeItem("farmalert_logged_in");
                 navigate("/");
@@ -136,7 +140,7 @@ const Index = () => {
               className="flex items-center justify-center gap-3 bg-primary/10 text-primary rounded-2xl p-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation border border-primary/20"
             >
               <span aria-hidden="true">📞</span>
-              <span>{t("helpline")}</span>
+              <span>{helplineText}</span>
             </a>
           </>
         )}
@@ -146,7 +150,7 @@ const Index = () => {
         {activeTab === "profile" && (
           <div className="space-y-4">
             <div className="text-center py-8">
-              <div className="text-6xl mb-4">👨‍🌾</div>
+              <FarmerEmojiImage className="mx-auto mb-4 h-20 w-20" />
               <h2 className="text-farmer-lg font-bold text-foreground">
                 {t("profile_title")}
               </h2>

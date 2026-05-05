@@ -1,3 +1,4 @@
+import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 type Tab = "weather" | "tips" | "news" | "profile";
@@ -34,7 +35,11 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-b-full" />
               )}
               <div className={`p-1.5 rounded-xl transition-colors ${isActive ? "bg-primary/10" : ""}`}>
-                <span className="text-2xl">{tab.emoji}</span>
+                {tab.id === "profile" ? (
+                  <FarmerEmojiImage className="h-6 w-6" />
+                ) : (
+                  <span className="text-2xl">{tab.emoji}</span>
+                )}
               </div>
               <span className={`text-xs font-semibold mt-0.5 ${isActive ? "text-primary" : ""}`}>{tab.label}</span>
             </button>

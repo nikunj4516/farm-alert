@@ -2,15 +2,52 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check, ArrowRight, Shield, Phone, Mic } from "lucide-react";
+import FarmerEmojiImage from "@/components/FarmerEmojiImage";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/farmalert-logo.png";
 
 const SubscriptionPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const [selectedPlan, setSelectedPlan] = useState<"daily" | "monthly">("daily");
+  const [error, setError] = useState("");
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
+    setError("");
+
+    if (user) {
+      const { error } = await supabase
+        .from("subscriptions")
+        .upsert(
+          {
+            user_id: user.id,
+            plan: selectedPlan,
+            status: "active",
+            amount_paise: selectedPlan === "daily" ? 200 : 6000,
+            started_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id" }
+        );
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+    } else if (localStorage.getItem("farmalert_dev_auth") === "true") {
+      localStorage.setItem(
+        "farmalert_dev_subscription",
+        JSON.stringify({
+          plan: selectedPlan,
+          status: "active",
+          amount_paise: selectedPlan === "daily" ? 200 : 6000,
+          started_at: new Date().toISOString(),
+        })
+      );
+    }
+
     localStorage.setItem("farmalert_onboarded", "true");
     localStorage.setItem("farmalert_subscribed", "true");
     navigate("/dashboard");
@@ -67,7 +104,7 @@ const SubscriptionPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center pt-2"
         >
-          <div className="text-5xl mb-3">👨‍🌾</div>
+          <FarmerEmojiImage className="mx-auto mb-3 h-16 w-16" />
           <h1 className="text-2xl font-extrabold text-foreground leading-tight">
             {t("sub_header_title")}
           </h1>
@@ -178,6 +215,12 @@ const SubscriptionPage = () => {
             </div>
           ))}
         </div>
+
+        {error && (
+          <p className="text-center text-sm font-semibold text-destructive">
+            {error}
+          </p>
+        )}
       </div>
 
       {/* Sticky CTA */}

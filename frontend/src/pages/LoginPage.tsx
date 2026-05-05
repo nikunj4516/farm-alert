@@ -1,8 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2, ShieldCheck, Phone } from "lucide-react";
+import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import logoWide from "@/assets/farmalert-logo-wide.png";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+
+const DEV_OTP = "123456";
+
+const getAuthErrorMessage = (message: string) => {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("unsupported phone provider")) {
+    return "Phone OTP is not enabled in Supabase. Enable Authentication > Sign In / Providers > Phone and connect an SMS provider.";
+  }
+
+  if (normalized.includes("invalid phone")) {
+    return "Please enter a valid 10-digit Indian mobile number.";
+  }
+
+  return message;
+};
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -12,26 +30,78 @@ const LoginPage = () => {
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [useDevOtp, setUseDevOtp] = useState(false);
 
-  const handleSendOtp = () => {
+  const formattedPhone = `+91${phone}`;
+
+  const handleSendOtp = async () => {
     if (phone.length < 10) {
       setError(t("login_phone_error"));
       return;
     }
+    setLoading(true);
+    setError("");
+
+    const { error } = await supabase.auth.signInWithOtp({
+      phone: formattedPhone,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      if (error.message.toLowerCase().includes("unsupported phone provider")) {
+        setUseDevOtp(true);
+        setStep("otp");
+        setError(`Free test mode is active. Use OTP ${DEV_OTP}.`);
+        return;
+      }
+
+      setError(getAuthErrorMessage(error.message));
+      return;
+    }
+
+    setUseDevOtp(false);
     setStep("otp");
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     if (otp.length !== 6) {
       setError(t("login_otp_error"));
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    setError("");
+
+    if (useDevOtp) {
       setLoading(false);
+
+      if (otp !== DEV_OTP) {
+        setError(`For free test mode, enter OTP ${DEV_OTP}.`);
+        return;
+      }
+
       localStorage.setItem("farmalert_logged_in", "true");
+      localStorage.setItem("farmalert_dev_auth", "true");
+      localStorage.setItem("farmalert_dev_phone", formattedPhone);
       navigate("/profile-setup");
-    }, 1000);
+      return;
+    }
+
+    const { error } = await supabase.auth.verifyOtp({
+      phone: formattedPhone,
+      token: otp,
+      type: "sms",
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setError(getAuthErrorMessage(error.message));
+      return;
+    }
+
+    localStorage.setItem("farmalert_logged_in", "true");
+    navigate("/profile-setup");
   };
 
   return (
@@ -54,7 +124,7 @@ const LoginPage = () => {
 
         {/* Farmer Illustration */}
         <div className="flex justify-center">
-          <div className="text-6xl">👨‍🌾</div>
+          <FarmerEmojiImage className="h-16 w-16" />
         </div>
 
         {step === "phone" ? (
@@ -94,10 +164,16 @@ const LoginPage = () => {
 
             <button
               onClick={handleSendOtp}
-              disabled={phone.length < 10}
+              disabled={loading || phone.length < 10}
               className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
             >
-              {t("login_send_otp")} <ArrowRight className="w-5 h-5" />
+              {loading ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : (
+                <>
+                  {t("login_send_otp")} <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
           </div>
         ) : (
@@ -105,7 +181,8 @@ const LoginPage = () => {
             <div className="bg-primary/5 rounded-2xl p-4 flex items-center gap-3 border border-primary/20">
               <ShieldCheck className="w-6 h-6 text-primary flex-shrink-0" />
               <p className="text-farmer-sm text-foreground">
-                <strong>+91 {phone}</strong> {t("login_otp_sent")}
+                <strong>+91 {phone}</strong>{" "}
+                {useDevOtp ? "is ready for free test OTP" : t("login_otp_sent")}
               </p>
             </div>
 
@@ -152,6 +229,7 @@ const LoginPage = () => {
                 setStep("phone");
                 setOtp("");
                 setError("");
+                setUseDevOtp(false);
               }}
               className="w-full text-center text-farmer-sm text-muted-foreground font-semibold py-3 touch-manipulation"
             >
