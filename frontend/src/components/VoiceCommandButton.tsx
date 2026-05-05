@@ -155,6 +155,7 @@ const VoiceCommandButton = ({ className, helpText, lang, onCommand }: VoiceComma
     recognition.lang = lang || speechLanguage[language] || "en-IN";
     recognition.continuous = false;
     recognition.interimResults = true;
+    // 3 alternatives let the result handler fall back to the next if the first is empty
     recognition.maxAlternatives = 3;
 
     recognition.onresult = (event) => {
@@ -246,6 +247,7 @@ const VoiceCommandButton = ({ className, helpText, lang, onCommand }: VoiceComma
       </button>
       {message && (
         <div
+          aria-live="polite"
           className={cn(
             "absolute right-0 top-12 z-50 max-w-[220px] rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold shadow-elevated",
             isInterim ? "text-muted-foreground italic" : "text-foreground"
