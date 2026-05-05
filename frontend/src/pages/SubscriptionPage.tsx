@@ -19,6 +19,11 @@ const SubscriptionPage = () => {
   const handleVoiceCommand = (transcript: string) => {
     const command = transcript.toLowerCase();
 
+    if (command.includes("benefit") || command.includes("what you get")) {
+      document.getElementById("subscription-benefits")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
     if (
       command.includes("gujarati") ||
       command.includes("ગુજરાતી") ||
@@ -146,7 +151,11 @@ const SubscriptionPage = () => {
         <img src={logo} alt="FarmAlert" className="h-8 w-8 rounded-lg" />
         <div className="flex items-center gap-2">
           {langToggle}
-          <VoiceCommandButton onCommand={handleVoiceCommand} />
+          <VoiceCommandButton
+            lang="en-IN"
+            helpText="Say: benefits, daily, monthly, subscribe, English"
+            onCommand={handleVoiceCommand}
+          />
         </div>
       </div>
 
@@ -203,7 +212,7 @@ const SubscriptionPage = () => {
         </motion.div>
 
         {/* Benefits */}
-        <div className="space-y-3">
+        <div id="subscription-benefits" className="space-y-3">
           <h2 className="text-farmer-base font-bold text-foreground">
             {t("sub_benefits_title")}
           </h2>

@@ -139,6 +139,7 @@ const Index = () => {
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-alert-red rounded-full border-2 border-primary" />
             </button>
             <VoiceCommandButton
+              helpText="Say: weather, tips, news, profile, call helpline"
               onCommand={handleVoiceCommand}
               className="rounded-xl bg-primary-foreground/15 text-primary-foreground"
             />

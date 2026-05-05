@@ -15,13 +15,17 @@ interface SpeechRecognitionEvent extends Event {
   };
 }
 
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
+
 interface SpeechRecognition extends EventTarget {
   lang: string;
   continuous: boolean;
   interimResults: boolean;
   maxAlternatives: number;
   onend: (() => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
   onresult: ((event: SpeechRecognitionEvent) => void) | null;
   start: () => void;
   stop: () => void;
@@ -29,6 +33,8 @@ interface SpeechRecognition extends EventTarget {
 
 interface VoiceCommandButtonProps {
   className?: string;
+  helpText?: string;
+  lang?: string;
   onCommand: (transcript: string) => void;
 }
 
@@ -38,7 +44,27 @@ const speechLanguage: Record<Language, string> = {
   en: "en-IN",
 };
 
-const VoiceCommandButton = ({ className, onCommand }: VoiceCommandButtonProps) => {
+const voiceErrorMessage = (error: string) => {
+  if (error === "not-allowed" || error === "service-not-allowed") {
+    return "Please allow microphone permission.";
+  }
+
+  if (error === "no-speech") {
+    return "No voice detected. Tap mic and speak clearly.";
+  }
+
+  if (error === "audio-capture") {
+    return "Microphone not found. Check your mic.";
+  }
+
+  if (error === "network") {
+    return "Voice needs internet in this browser. Try again.";
+  }
+
+  return "Could not hear clearly. Try again.";
+};
+
+const VoiceCommandButton = ({ className, helpText, lang, onCommand }: VoiceCommandButtonProps) => {
   const { language } = useLanguage();
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [listening, setListening] = useState(false);
@@ -56,7 +82,7 @@ const VoiceCommandButton = ({ className, onCommand }: VoiceCommandButtonProps) =
 
     const recognition = new SpeechRecognitionApi();
     recognitionRef.current = recognition;
-    recognition.lang = speechLanguage[language];
+    recognition.lang = lang || speechLanguage[language] || "en-IN";
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
@@ -68,16 +94,16 @@ const VoiceCommandButton = ({ className, onCommand }: VoiceCommandButtonProps) =
       onCommand(transcript);
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (event) => {
       setListening(false);
-      setMessage("Could not hear clearly. Try again.");
+      setMessage(voiceErrorMessage(event.error));
     };
 
     recognition.onend = () => {
       setListening(false);
     };
 
-    setMessage("");
+    setMessage(helpText || "Listening...");
     setListening(true);
     recognition.start();
   };
