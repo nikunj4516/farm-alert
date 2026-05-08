@@ -12,6 +12,7 @@ import AboutTab from "@/components/AboutTab";
 import { Bell, LogOut, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
+import userDp from "@/assets/user-dp.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -288,7 +289,11 @@ const Index = () => {
         {activeTab === "profile" && (
           <div className="space-y-4">
             <div className="text-center py-8">
-              <FarmerEmojiImage className="mx-auto mb-4 h-20 w-20" />
+              <img 
+                src={userDp} 
+                alt="User Profile" 
+                className="mx-auto mb-4 h-24 w-24 rounded-full object-cover border-2 border-primary/20 shadow-sm" 
+              />
               <h2 className="text-farmer-lg font-bold text-foreground">
                 {t("profile_title")}
               </h2>
@@ -301,12 +306,6 @@ const Index = () => {
               className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation shadow-elevated"
             >
               {t("profile_save")}
-            </button>
-            <button
-              onClick={() => setActiveTab("about")}
-              className="w-full bg-primary/10 text-primary border border-primary/20 rounded-2xl py-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation mt-3"
-            >
-              About FarmAlert
             </button>
           </div>
         )}

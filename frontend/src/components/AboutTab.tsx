@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, CloudLightning, Globe, ShieldCheck, Smartphone, TrendingUp, Users } from "lucide-react";
 import logo from "@/assets/farmalert-logo.png";
-import founderImg from "@/assets/farmer.jpeg";
+import founderImg from "@/assets/user-dp.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const AboutTab = () => {
