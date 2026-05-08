@@ -1,4 +1,4 @@
-import farmerEmoji from "@/assets/farmer-1.png";
+import userPhoto from "@/assets/farmer.jpeg";
 import { cn } from "@/lib/utils";
 
 interface FarmerEmojiImageProps {
@@ -7,9 +7,9 @@ interface FarmerEmojiImageProps {
 
 const FarmerEmojiImage = ({ className }: FarmerEmojiImageProps) => (
   <img
-    src={farmerEmoji}
-    alt="Indian farmer"
-    className={cn("h-16 w-16 rounded-full object-contain", className)}
+    src={userPhoto}
+    alt="User Profile"
+    className={cn("h-16 w-16 rounded-full object-cover border-2 border-primary/20 shadow-sm", className)}
   />
 );
 
