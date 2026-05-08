@@ -11,6 +11,7 @@ import ProfileSetup from "./pages/ProfileSetup.tsx";
 import SubscriptionPage from "./pages/SubscriptionPage.tsx";
 import SplashScreen from "./pages/SplashScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import AboutPage from "./pages/AboutPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/profile-setup" element={<ProfileSetup />} />
               <Route path="/subscription" element={<SubscriptionPage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/dashboard" element={<Index />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

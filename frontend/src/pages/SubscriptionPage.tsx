@@ -19,7 +19,17 @@ const SubscriptionPage = () => {
   const handleVoiceCommand = (transcript: string) => {
     const command = transcript.toLowerCase();
 
-    if (command.includes("benefit") || command.includes("what you get")) {
+    if (
+      command.includes("benefit") || 
+      command.includes("what you get") ||
+      command.includes("ફાયદા") ||
+      command.includes("લાભ") ||
+      command.includes("fayda") ||
+      command.includes("fayde") ||
+      command.includes("labh") ||
+      command.includes("फायदे") ||
+      command.includes("लाभ")
+    ) {
       document.getElementById("subscription-benefits")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
@@ -42,7 +52,12 @@ const SubscriptionPage = () => {
       return;
     }
 
-    if (command.includes("english") || command.includes("અંગ્રેજી")) {
+    if (
+      command.includes("english") || 
+      command.includes("અંગ્રેજી") ||
+      command.includes("angreji") ||
+      command.includes("अंग्रेजी")
+    ) {
       setLanguage("en");
       return;
     }
@@ -50,7 +65,13 @@ const SubscriptionPage = () => {
     if (
       command.includes("daily") ||
       command.includes("દિવસ") ||
-      command.includes("दिन")
+      command.includes("दिन") ||
+      command.includes("divas") ||
+      command.includes("din") ||
+      command.includes("roj") ||
+      command.includes("roz") ||
+      command.includes("રોજ") ||
+      command.includes("रोज")
     ) {
       setSelectedPlan("daily");
       return;
@@ -60,7 +81,13 @@ const SubscriptionPage = () => {
       command.includes("monthly") ||
       command.includes("month") ||
       command.includes("મહિનો") ||
-      command.includes("महीना")
+      command.includes("મહિને") ||
+      command.includes("महीना") ||
+      command.includes("mahina") ||
+      command.includes("mahino") ||
+      command.includes("masik") ||
+      command.includes("માસિક") ||
+      command.includes("मासिक")
     ) {
       setSelectedPlan("monthly");
       return;
@@ -69,7 +96,10 @@ const SubscriptionPage = () => {
     if (
       command.includes("subscribe") ||
       command.includes("સબ્સ્ક્રાઇબ") ||
-      command.includes("सब्सक्राइब")
+      command.includes("सब्सक्राइब") ||
+      command.includes("kharido") ||
+      command.includes("le lo") ||
+      command.includes("buy")
     ) {
       void handleSubscribe();
     }

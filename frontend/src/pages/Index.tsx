@@ -28,7 +28,16 @@ const Index = () => {
       command.includes("weather") ||
       command.includes("મોસમ") ||
       command.includes("હવામાન") ||
-      command.includes("मौसम")
+      command.includes("मौसम") ||
+      command.includes("havaman") ||
+      command.includes("mausam") ||
+      command.includes("mosam") ||
+      command.includes("tapman") ||
+      command.includes("વરસાદ") ||
+      command.includes("varsad") ||
+      command.includes("baarish") ||
+      command.includes("barish") ||
+      command.includes("rain")
     ) {
       setActiveTab("weather");
       return;
@@ -39,7 +48,12 @@ const Index = () => {
       command.includes("tip") ||
       command.includes("ટિપ્સ") ||
       command.includes("सलाह") ||
-      command.includes("टिप्स")
+      command.includes("टिप्स") ||
+      command.includes("salah") ||
+      command.includes("sujav") ||
+      command.includes("sujhav") ||
+      command.includes("mahiti") ||
+      command.includes("kheti")
     ) {
       setActiveTab("tips");
       return;
@@ -49,7 +63,12 @@ const Index = () => {
       command.includes("news") ||
       command.includes("સમાચાર") ||
       command.includes("न्यूज़") ||
-      command.includes("समाचार")
+      command.includes("समाचार") ||
+      command.includes("samachar") ||
+      command.includes("khabar") ||
+      command.includes("taaja") ||
+      command.includes("bajar") ||
+      command.includes("bhav")
     ) {
       setActiveTab("news");
       return;
@@ -58,7 +77,11 @@ const Index = () => {
     if (
       command.includes("profile") ||
       command.includes("પ્રોફાઇલ") ||
-      command.includes("प्रोफाइल")
+      command.includes("प्रोफाइल") ||
+      command.includes("profil") ||
+      command.includes("maru") ||
+      command.includes("mera") ||
+      command.includes("khata")
     ) {
       setActiveTab("profile");
       return;
@@ -68,7 +91,10 @@ const Index = () => {
       command.includes("setup") ||
       command.includes("edit profile") ||
       command.includes("માહિતી") ||
-      command.includes("जानकारी")
+      command.includes("जानकारी") ||
+      command.includes("jankari") ||
+      command.includes("badlo") ||
+      command.includes("sudharo")
     ) {
       navigate("/profile-setup");
       return;
@@ -78,7 +104,11 @@ const Index = () => {
       command.includes("call") ||
       command.includes("helpline") ||
       command.includes("કોલ") ||
-      command.includes("हेल्पलाइन")
+      command.includes("हेल्पलाइन") ||
+      command.includes("phone") ||
+      command.includes("fon") ||
+      command.includes("fone") ||
+      command.includes("madad")
     ) {
       window.location.href = "tel:18001801551";
     }
@@ -232,6 +262,12 @@ const Index = () => {
               className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation shadow-elevated"
             >
               {t("profile_save")}
+            </button>
+            <button
+              onClick={() => navigate("/about")}
+              className="w-full bg-primary/10 text-primary border border-primary/20 rounded-2xl py-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation mt-3"
+            >
+              About FarmAlert
             </button>
           </div>
         )}
