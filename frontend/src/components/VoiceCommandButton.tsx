@@ -116,6 +116,7 @@ const VoiceCommandButton = ({ className, helpText, lang, onCommand }: VoiceComma
   return (
     <div className="relative">
       <button
+        id="voice-command-btn"
         type="button"
         onClick={listening ? stopListening : startListening}
         aria-label={listening ? "Stop voice command" : "Start voice command"}

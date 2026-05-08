@@ -1,7 +1,7 @@
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-type Tab = "weather" | "tips" | "news" | "profile";
+type Tab = "weather" | "tips" | "news" | "about" | "profile";
 
 interface BottomNavProps {
   activeTab: Tab;
@@ -15,6 +15,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
     { id: "weather" as Tab, label: t("nav_weather"), emoji: "🌤️" },
     { id: "tips" as Tab, label: t("nav_tips"), emoji: "💡" },
     { id: "news" as Tab, label: t("nav_news"), emoji: "📰" },
+    { id: "about" as Tab, label: t("nav_about"), emoji: "🏢" },
     { id: "profile" as Tab, label: t("nav_profile"), emoji: "👨‍🌾" },
   ];
 

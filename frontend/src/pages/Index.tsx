@@ -6,11 +6,14 @@ import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import QuickActions from "@/components/QuickActions";
 import VoiceCommandButton from "@/components/VoiceCommandButton";
+import WakeWordListener from "@/components/WakeWordListener";
 import BottomNav, { type Tab } from "@/components/BottomNav";
+import AboutTab from "@/components/AboutTab";
 import { Bell, LogOut, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
@@ -23,6 +26,12 @@ const Index = () => {
 
   const handleVoiceCommand = (transcript: string) => {
     const command = transcript.toLowerCase();
+
+    // Check for Wake Word
+    if (command.includes("hey farm") || command.includes("hey farmalert") || command.includes("farm alert")) {
+      // It's a wake word command, user might say "hey farmalert weather"
+      // the string will contain both. We just let it fall through to the specific handlers.
+    }
 
     if (
       command.includes("weather") ||
@@ -37,7 +46,8 @@ const Index = () => {
       command.includes("varsad") ||
       command.includes("baarish") ||
       command.includes("barish") ||
-      command.includes("rain")
+      command.includes("rain") ||
+      command.includes("બારીશ")
     ) {
       setActiveTab("weather");
       return;
@@ -53,7 +63,9 @@ const Index = () => {
       command.includes("sujav") ||
       command.includes("sujhav") ||
       command.includes("mahiti") ||
-      command.includes("kheti")
+      command.includes("kheti") ||
+      command.includes("ખેતી") ||
+      command.includes("खेती")
     ) {
       setActiveTab("tips");
       return;
@@ -68,9 +80,22 @@ const Index = () => {
       command.includes("khabar") ||
       command.includes("taaja") ||
       command.includes("bajar") ||
-      command.includes("bhav")
+      command.includes("bhav") ||
+      command.includes("ખબર") ||
+      command.includes("खबर")
     ) {
       setActiveTab("news");
+      return;
+    }
+
+    if (
+      command.includes("about") ||
+      command.includes("અમારા વિશે") ||
+      command.includes("हमारे बारे में") ||
+      command.includes("company") ||
+      command.includes("founder")
+    ) {
+      setActiveTab("about");
       return;
     }
 
@@ -104,18 +129,31 @@ const Index = () => {
       command.includes("call") ||
       command.includes("helpline") ||
       command.includes("કોલ") ||
+      command.includes("હેલ્પલાઇન") ||
       command.includes("हेल्पलाइन") ||
       command.includes("phone") ||
       command.includes("fon") ||
       command.includes("fone") ||
-      command.includes("madad")
+      command.includes("madad") ||
+      command.includes("મદદ") ||
+      command.includes("मदद")
     ) {
       window.location.href = "tel:18001801551";
     }
   };
 
+  const handleWakeWord = () => {
+    toast.success("Farmalert Assistant Activated!", {
+      description: "Listening for your command...",
+    });
+    // Programmatically click the mic button to start the actual command listener
+    const btn = document.getElementById("voice-command-btn");
+    if (btn) btn.click();
+  };
+
   return (
     <div className="min-h-screen bg-background pb-24">
+      <WakeWordListener onWakeWord={handleWakeWord} />
       {/* Header */}
       <header className="bg-primary px-4 pt-4 pb-5 sticky top-0 z-40 shadow-elevated rounded-b-3xl">
         <div className="max-w-[600px] mx-auto flex items-center justify-between">
@@ -246,6 +284,7 @@ const Index = () => {
 
         {activeTab === "tips" && <FarmingTips />}
         {activeTab === "news" && <AgriNews />}
+        {activeTab === "about" && <AboutTab />}
         {activeTab === "profile" && (
           <div className="space-y-4">
             <div className="text-center py-8">
@@ -264,7 +303,7 @@ const Index = () => {
               {t("profile_save")}
             </button>
             <button
-              onClick={() => navigate("/about")}
+              onClick={() => setActiveTab("about")}
               className="w-full bg-primary/10 text-primary border border-primary/20 rounded-2xl py-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation mt-3"
             >
               About FarmAlert

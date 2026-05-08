@@ -466,6 +466,105 @@ const translations = {
     hi: "सुरक्षित भुगतान • आसान रद्दीकरण",
     en: "Secure payment • Easy cancellation",
   },
+
+  // About Us
+  nav_about: {
+    gu: "અમારા વિશે",
+    hi: "हमारे बारे में",
+    en: "About Us",
+  },
+  about_tagline: {
+    gu: "ડિજિટલ ખેતી",
+    hi: "डिजिटल कृषि",
+    en: "Digital Agriculture",
+  },
+  about_title_1: {
+    gu: "સ્માર્ટ ટેકનોલોજી દ્વારા",
+    hi: "स्मार्ट तकनीक के माध्यम से",
+    en: "Empowering Farmers Through",
+  },
+  about_title_2: {
+    gu: "ખેડૂતોનું સશક્તિકરણ",
+    hi: "किसानों का सशक्तिकरण",
+    en: "Smart Technology",
+  },
+  about_desc: {
+    gu: "ફાર્મએલર્ટ સોલ્યુશન્સ પ્રા. લિ. ખેતી માટે આધુનિક ડિજિટલ ઉકેલો બનાવી રહી છે - ખેડૂતોને હવામાનની માહિતી, સ્માર્ટ ખેતીના સાધનો અને ભવિષ્યની સેવાઓ એક જ પ્લેટફોર્મ પર મેળવવામાં મદદ કરે છે.",
+    hi: "फार्मअलर्ट सॉल्यूशंस प्राइवेट लिमिटेड कृषि के लिए आधुनिक डिजिटल समाधान बना रहा है - किसानों को मौसम की जानकारी, स्मार्ट खेती के उपकरण और भविष्य की सेवाएं एक ही प्लेटफॉर्म पर प्राप्त करने में मदद कर रहा है।",
+    en: "Farmalert Solutions Pvt. Ltd. is building modern digital solutions for agriculture — helping farmers access weather insights, smart farming tools, quality products, and future-ready services in one platform.",
+  },
+  about_explore: {
+    gu: "સેવાઓ જુઓ",
+    hi: "सेवाएं देखें",
+    en: "Explore Services",
+  },
+  about_join: {
+    gu: "ખેડૂત નેટવર્કમાં જોડાઓ",
+    hi: "किसान नेटवर्क से जुड़ें",
+    en: "Join Farmers Network",
+  },
+  about_who_we_are: {
+    gu: "અમે કોણ છીએ",
+    hi: "हम कौन हैं",
+    en: "Who We Are",
+  },
+  about_who_desc_1: {
+    gu: "ફાર્મએલર્ટ સોલ્યુશન્સ પ્રા. લિ. એ ખેતી પર કેન્દ્રિત ટેકનોલોજી સ્ટાર્ટઅપ છે, જેનો ઉદ્દેશ્ય ડિજિટલ નવીનીકરણ દ્વારા ખેતીને સરળ બનાવવાનો છે.",
+    hi: "फार्मअलर्ट सॉल्यूशंस प्राइवेट लिमिटेड एक कृषि-केंद्रित प्रौद्योगिकी स्टार्टअप है जिसे डिजिटल नवाचार का उपयोग करके खेती को सरल बनाने के दृष्टिकोण के साथ बनाया गया है।",
+    en: "Farmalert Solutions Pvt. Ltd. is an agriculture-focused technology startup created with a vision to simplify farming using digital innovation.",
+  },
+  about_who_desc_2: {
+    gu: "અમારું લક્ષ્ય ખેડૂતો અને ટેકનોલોજી વચ્ચેનું અંતર ઘટાડવાનું છે.",
+    hi: "हमारा उद्देश्य किसानों और प्रौद्योगिकी के बीच की खाई को पाटना है।",
+    en: "We aim to bridge the gap between farmers and technology by providing practical, affordable, and easy-to-use solutions that support daily agricultural needs.",
+  },
+  about_who_desc_3: {
+    gu: "હવામાનની ચેતવણીઓ અને પાકના અપડેટ્સથી લઈને કૃષિ સેવાઓ અને ભવિષ્યના ઈ-કોમર્સ સપોર્ટ સુધી, અમારું લક્ષ્ય દરેક ખેડૂત માટે કનેક્ટેડ ખેતી ઇકોસિસ્ટમ બનાવવાનું છે.",
+    hi: "मौसम अलर्ट और फसल अपडेट से लेकर कृषि सेवाओं और भविष्य के ई-कॉमर्स समर्थन तक, हमारा मिशन हर किसान के लिए एक जुड़ा हुआ कृषि पारिस्थितिकी तंत्र बनाना है।",
+    en: "From weather alerts and crop updates to agriculture services and future e-commerce support, our mission is to create a connected farming ecosystem for every farmer.",
+  },
+  about_vision_title: { gu: "અમારું વિઝન", hi: "हमारा दृष्टिकोण", en: "Our Vision" },
+  about_vision_desc: {
+    gu: "એક સ્માર્ટ અને ડિજિટલી કનેક્ટેડ એગ્રીકલ્ચર ઇકોસિસ્ટમ બનાવવી જે દરેક ખેડૂતને સુલભ ટેકનોલોજી વડે સશક્ત બનાવે છે.",
+    hi: "एक स्मार्ट और डिजिटल रूप से जुड़ा कृषि पारिस्थितिकी तंत्र बनाने के लिए जो हर किसान को सुलभ तकनीक से सशक्त बनाता है।",
+    en: "To build a smarter and digitally connected agriculture ecosystem that empowers every farmer with accessible technology.",
+  },
+  about_mission_title: { gu: "અમારું મિશન", hi: "हमारा मिशन", en: "Our Mission" },
+  about_mission_desc: {
+    gu: "નવીનતા, સરળતા અને ખેડૂત-કેન્દ્રિત ડિજિટલ સેવાઓ દ્વારા વિશ્વસનીય કૃષિ ઉકેલો પ્રદાન કરવા.",
+    hi: "नवाचार, सरलता और किसान-केंद्रित डिजिटल सेवाओं के माध्यम से विश्वसनीय कृषि समाधान प्रदान करने के लिए।",
+    en: "To provide trusted agriculture solutions through innovation, simplicity, and farmer-focused digital services.",
+  },
+  about_why_choose: { gu: "અમને શા માટે પસંદ કરો", hi: "हमें क्यों चुनें", en: "Why Choose Us" },
+  feature_weather: { gu: "સ્માર્ટ હવામાન ચેતવણી", hi: "स्मार्ट मौसम अलर्ट", en: "Smart Weather Alerts" },
+  feature_interface: { gu: "ખેડૂત-મિત્ર ઇન્ટરફેસ", hi: "किसान-अनुकूल इंटरफेस", en: "Farmer-Friendly Interface" },
+  feature_affordable: { gu: "પોસાય તેવી ડિજિટલ સેવાઓ", hi: "किफायती डिजिटल सेवाएं", en: "Affordable Digital Services" },
+  feature_innovation: { gu: "કૃષિ-કેન્દ્રિત નવીનતા", hi: "कृषि-केंद्रित नवाचार", en: "Agriculture-Focused Innovation" },
+  feature_future: { gu: "ભવિષ્ય-તૈયાર ટેકનોલોજી", hi: "भविष्य के लिए तैयार तकनीक", en: "Future-Ready Technology" },
+  feature_support: { gu: "વિશ્વસનીય સપોર્ટ સિસ્ટમ", hi: "विश्वसनीय समर्थन प्रणाली", en: "Trusted Support System" },
+  about_founder_title: { gu: "સ્થાપકને મળો", hi: "संस्थापक से मिलें", en: "Meet The Founder" },
+  founder_name: { gu: "નિકુંજ બારિયા", hi: "निकुंज बारिया", en: "Nikunj Bariya" },
+  founder_role: { gu: "સહ-સ્થાપક અને મોબાઇલ એપ્લિકેશન ડેવલપર", hi: "सह-संस्थापक और मोबाइल एप्लिकेशन डेवलपर", en: "Co-Founder & Mobile Application Developer" },
+  founder_desc: {
+    gu: "ટેક્નોલોજી અને નવીનતા પ્રત્યે જુસ્સાદાર, નિકુંજ બારિયાએ ડિજિટલ સોલ્યુશન્સ દ્વારા કૃષિને આધુનિક બનાવવાના વિઝન સાથે ફાર્મએલર્ટની શરૂઆત કરી જે સમગ્ર ભારતમાં ખેડૂતો માટે વ્યવહારુ, માપી શકાય તેવા અને સુલભ છે.",
+    hi: "प्रौद्योगिकी और नवाचार के प्रति जुनूनी, निकुंज बारिया ने डिजिटल समाधानों के माध्यम से कृषि को आधुनिक बनाने के दृष्टिकोण के साथ फार्मअलर्ट की शुरुआत की, जो पूरे भारत में किसानों के लिए व्यावहारिक, स्केलेबल और सुलभ हैं।",
+    en: "Passionate about technology and innovation, Nikunj Bariya started Farmalert with a vision to modernize agriculture through digital solutions that are practical, scalable, and accessible for farmers across India.",
+  },
+  founder_quote: {
+    gu: "ટેક્નોલોજીએ એવા લોકોને ટેકો આપવો જોઈએ જેઓ વિશ્વનું ભરણપોષણ કરે છે.",
+    hi: "प्रौद्योगिकी को उन लोगों का समर्थन करना चाहिए जो दुनिया का पेट भरते हैं।",
+    en: "Technology should support the people who feed the world.",
+  },
+  footer_text: {
+    gu: "સ્માર્ટ, સુલભ અને વિશ્વસનીય ડિજિટલ ટેકનોલોજી દ્વારા કૃષિને સશક્ત બનાવવી.",
+    hi: "स्मार्ट, सुलभ और विश्वसनीय डिजिटल तकनीक के माध्यम से कृषि को सशक्त बनाना।",
+    en: "Empowering agriculture through smart, accessible, and trusted digital technology.",
+  },
+  footer_rights: {
+    gu: "ફાર્મએલર્ટ. સર્વાધિકાર સુરક્ષિત.",
+    hi: "फार्मअलर्ट। सर्वाधिकार सुरक्षित。",
+    en: "FarmAlert. All rights reserved.",
+  },
 } as const;
 
 type TranslationKey = keyof typeof translations;
