@@ -12,7 +12,6 @@ import AboutTab from "@/components/AboutTab";
 import { Bell, LogOut, Globe } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
-import userDp from "@/assets/user-dp.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -289,11 +288,7 @@ const Index = () => {
         {activeTab === "profile" && (
           <div className="space-y-4">
             <div className="text-center py-8">
-              <img 
-                src={userDp} 
-                alt="User Profile" 
-                className="mx-auto mb-4 h-24 w-24 rounded-full object-cover border-2 border-primary/20 shadow-sm" 
-              />
+              <FarmerEmojiImage className="mx-auto mb-4 h-24 w-24" />
               <h2 className="text-farmer-lg font-bold text-foreground">
                 {t("profile_title")}
               </h2>
