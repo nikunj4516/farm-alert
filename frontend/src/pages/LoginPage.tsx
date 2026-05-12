@@ -89,7 +89,17 @@ const LoginPage = () => {
       return;
     }
 
-    navigate("/profile-setup");
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("name")
+      .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+      .single();
+
+    if (profile?.name) {
+      navigate("/dashboard");
+    } else {
+      navigate("/profile-setup");
+    }
   };
 
   return (
