@@ -9,12 +9,13 @@ import VoiceCommandButton from "@/components/VoiceCommandButton";
 import WakeWordListener from "@/components/WakeWordListener";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
-import { Bell, LogOut, Globe, Loader2, CloudRain, CloudLightning, CloudSun, Cloud, Sun, Phone } from "lucide-react";
+import { Bell, LogOut, Globe, Loader2, CloudRain, CloudLightning, CloudSun, Cloud, Sun, Phone, MapPin } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDashboardData } from "@/hooks/useDashboardData";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
@@ -22,6 +23,8 @@ const Index = () => {
   const { language, setLanguage, t, tArray } = useLanguage();
   const { user, loading } = useAuth();
   const [showLangMenu, setShowLangMenu] = useState(false);
+
+  const { profile, weather, news, tips, alerts, isLoading: isDashboardLoading } = useDashboardData(user?.id);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -159,7 +162,7 @@ const Index = () => {
     if (btn) btn.click();
   };
 
-  if (loading || !user) {
+  if (loading || !user || isDashboardLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -182,9 +185,9 @@ const Index = () => {
                 FarmAlert
               </h1>
               <div className="flex items-center gap-1">
-                <span className="text-sm">📍</span>
+                <MapPin className="w-4 h-4 text-primary-foreground/80" />
                 <span className="text-xs text-primary-foreground/70 font-medium">
-                  {t("location")}
+                  {profile?.district ? `${profile.district}, ${profile.state || 'Gujarat'}` : t("location")}
                 </span>
               </div>
             </div>
@@ -245,12 +248,12 @@ const Index = () => {
         {activeTab === "weather" && (
           <>
             <WeatherAlertCard
-              level="orange"
-              title={t("weather_title")}
-              description={t("weather_desc")}
-              temperature="34°C"
-              humidity="82%"
-              wind="25 km/h"
+              level={weather?.weather_condition?.toLowerCase().includes("rain") ? "red" : "orange"}
+              title={weather ? `${weather.temperature}°C in ${weather.district}` : t("weather_title")}
+              description={weather?.weather_condition || t("weather_desc")}
+              temperature={weather ? `${weather.temperature}°C` : "34°C"}
+              humidity={weather ? `${weather.humidity}%` : "82%"}
+              wind={weather ? `${weather.wind_speed} km/h` : "25 km/h"}
             />
 
             <QuickActions />
@@ -297,8 +300,8 @@ const Index = () => {
           </>
         )}
 
-        {activeTab === "tips" && <FarmingTips />}
-        {activeTab === "news" && <AgriNews />}
+        {activeTab === "tips" && <FarmingTips tipsData={tips} />}
+        {activeTab === "news" && <AgriNews newsData={news} />}
         {activeTab === "about" && <AboutTab />}
         {activeTab === "profile" && (
           <div className="space-y-4">

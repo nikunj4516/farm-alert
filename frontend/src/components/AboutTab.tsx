@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, CloudLightning, Globe, ShieldCheck, Smartphone, TrendingUp, Users } from "lucide-react";
+import { ArrowRight, CloudLightning, Globe, ShieldCheck, Smartphone, TrendingUp, Users, Eye, Target } from "lucide-react";
 import logo from "@/assets/farmalert-logo.png";
 import founderImg from "@/assets/user-dp.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -101,7 +101,7 @@ const AboutTab = () => {
           className="bg-gradient-to-br from-[#16A34A] to-emerald-600 rounded-2xl p-6 sm:p-8 text-white shadow-md"
         >
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <span className="text-2xl">👁️</span> {t("about_vision_title")}
+            <Eye className="w-6 h-6 text-emerald-100" /> {t("about_vision_title")}
           </h3>
           <p className="text-emerald-50 text-sm sm:text-base leading-relaxed">
             {t("about_vision_desc")}
@@ -114,7 +114,7 @@ const AboutTab = () => {
           className="bg-card rounded-2xl p-6 sm:p-8 border border-[#DCFCE7] shadow-sm"
         >
           <h3 className="text-lg font-semibold mb-3 text-[#16A34A] flex items-center gap-2">
-            <span className="text-2xl">🎯</span> {t("about_mission_title")}
+            <Target className="w-6 h-6 text-[#16A34A]" /> {t("about_mission_title")}
           </h3>
           <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
             {t("about_mission_desc")}

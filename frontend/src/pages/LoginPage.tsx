@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Loader2, ShieldCheck, Phone } from "lucide-react";
+import { ArrowRight, Loader2, ShieldCheck, Phone, AlertTriangle, Key } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import logoWide from "@/assets/farmalert-logo-wide.png";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -155,8 +155,8 @@ const LoginPage = () => {
             </div>
 
             {error && (
-              <p className="text-destructive text-sm font-semibold text-center">
-                ⚠️ {error}
+              <p className="text-destructive text-sm font-semibold flex items-center justify-center gap-1">
+                <AlertTriangle className="w-4 h-4" /> {error}
               </p>
             )}
 
@@ -188,7 +188,7 @@ const LoginPage = () => {
 
             <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4">
               <label className="text-base font-semibold text-foreground flex items-center gap-2">
-                🔑 {t("login_otp_label")}
+                <Key className="w-5 h-5 text-primary" /> {t("login_otp_label")}
               </label>
               <input
                 type="tel"
@@ -205,8 +205,8 @@ const LoginPage = () => {
             </div>
 
             {error && (
-              <p className="text-destructive text-sm font-semibold text-center">
-                ⚠️ {error}
+              <p className="text-destructive text-sm font-semibold flex items-center justify-center gap-1">
+                <AlertTriangle className="w-4 h-4" /> {error}
               </p>
             )}
 

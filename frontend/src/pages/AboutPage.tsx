@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CloudLightning, Globe, ShieldCheck, Smartphone, TrendingUp, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, CloudLightning, Globe, ShieldCheck, Smartphone, TrendingUp, Users, Eye, Target } from "lucide-react";
 import logo from "@/assets/farmalert-logo.png";
 import founderImg from "@/assets/user-dp.jpg";
 
@@ -125,7 +125,7 @@ const AboutPage = () => {
             className="bg-gradient-to-br from-[#16A34A] to-emerald-600 rounded-3xl p-6 sm:p-8 text-white shadow-[0_10px_30px_-10px_rgba(22,163,74,0.4)]"
           >
             <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
-              <span className="text-2xl">👁️</span> Our Vision
+              <Eye className="w-6 h-6 text-emerald-100" /> Our Vision
             </h3>
             <p className="text-emerald-50 text-[15px] leading-relaxed">
               To build a smarter and digitally connected agriculture ecosystem that empowers every farmer with accessible technology.
@@ -138,7 +138,7 @@ const AboutPage = () => {
             className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DCFCE7] shadow-[0_4px_20px_-10px_rgba(22,163,74,0.15)]"
           >
             <h3 className="text-xl font-bold mb-3 text-[#16A34A] flex items-center gap-2">
-              <span className="text-2xl">🎯</span> Our Mission
+              <Target className="w-6 h-6 text-[#16A34A]" /> Our Mission
             </h3>
             <p className="text-gray-600 text-[15px] leading-relaxed">
               To provide trusted agriculture solutions through innovation, simplicity, and farmer-focused digital services.

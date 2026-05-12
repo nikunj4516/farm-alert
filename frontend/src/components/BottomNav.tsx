@@ -1,6 +1,5 @@
-import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { CloudSun, Lightbulb, Newspaper, Building2 } from "lucide-react";
+import { CloudSun, Lightbulb, Newspaper, Building2, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 type Tab = "weather" | "tips" | "news" | "about" | "profile";
@@ -18,7 +17,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
     { id: "tips" as Tab, label: t("nav_tips"), icon: <Lightbulb className="w-6 h-6" /> },
     { id: "news" as Tab, label: t("nav_news"), icon: <Newspaper className="w-6 h-6" /> },
     { id: "about" as Tab, label: t("nav_about"), icon: <Building2 className="w-6 h-6" /> },
-    { id: "profile" as Tab, label: t("nav_profile"), isProfile: true },
+    { id: "profile" as Tab, label: t("nav_profile"), icon: <User className="w-6 h-6" /> },
   ];
 
   return (
@@ -42,11 +41,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
                 />
               )}
               <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? "bg-primary/10 scale-110" : ""}`}>
-                {tab.isProfile ? (
-                  <FarmerEmojiImage className="h-6 w-6" />
-                ) : (
-                  tab.icon
-                )}
+                {tab.icon}
               </div>
               <span className={`text-xs font-semibold mt-0.5 transition-colors ${isActive ? "text-primary" : ""}`}>{tab.label}</span>
             </button>

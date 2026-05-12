@@ -1,11 +1,16 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import { Droplets, Bug, Wheat, Leaf } from "lucide-react";
+import { Database } from "@/types/database.types";
 
-const FarmingTips = () => {
+interface FarmingTipsProps {
+  tipsData?: Database["public"]["Tables"]["farming_tips"]["Row"][];
+}
+
+const FarmingTips = ({ tipsData }: FarmingTipsProps) => {
   const { t } = useLanguage();
 
-  const tips = [
+  const defaultTips = [
     {
       icon: <Droplets className="w-6 h-6 text-blue-600" />,
       title: t("tip_water_title"),
@@ -32,11 +37,21 @@ const FarmingTips = () => {
     },
   ];
 
+
+  const displayTips = tipsData && tipsData.length > 0 
+    ? tipsData.map(tip => ({
+        icon: <Leaf className="w-6 h-6 text-green-600" />,
+        title: tip.title,
+        description: tip.content || tip.description,
+        bg: "bg-green-50"
+      }))
+    : defaultTips;
+
   return (
     <div className="space-y-3">
       <h2 className="text-lg font-semibold text-foreground">{t("tips_title")}</h2>
       <div className="space-y-3">
-        {tips.map((tip, index) => (
+        {displayTips.map((tip, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 10 }}

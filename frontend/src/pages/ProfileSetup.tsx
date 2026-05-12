@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat } from "lucide-react";
+import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat, Bean, Cloud, Sprout, Trees, Carrot, Package } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -25,7 +25,15 @@ const ProfileSetup = () => {
   });
 
   const crops = tArray("crops");
-  const cropIcons = tArray("crop_icons");
+  const cropIconsList = [
+    <Wheat key="wheat" className="w-5 h-5 text-amber-500" />,
+    <Sprout key="sprout" className="w-5 h-5 text-emerald-500" />,
+    <Cloud key="cloud" className="w-5 h-5 text-blue-400" />,
+    <Bean key="bean" className="w-5 h-5 text-orange-600" />,
+    <Trees key="trees" className="w-5 h-5 text-green-600" />,
+    <Carrot key="carrot" className="w-5 h-5 text-orange-500" />,
+    <Package key="package" className="w-5 h-5 text-gray-400" />
+  ];
 
   const stepLabels = [
     { label: t("profile_step_personal"), icon: User },
@@ -184,7 +192,7 @@ const ProfileSetup = () => {
                           : "bg-background text-foreground border-border hover:border-primary/30"
                       }`}
                     >
-                      <span>{cropIcons[i]}</span>
+                      <span>{cropIconsList[i]}</span>
                       {crop}
                       {form.crop_type === crop && <Check className="w-4 h-4 ml-auto" />}
                     </button>

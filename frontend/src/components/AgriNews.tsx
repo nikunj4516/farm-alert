@@ -1,22 +1,36 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import { Newspaper, Landmark, Wheat, Coins } from "lucide-react";
+import { Database } from "@/types/database.types";
 
-const AgriNews = () => {
+interface AgriNewsProps {
+  newsData?: Database["public"]["Tables"]["agri_news"]["Row"][];
+}
+
+const AgriNews = ({ newsData }: AgriNewsProps) => {
   const { t } = useLanguage();
 
-  const newsItems = [
+  const defaultNewsItems = [
     { icon: <Newspaper className="w-5 h-5 text-primary" />, title: t("news_1_title"), source: t("news_1_source"), time: t("news_1_time") },
     { icon: <Landmark className="w-5 h-5 text-primary" />, title: t("news_2_title"), source: t("news_2_source"), time: t("news_2_time") },
     { icon: <Wheat className="w-5 h-5 text-primary" />, title: t("news_3_title"), source: t("news_3_source"), time: t("news_3_time") },
     { icon: <Coins className="w-5 h-5 text-primary" />, title: t("news_4_title"), source: t("news_4_source"), time: t("news_4_time") },
   ];
 
+  const displayNews = newsData && newsData.length > 0
+    ? newsData.map(news => ({
+        icon: <Newspaper className="w-5 h-5 text-primary" />,
+        title: news.title,
+        source: news.source,
+        time: new Date(news.published_at).toLocaleDateString()
+      }))
+    : defaultNewsItems;
+
   return (
     <div className="space-y-3">
       <h2 className="text-lg font-semibold text-foreground">{t("news_title")}</h2>
       <div className="space-y-3">
-        {newsItems.map((item, index) => (
+        {displayNews.map((item, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 10 }}

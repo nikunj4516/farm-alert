@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Shield, Phone } from "lucide-react";
+import { Check, ArrowRight, Shield, Phone, CloudRain, Wheat, Bug, MapPin, Leaf } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import VoiceCommandButton from "@/components/VoiceCommandButton";
 import { useAuth } from "@/contexts/AuthContext";
@@ -137,16 +137,16 @@ const SubscriptionPage = () => {
   };
 
   const benefits = [
-    { emoji: "🌧️", text: t("sub_benefit_1") },
-    { emoji: "🌾", text: t("sub_benefit_2") },
-    { emoji: "🐛", text: t("sub_benefit_3") },
-    { emoji: "📍", text: t("sub_benefit_4") },
-    { emoji: "☎️", text: t("sub_benefit_5") },
+    { icon: <CloudRain className="w-6 h-6 text-primary" />, text: t("sub_benefit_1") },
+    { icon: <Wheat className="w-6 h-6 text-primary" />, text: t("sub_benefit_2") },
+    { icon: <Bug className="w-6 h-6 text-primary" />, text: t("sub_benefit_3") },
+    { icon: <MapPin className="w-6 h-6 text-primary" />, text: t("sub_benefit_4") },
+    { icon: <Phone className="w-6 h-6 text-primary" />, text: t("sub_benefit_5") },
   ];
 
   const testimonials = [
-    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), crop: "🌾" },
-    { name: t("sub_testimonial_2_name"), text: t("sub_testimonial_2_text"), crop: "🥜" },
+    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), icon: <Wheat className="w-4 h-4 text-muted-foreground inline" /> },
+    { name: t("sub_testimonial_2_name"), text: t("sub_testimonial_2_text"), icon: <Leaf className="w-4 h-4 text-muted-foreground inline" /> },
   ];
 
   const langToggle = (
@@ -224,7 +224,7 @@ const SubscriptionPage = () => {
 
           <div className="relative z-10 mt-4 bg-white/15 rounded-xl px-4 py-3">
             <p className="text-sm font-medium italic leading-relaxed">
-              "{t("sub_emotional_line")}" 🌾
+              "{t("sub_emotional_line")}"
             </p>
           </div>
 
@@ -248,8 +248,8 @@ const SubscriptionPage = () => {
                 transition={{ delay: 0.2 + i * 0.08 }}
                 className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border shadow-card"
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl shrink-0">
-                  {b.emoji}
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  {b.icon}
                 </div>
                 <span className="text-sm font-medium text-foreground leading-snug">
                   {b.text}
@@ -278,7 +278,7 @@ const SubscriptionPage = () => {
                   "{tm.text}"
                 </p>
                 <p className="text-xs font-semibold text-foreground mt-2">
-                  — {tm.name} {tm.crop}
+                  — {tm.name} <span className="ml-1">{tm.icon}</span>
                 </p>
               </div>
             ))}

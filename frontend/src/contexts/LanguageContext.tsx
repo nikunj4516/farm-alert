@@ -10,9 +10,9 @@ const translations = {
     en: "Weather Alerts • Farming Tips • News",
   },
   splash_footer: {
-    gu: "ભારતના ખેડૂતો માટે બનાવેલ 🌾",
-    hi: "भारत के किसानों के लिए बनाया गया 🌾",
-    en: "Made for India's Farmers 🌾",
+    gu: "ભારતના ખેડૂતો માટે બનાવેલ ",
+    hi: "भारत के किसानों के लिए बनाया गया ",
+    en: "Made for India's Farmers ",
   },
   choose_language: {
     gu: "ભાષા પસંદ કરો",
@@ -72,9 +72,9 @@ const translations = {
     en: "← Change Number",
   },
   login_secure: {
-    gu: "🔒 તમારો નંબર સુરક્ષિત છે",
-    hi: "🔒 आपका नंबर सुरक्षित है",
-    en: "🔒 Your number is secure",
+    gu: "તમારો નંબર સુરક્ષિત છે",
+    hi: "आपका नंबर सुरक्षित है",
+    en: "Your number is secure",
   },
   login_welcome: {
     gu: "ફરી આવો!",
@@ -184,9 +184,9 @@ const translations = {
     en: ["Wheat", "Rice", "Cotton", "Groundnut", "Sugarcane", "Vegetables", "Other"],
   },
   crop_icons: {
-    gu: ["🌾", "🍚", "🧵", "🥜", "🎋", "🥬", "📦"],
-    hi: ["🌾", "🍚", "🧵", "🥜", "🎋", "🥬", "📦"],
-    en: ["🌾", "🍚", "🧵", "🥜", "🎋", "🥬", "📦"],
+    gu: ["", "", "", "", "", "", ""],
+    hi: ["", "", "", "", "", "", ""],
+    en: ["", "", "", "", "", "", ""],
   },
 
   // Index / Dashboard
@@ -196,9 +196,9 @@ const translations = {
     en: "Ahmedabad, Gujarat",
   },
   forecast_title: {
-    gu: "🌦️ 5 દિવસનું હવામાન",
-    hi: "🌦️ 5 दिन का मौसम",
-    en: "🌦️ 5 Days Weather",
+    gu: "5 દિવસનું હવામાન",
+    hi: "5 दिन का मौसम",
+    en: "5 Days Weather",
   },
   helpline: {
     gu: "કિસાન હેલ્પલાઇન: 1800-180-1551",
@@ -211,9 +211,9 @@ const translations = {
     en: ["Today", "Tomorrow", "Thu", "Fri", "Sat"],
   },
   quick_actions_title: {
-    gu: "🌾 ઝડપી ક્રિયાઓ",
-    hi: "🌾 त्वरित कार्य",
-    en: "🌾 Quick Actions",
+    gu: "ઝડપી ક્રિયાઓ",
+    hi: "त्वरित कार्य",
+    en: "Quick Actions",
   },
   action_crop_tips: {
     gu: "પાક ટિપ્સ",
@@ -238,24 +238,24 @@ const translations = {
 
   // Weather Alert
   alert_red: {
-    gu: "🔴 ભારે ખતરો",
-    hi: "🔴 भारी खतरा",
-    en: "🔴 Severe Danger",
+    gu: "ભારે ખતરો",
+    hi: "भारी खतरा",
+    en: "Severe Danger",
   },
   alert_orange: {
-    gu: "🟠 સાવધાન",
-    hi: "🟠 सावधान",
-    en: "🟠 Caution",
+    gu: "સાવધાન",
+    hi: "सावधान",
+    en: "Caution",
   },
   alert_yellow: {
-    gu: "🟡 ચેતવણી",
-    hi: "🟡 चेतावनी",
-    en: "🟡 Warning",
+    gu: "ચેતવણી",
+    hi: "चेतावनी",
+    en: "Warning",
   },
   alert_green: {
-    gu: "🟢 સુરક્ષિત",
-    hi: "🟢 सुरक्षित",
-    en: "🟢 Safe",
+    gu: "સુરક્ષિત",
+    hi: "सुरक्षित",
+    en: "Safe",
   },
   weather_title: {
     gu: "આજે ભારે વરસાદ",
@@ -292,14 +292,14 @@ const translations = {
 
   // Farming Tips
   tips_title: {
-    gu: "🌿 ખેતી ટિપ્સ",
-    hi: "🌿 खेती टिप्स",
-    en: "🌿 Farming Tips",
+    gu: "ખેતી ટિપ્સ",
+    hi: "खेती टिप्स",
+    en: "Farming Tips",
   },
   tip_water_title: {
-    gu: "💧 પાણી આપો",
-    hi: "💧 पानी दें",
-    en: "💧 Water Crops",
+    gu: "પાણી આપો",
+    hi: "पानी दें",
+    en: "Water Crops",
   },
   tip_water_desc: {
     gu: "સવારે 6 વાગ્યે પાણી આપો, બપોરે નહીં",
@@ -307,9 +307,9 @@ const translations = {
     en: "Water at 6 AM, not in the afternoon",
   },
   tip_pest_title: {
-    gu: "🐛 જીવાત ચેક",
-    hi: "🐛 कीट जांच",
-    en: "🐛 Pest Check",
+    gu: "જીવાત ચેક",
+    hi: "कीट जांच",
+    en: "Pest Check",
   },
   tip_pest_desc: {
     gu: "પાંદડા નીચે જુઓ, સફેદ ડાઘ હોય તો દવા છાંટો",
@@ -317,9 +317,9 @@ const translations = {
     en: "Check under leaves, spray if white spots found",
   },
   tip_harvest_title: {
-    gu: "🌾 લણણી",
-    hi: "🌾 कटाई",
-    en: "🌾 Harvest",
+    gu: "લણણી",
+    hi: "कटाई",
+    en: "Harvest",
   },
   tip_harvest_desc: {
     gu: "ઘઉં પીળા થાય ત્યારે 2 દિવસમાં કાપો",
@@ -327,9 +327,9 @@ const translations = {
     en: "Cut wheat within 2 days when it turns yellow",
   },
   tip_fertilizer_title: {
-    gu: "🌱 ખાતર",
-    hi: "🌱 खाद",
-    en: "🌱 Fertilizer",
+    gu: "ખાતર",
+    hi: "खाद",
+    en: "Fertilizer",
   },
   tip_fertilizer_desc: {
     gu: "વાવણી પહેલાં છાણિયું ખાતર નાખો",
@@ -339,44 +339,44 @@ const translations = {
 
   // News
   news_title: {
-    gu: "📰 ખેતી સમાચાર",
-    hi: "📰 खेती समाचार",
-    en: "📰 Agriculture News",
+    gu: "ખેતી સમાચાર",
+    hi: "खेती समाचार",
+    en: "Agriculture News",
   },
   news_1_title: {
-    gu: "📢 ગુજરાત: MSP ઘઉંનો ભાવ ₹2275 પ્રતિ ક્વિન્ટલ જાહેર",
-    hi: "📢 गुजरात: MSP गेहूँ का भाव ₹2275 प्रति क्विंटल घोषित",
-    en: "📢 Gujarat: MSP for wheat declared ₹2275 per quintal",
+    gu: "ગુજરાત: MSP ઘઉંનો ભાવ ₹2275 પ્રતિ ક્વિન્ટલ જાહેર",
+    hi: "गुजरात: MSP गेहूँ का भाव ₹2275 प्रति क्विंटल घोषित",
+    en: "Gujarat: MSP for wheat declared ₹2275 per quintal",
   },
   news_1_source: { gu: "કૃષિ વિભાગ", hi: "कृषि विभाग", en: "Agriculture Dept" },
   news_1_time: { gu: "2 કલાક પહેલા", hi: "2 घंटे पहले", en: "2 hours ago" },
   news_2_title: {
-    gu: "🚜 PM કિસાન યોજના: 17મો હપ્તો ટૂંક સમયમાં",
-    hi: "🚜 PM किसान योजना: 17वीं किस्त जल्द",
-    en: "🚜 PM Kisan Scheme: 17th installment soon",
+    gu: "PM કિસાન યોજના: 17મો હપ્તો ટૂંક સમયમાં",
+    hi: "PM किसान योजना: 17वीं किस्त जल्द",
+    en: "PM Kisan Scheme: 17th installment soon",
   },
   news_2_source: { gu: "સરકારી યોજના", hi: "सरकारी योजना", en: "Government Scheme" },
   news_2_time: { gu: "5 કલાક પહેલા", hi: "5 घंटे पहले", en: "5 hours ago" },
   news_3_title: {
-    gu: "🌧️ ચોમાસું સમયસર આવશે, IMD અનુમાન",
-    hi: "🌧️ मानसून समय पर आएगा, IMD अनुमान",
-    en: "🌧️ Monsoon on time, IMD forecast",
+    gu: "ચોમાસું સમયસર આવશે, IMD અનુમાન",
+    hi: "मानसून समय पर आएगा, IMD अनुमान",
+    en: "Monsoon on time, IMD forecast",
   },
   news_3_source: { gu: "હવામાન વિભાગ", hi: "मौसम विभाग", en: "Weather Dept" },
   news_3_time: { gu: "1 દિવસ પહેલા", hi: "1 दिन पहले", en: "1 day ago" },
   news_4_title: {
-    gu: "🧪 માટી પરીક્ષણ મફત — નજીકની KVK પર",
-    hi: "🧪 मिट्टी परीक्षण मुफ्त — नजदीकी KVK पर",
-    en: "🧪 Free soil testing — at nearest KVK",
+    gu: "માટી પરીક્ષણ મફત — નજીકની KVK પર",
+    hi: "मिट्टी परीक्षण मुफ्त — नजदीकी KVK पर",
+    en: "Free soil testing — at nearest KVK",
   },
   news_4_source: { gu: "કૃષિ કેન્દ્ર", hi: "कृषि केंद्र", en: "Agriculture Center" },
   news_4_time: { gu: "2 દિવસ પહેલા", hi: "2 दिन पहले", en: "2 days ago" },
 
   // Subscription
   sub_header_title: {
-    gu: "સુરક્ષિત રહો. માહિતગાર રહો 🌾",
-    hi: "सुरक्षित रहें। जानकार रहें 🌾",
-    en: "Stay Safe. Stay Informed 🌾",
+    gu: "સુરક્ષિત રહો. માહિતગાર રહો ",
+    hi: "सुरक्षित रहें। जानकार रहें ",
+    en: "Stay Safe. Stay Informed ",
   },
   sub_header_subtitle: {
     gu: "રીઅલ-ટાઇમ હવામાન ચેતવણી, પાક ટિપ્સ અને ખેતી માર્ગદર્શન મેળવો",
@@ -427,9 +427,9 @@ const translations = {
     en: "Direct Farmer Helpline Support",
   },
   sub_trusted: {
-    gu: "ભારતભરના હજારો ખેડૂતોનો વિશ્વાસ 🌾",
-    hi: "भारत भर के हज़ारों किसानों का भरोसा 🌾",
-    en: "Trusted by thousands of farmers across India 🌾",
+    gu: "ભારતભરના હજારો ખેડૂતોનો વિશ્વાસ ",
+    hi: "भारत भर के हज़ारों किसानों का भरोसा ",
+    en: "Trusted by thousands of farmers across India ",
   },
   sub_testimonial_1_name: {
     gu: "રમેશભાઈ, અમદાવાદ",
