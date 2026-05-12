@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import WeatherAlertCard from "@/components/WeatherAlertCard";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
@@ -9,17 +9,25 @@ import VoiceCommandButton from "@/components/VoiceCommandButton";
 import WakeWordListener from "@/components/WakeWordListener";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
-import { Bell, LogOut, Globe } from "lucide-react";
+import { Bell, LogOut, Globe, Loader2 } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
   const navigate = useNavigate();
   const { language, setLanguage, t, tArray } = useLanguage();
+  const { user, loading } = useAuth();
   const [showLangMenu, setShowLangMenu] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const forecastDays = tArray("forecast_days");
   const helplineText = t("helpline").replace(/^📞\s*/, "");
@@ -151,6 +159,14 @@ const Index = () => {
     if (btn) btn.click();
   };
 
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <WakeWordListener onWakeWord={handleWakeWord} />
@@ -215,7 +231,6 @@ const Index = () => {
               onClick={async () => {
                 await supabase.auth.signOut();
                 localStorage.removeItem("farmalert_onboarded");
-                localStorage.removeItem("farmalert_logged_in");
                 navigate("/");
               }}
               className="bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation"

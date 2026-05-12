@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2, ShieldCheck, Phone } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
@@ -6,7 +6,6 @@ import logoWide from "@/assets/farmalert-logo-wide.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
-const DEV_OTP = "123456";
 
 const getAuthErrorMessage = (message: string) => {
   const normalized = message.toLowerCase();
@@ -30,7 +29,14 @@ const LoginPage = () => {
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [useDevOtp, setUseDevOtp] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
 
   const formattedPhone = `+91${phone}`;
 
@@ -39,6 +45,11 @@ const LoginPage = () => {
       setError(t("login_phone_error"));
       return;
     }
+    if (cooldown > 0) {
+      setError(`Please wait ${cooldown} seconds before requesting a new OTP.`);
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -49,18 +60,11 @@ const LoginPage = () => {
     setLoading(false);
 
     if (error) {
-      if (error.message.toLowerCase().includes("unsupported phone provider")) {
-        setUseDevOtp(true);
-        setStep("otp");
-        setError(`Free test mode is active. Use OTP ${DEV_OTP}.`);
-        return;
-      }
-
       setError(getAuthErrorMessage(error.message));
       return;
     }
 
-    setUseDevOtp(false);
+    setCooldown(60);
     setStep("otp");
   };
 
@@ -71,21 +75,6 @@ const LoginPage = () => {
     }
     setLoading(true);
     setError("");
-
-    if (useDevOtp) {
-      setLoading(false);
-
-      if (otp !== DEV_OTP) {
-        setError(`For free test mode, enter OTP ${DEV_OTP}.`);
-        return;
-      }
-
-      localStorage.setItem("farmalert_logged_in", "true");
-      localStorage.setItem("farmalert_dev_auth", "true");
-      localStorage.setItem("farmalert_dev_phone", formattedPhone);
-      navigate("/profile-setup");
-      return;
-    }
 
     const { error } = await supabase.auth.verifyOtp({
       phone: formattedPhone,
@@ -100,7 +89,6 @@ const LoginPage = () => {
       return;
     }
 
-    localStorage.setItem("farmalert_logged_in", "true");
     navigate("/profile-setup");
   };
 
@@ -164,11 +152,13 @@ const LoginPage = () => {
 
             <button
               onClick={handleSendOtp}
-              disabled={loading || phone.length < 10}
+              disabled={loading || phone.length < 10 || cooldown > 0}
               className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
             >
               {loading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
+              ) : cooldown > 0 ? (
+                `Wait ${cooldown}s`
               ) : (
                 <>
                   {t("login_send_otp")} <ArrowRight className="w-5 h-5" />
@@ -182,7 +172,7 @@ const LoginPage = () => {
               <ShieldCheck className="w-6 h-6 text-primary flex-shrink-0" />
               <p className="text-farmer-sm text-foreground">
                 <strong>+91 {phone}</strong>{" "}
-                {useDevOtp ? "is ready for free test OTP" : t("login_otp_sent")}
+                {t("login_otp_sent")}
               </p>
             </div>
 
@@ -229,7 +219,6 @@ const LoginPage = () => {
                 setStep("phone");
                 setOtp("");
                 setError("");
-                setUseDevOtp(false);
               }}
               className="w-full text-center text-farmer-sm text-muted-foreground font-semibold py-3 touch-manipulation"
             >

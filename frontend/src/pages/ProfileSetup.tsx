@@ -35,23 +35,9 @@ const ProfileSetup = () => {
 
   const handleSave = async () => {
     if (!form.name.trim()) return;
-    const isDevAuth = localStorage.getItem("farmalert_dev_auth") === "true";
 
     if (!user) {
-      if (!isDevAuth) {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      localStorage.setItem(
-        "farmalert_dev_profile",
-        JSON.stringify({
-          ...form,
-          phone: localStorage.getItem("farmalert_dev_phone"),
-          saved_at: new Date().toISOString(),
-        })
-      );
-      navigate("/subscription");
+      navigate("/login", { replace: true });
       return;
     }
 
@@ -64,9 +50,9 @@ const ProfileSetup = () => {
       .upsert(
         {
           user_id: user.id,
-          name: form.name.trim(),
-          village: form.village.trim() || null,
-          district: form.district.trim() || null,
+          name: form.name.trim().substring(0, 100),
+          village: form.village.trim().substring(0, 100) || null,
+          district: form.district.trim().substring(0, 100) || null,
           crop_type: form.crop_type || null,
           land_size: Number.isFinite(landSize) ? landSize : null,
         },

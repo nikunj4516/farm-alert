@@ -108,34 +108,27 @@ const SubscriptionPage = () => {
   const handleSubscribe = async () => {
     setError("");
 
-    if (user) {
-      const { error } = await supabase
-        .from("subscriptions")
-        .upsert(
-          {
-            user_id: user.id,
-            plan: selectedPlan,
-            status: "active",
-            amount_paise: selectedPlan === "daily" ? 200 : 6000,
-            started_at: new Date().toISOString(),
-          },
-          { onConflict: "user_id" }
-        );
+    if (!user) {
+      navigate("/login", { replace: true });
+      return;
+    }
 
-      if (error) {
-        setError(error.message);
-        return;
-      }
-    } else if (localStorage.getItem("farmalert_dev_auth") === "true") {
-      localStorage.setItem(
-        "farmalert_dev_subscription",
-        JSON.stringify({
+    const { error: upsertError } = await supabase
+      .from("subscriptions")
+      .upsert(
+        {
+          user_id: user.id,
           plan: selectedPlan,
           status: "active",
           amount_paise: selectedPlan === "daily" ? 200 : 6000,
           started_at: new Date().toISOString(),
-        })
+        },
+        { onConflict: "user_id" }
       );
+
+    if (upsertError) {
+      setError(upsertError.message);
+      return;
     }
 
     localStorage.setItem("farmalert_onboarded", "true");

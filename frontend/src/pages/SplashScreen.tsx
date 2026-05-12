@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import logo from "@/assets/farmalert-logo.png";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const languages: { id: Language; flag: string; script: string }[] = [
   { id: "gu", flag: "🌾", script: "ક" },
@@ -14,12 +15,13 @@ const languages: { id: Language; flag: string; script: string }[] = [
 const SplashScreen = () => {
   const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (localStorage.getItem("farmalert_onboarded") === "true") {
+    if (!loading && user) {
       navigate("/dashboard", { replace: true });
     }
-  }, [navigate]);
+  }, [user, loading, navigate]);
 
   const handleContinue = () => {
     navigate("/login");
