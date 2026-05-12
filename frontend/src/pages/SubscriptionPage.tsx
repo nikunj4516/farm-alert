@@ -193,7 +193,7 @@ const SubscriptionPage = () => {
           <h1 className="text-2xl font-extrabold text-foreground leading-tight">
             {t("sub_header_title")}
           </h1>
-          <p className="text-farmer-sm text-muted-foreground mt-2 leading-relaxed">
+          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
             {t("sub_header_subtitle")}
           </p>
         </motion.div>
@@ -236,7 +236,7 @@ const SubscriptionPage = () => {
 
         {/* Benefits */}
         <div id="subscription-benefits" className="space-y-3">
-          <h2 className="text-farmer-base font-bold text-foreground">
+          <h2 className="text-base font-bold text-foreground">
             {t("sub_benefits_title")}
           </h2>
           <div className="space-y-2">
@@ -251,7 +251,7 @@ const SubscriptionPage = () => {
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl shrink-0">
                   {b.emoji}
                 </div>
-                <span className="text-farmer-sm font-medium text-foreground leading-snug">
+                <span className="text-sm font-medium text-foreground leading-snug">
                   {b.text}
                 </span>
               </motion.div>
@@ -313,7 +313,7 @@ const SubscriptionPage = () => {
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={handleSubscribe}
-          className="w-full h-14 bg-primary text-primary-foreground rounded-2xl text-farmer-base font-bold flex items-center justify-center gap-2 shadow-elevated touch-manipulation"
+          className="w-full h-14 bg-primary text-primary-foreground rounded-xl text-base font-semibold flex items-center justify-center gap-2 shadow-md touch-manipulation transition-transform active:scale-[0.98]"
         >
           {t("sub_cta")}
           <ArrowRight className="w-5 h-5" />

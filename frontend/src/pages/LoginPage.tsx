@@ -101,10 +101,10 @@ const LoginPage = () => {
             <img src={logoWide} alt="FarmAlert Solutions" className="h-12" />
           </div>
           <div>
-            <h1 className="text-farmer-xl font-extrabold text-foreground">
+            <h1 className="text-2xl font-bold text-foreground">
               {t("login_welcome")}
             </h1>
-            <p className="text-farmer-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {t("login_subtitle")}
             </p>
           </div>
@@ -118,12 +118,12 @@ const LoginPage = () => {
         {step === "phone" ? (
           <div className="space-y-5">
             <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4">
-              <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2">
+              <label className="text-base font-semibold text-foreground flex items-center gap-2">
                 <Phone className="w-5 h-5 text-primary" />
                 {t("login_phone_label")}
               </label>
               <div className="flex items-center border-2 border-border rounded-xl bg-background overflow-hidden focus-within:border-primary transition-colors">
-                <span className="text-farmer-base font-bold text-muted-foreground px-4 py-4 bg-muted border-r border-border">
+                <span className="text-base font-bold text-muted-foreground px-4 py-4 bg-muted border-r border-border">
                   +91
                 </span>
                 <input
@@ -136,7 +136,7 @@ const LoginPage = () => {
                     setError("");
                   }}
                   placeholder="9876543210"
-                  className="flex-1 text-farmer-lg font-bold text-foreground py-4 px-3 bg-transparent outline-none"
+                  className="flex-1 text-lg font-bold text-foreground py-4 px-3 bg-transparent outline-none"
                 />
               </div>
               <p className="text-sm text-muted-foreground">
@@ -145,7 +145,7 @@ const LoginPage = () => {
             </div>
 
             {error && (
-              <p className="text-destructive text-farmer-sm font-semibold text-center">
+              <p className="text-destructive text-sm font-semibold text-center">
                 ⚠️ {error}
               </p>
             )}
@@ -153,7 +153,7 @@ const LoginPage = () => {
             <button
               onClick={handleSendOtp}
               disabled={loading || phone.length < 10 || cooldown > 0}
-              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
+              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-md"
             >
               {loading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
@@ -170,14 +170,14 @@ const LoginPage = () => {
           <div className="space-y-5">
             <div className="bg-primary/5 rounded-2xl p-4 flex items-center gap-3 border border-primary/20">
               <ShieldCheck className="w-6 h-6 text-primary flex-shrink-0" />
-              <p className="text-farmer-sm text-foreground">
+              <p className="text-sm text-foreground">
                 <strong>+91 {phone}</strong>{" "}
                 {t("login_otp_sent")}
               </p>
             </div>
 
             <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4">
-              <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2">
+              <label className="text-base font-semibold text-foreground flex items-center gap-2">
                 🔑 {t("login_otp_label")}
               </label>
               <input
@@ -190,12 +190,12 @@ const LoginPage = () => {
                   setError("");
                 }}
                 placeholder="● ● ● ● ● ●"
-                className="w-full text-center text-farmer-2xl font-bold text-foreground py-4 border-2 border-border rounded-xl bg-background outline-none tracking-[0.5em] focus:border-primary transition-colors"
+                className="w-full text-center text-2xl font-bold text-foreground py-4 border-2 border-border rounded-xl bg-background outline-none tracking-[0.5em] focus:border-primary transition-colors"
               />
             </div>
 
             {error && (
-              <p className="text-destructive text-farmer-sm font-semibold text-center">
+              <p className="text-destructive text-sm font-semibold text-center">
                 ⚠️ {error}
               </p>
             )}
@@ -203,7 +203,7 @@ const LoginPage = () => {
             <button
               onClick={handleVerifyOtp}
               disabled={loading || otp.length < 6}
-              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
+              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-md"
             >
               {loading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
@@ -220,7 +220,7 @@ const LoginPage = () => {
                 setOtp("");
                 setError("");
               }}
-              className="w-full text-center text-farmer-sm text-muted-foreground font-semibold py-3 touch-manipulation"
+              className="w-full text-center text-sm text-muted-foreground font-semibold py-3 touch-manipulation"
             >
               {t("login_change_number")}
             </button>

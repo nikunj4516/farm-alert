@@ -1,5 +1,7 @@
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CloudSun, Lightbulb, Newspaper, Building2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 type Tab = "weather" | "tips" | "news" | "about" | "profile";
 
@@ -12,11 +14,11 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   const { t } = useLanguage();
 
   const tabs = [
-    { id: "weather" as Tab, label: t("nav_weather"), emoji: "🌤️" },
-    { id: "tips" as Tab, label: t("nav_tips"), emoji: "💡" },
-    { id: "news" as Tab, label: t("nav_news"), emoji: "📰" },
-    { id: "about" as Tab, label: t("nav_about"), emoji: "🏢" },
-    { id: "profile" as Tab, label: t("nav_profile"), emoji: "👨‍🌾" },
+    { id: "weather" as Tab, label: t("nav_weather"), icon: <CloudSun className="w-6 h-6" /> },
+    { id: "tips" as Tab, label: t("nav_tips"), icon: <Lightbulb className="w-6 h-6" /> },
+    { id: "news" as Tab, label: t("nav_news"), icon: <Newspaper className="w-6 h-6" /> },
+    { id: "about" as Tab, label: t("nav_about"), icon: <Building2 className="w-6 h-6" /> },
+    { id: "profile" as Tab, label: t("nav_profile"), isProfile: true },
   ];
 
   return (
@@ -28,21 +30,25 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex-1 flex flex-col items-center py-3 px-2 min-h-[64px] transition-all touch-manipulation relative ${
-                isActive ? "text-primary" : "text-muted-foreground"
+              className={`flex-1 flex flex-col items-center py-3 px-2 min-h-[64px] transition-colors touch-manipulation relative ${
+                isActive ? "text-primary" : "text-muted-foreground hover:text-primary/70"
               }`}
             >
               {isActive && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-b-full" />
+                <motion.div
+                  layoutId="bottomNavIndicator"
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-b-full"
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
               )}
-              <div className={`p-1.5 rounded-xl transition-colors ${isActive ? "bg-primary/10" : ""}`}>
-                {tab.id === "profile" ? (
+              <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? "bg-primary/10 scale-110" : ""}`}>
+                {tab.isProfile ? (
                   <FarmerEmojiImage className="h-6 w-6" />
                 ) : (
-                  <span className="text-2xl">{tab.emoji}</span>
+                  tab.icon
                 )}
               </div>
-              <span className={`text-xs font-semibold mt-0.5 ${isActive ? "text-primary" : ""}`}>{tab.label}</span>
+              <span className={`text-xs font-semibold mt-0.5 transition-colors ${isActive ? "text-primary" : ""}`}>{tab.label}</span>
             </button>
           );
         })}

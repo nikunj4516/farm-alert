@@ -48,12 +48,12 @@ const SplashScreen = () => {
             />
           </motion.div>
           <div>
-            <h1 className="text-farmer-xl font-extrabold text-foreground">FarmAlert</h1>
+            <h1 className="text-2xl font-bold text-foreground">FarmAlert</h1>
             <motion.p
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-muted-foreground text-farmer-sm font-medium mt-1"
+              className="text-muted-foreground text-sm font-medium mt-1"
             >
               {t("splash_tagline")}
             </motion.p>
@@ -68,7 +68,7 @@ const SplashScreen = () => {
         className="w-full max-w-[360px] space-y-5"
       >
         <div className="text-center space-y-1">
-          <p className="text-farmer-base font-bold text-foreground">
+          <p className="text-base font-semibold text-foreground">
             {t("choose_language")}
           </p>
           <p className="text-sm text-muted-foreground">
@@ -84,7 +84,7 @@ const SplashScreen = () => {
                 key={lang.id}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setLanguage(lang.id)}
-                className={`w-full flex items-center gap-4 py-4 px-5 rounded-2xl border-2 text-farmer-base font-bold transition-all touch-manipulation ${
+                className={`w-full flex items-center gap-4 py-3.5 px-5 rounded-xl border-2 text-base font-semibold transition-all touch-manipulation ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-elevated"
                     : "bg-card text-foreground border-border shadow-card hover:border-primary/30"
@@ -113,7 +113,7 @@ const SplashScreen = () => {
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={handleContinue}
-          className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold shadow-elevated touch-manipulation"
+          className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold shadow-md touch-manipulation transition-transform active:scale-[0.98]"
         >
           {language === "en" ? "Continue" : language === "hi" ? "आगे बढ़ें" : "આગળ વધો"}
           <ArrowRight className="w-5 h-5" />

@@ -9,7 +9,7 @@ import VoiceCommandButton from "@/components/VoiceCommandButton";
 import WakeWordListener from "@/components/WakeWordListener";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
-import { Bell, LogOut, Globe, Loader2 } from "lucide-react";
+import { Bell, LogOut, Globe, Loader2, CloudRain, CloudLightning, CloudSun, Cloud, Sun, Phone } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
 import { supabase } from "@/integrations/supabase/client";
@@ -178,7 +178,7 @@ const Index = () => {
               <img src={logo} alt="FarmAlert" className="w-7 h-7" />
             </div>
             <div>
-              <h1 className="text-farmer-lg font-extrabold text-primary-foreground">
+              <h1 className="text-xl font-bold text-primary-foreground">
                 FarmAlert
               </h1>
               <div className="flex items-center gap-1">
@@ -206,7 +206,7 @@ const Index = () => {
                         setLanguage(lang);
                         setShowLangMenu(false);
                       }}
-                      className={`w-full text-left px-4 py-3 text-farmer-sm font-semibold transition-colors touch-manipulation ${
+                      className={`w-full text-left px-4 py-3 text-sm font-semibold transition-colors touch-manipulation ${
                         language === lang
                           ? "bg-primary text-primary-foreground"
                           : "text-foreground hover:bg-muted"
@@ -257,16 +257,16 @@ const Index = () => {
 
             {/* 5-day forecast */}
             <div className="space-y-3">
-              <h2 className="text-farmer-base font-bold text-foreground">
+              <h2 className="text-lg font-semibold text-foreground">
                 {t("forecast_title")}
               </h2>
               <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
                 {[
-                  { temp: "34°", icon: "🌧️" },
-                  { temp: "31°", icon: "⛈️" },
-                  { temp: "29°", icon: "🌦️" },
-                  { temp: "32°", icon: "⛅" },
-                  { temp: "35°", icon: "☀️" },
+                  { temp: "34°", icon: <CloudRain className="w-6 h-6" /> },
+                  { temp: "31°", icon: <CloudLightning className="w-6 h-6" /> },
+                  { temp: "29°", icon: <CloudSun className="w-6 h-6" /> },
+                  { temp: "32°", icon: <Cloud className="w-6 h-6" /> },
+                  { temp: "35°", icon: <Sun className="w-6 h-6" /> },
                 ].map((d, i) => (
                   <div
                     key={i}
@@ -277,8 +277,8 @@ const Index = () => {
                     <span className="text-xs font-semibold text-muted-foreground">
                       {forecastDays[i]}
                     </span>
-                    <span className="text-2xl my-1.5">{d.icon}</span>
-                    <span className="text-farmer-sm font-bold text-foreground">
+                    <span className="text-muted-foreground my-2">{d.icon}</span>
+                    <span className="text-sm font-bold text-foreground">
                       {d.temp}
                     </span>
                   </div>
@@ -289,9 +289,9 @@ const Index = () => {
             {/* Helpline */}
             <a
               href="tel:18001801551"
-              className="flex items-center justify-center gap-3 bg-primary/10 text-primary rounded-2xl p-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation border border-primary/20"
+              className="flex items-center justify-center gap-3 bg-primary/10 text-primary rounded-xl p-4 text-base font-bold active:scale-[0.97] transition-transform touch-manipulation border border-primary/20"
             >
-              <span aria-hidden="true">📞</span>
+              <Phone className="w-5 h-5" />
               <span>{helplineText}</span>
             </a>
           </>
@@ -304,16 +304,16 @@ const Index = () => {
           <div className="space-y-4">
             <div className="text-center py-8">
               <FarmerEmojiImage className="mx-auto mb-4 h-24 w-24" />
-              <h2 className="text-farmer-lg font-bold text-foreground">
+              <h2 className="text-2xl font-bold text-foreground">
                 {t("profile_title")}
               </h2>
-              <p className="text-muted-foreground text-farmer-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 {t("profile_subtitle")}
               </p>
             </div>
             <button
               onClick={() => navigate("/profile-setup")}
-              className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation shadow-elevated"
+              className="w-full bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-all touch-manipulation shadow-md"
             >
               {t("profile_save")}
             </button>

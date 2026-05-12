@@ -82,10 +82,10 @@ const ProfileSetup = () => {
         {/* Header */}
         <div className="text-center space-y-2">
           <FarmerEmojiImage className="mx-auto h-16 w-16" />
-          <h1 className="text-farmer-xl font-extrabold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground">
             {t("profile_title")}
           </h1>
-          <p className="text-farmer-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {t("profile_subtitle")}
           </p>
         </div>
@@ -121,7 +121,7 @@ const ProfileSetup = () => {
           {step === 0 && (
             <div className="space-y-4">
               <div>
-                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
                   <User className="w-5 h-5 text-primary" />
                   {t("profile_name")}
                 </label>
@@ -130,7 +130,7 @@ const ProfileSetup = () => {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder={t("profile_name_placeholder")}
-                  className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
                 />
               </div>
             </div>
@@ -139,7 +139,7 @@ const ProfileSetup = () => {
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
                   <MapPin className="w-5 h-5 text-primary" />
                   {t("profile_village")}
                 </label>
@@ -148,11 +148,11 @@ const ProfileSetup = () => {
                   value={form.village}
                   onChange={(e) => setForm({ ...form, village: e.target.value })}
                   placeholder={t("profile_village_placeholder")}
-                  className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
                 />
               </div>
               <div>
-                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
                   <MapPin className="w-5 h-5 text-primary" />
                   {t("profile_district")}
                 </label>
@@ -161,7 +161,7 @@ const ProfileSetup = () => {
                   value={form.district}
                   onChange={(e) => setForm({ ...form, district: e.target.value })}
                   placeholder={t("profile_district_placeholder")}
-                  className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
                 />
               </div>
             </div>
@@ -170,15 +170,15 @@ const ProfileSetup = () => {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  🌾 {t("profile_crop")}
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <Wheat className="w-5 h-5 text-primary" /> {t("profile_crop")}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {crops.map((crop, i) => (
                     <button
                       key={crop}
                       onClick={() => setForm({ ...form, crop_type: crop })}
-                      className={`py-3 px-4 rounded-xl text-farmer-sm font-semibold border-2 transition-all touch-manipulation flex items-center gap-2 ${
+                      className={`py-3 px-4 rounded-xl text-sm font-semibold border-2 transition-all touch-manipulation flex items-center gap-2 ${
                         form.crop_type === crop
                           ? "bg-primary text-primary-foreground border-primary shadow-soft"
                           : "bg-background text-foreground border-border hover:border-primary/30"
@@ -193,8 +193,8 @@ const ProfileSetup = () => {
               </div>
 
               <div>
-                <label className="text-farmer-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  📐 {t("profile_land")}
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <MapPin className="w-5 h-5 text-primary" /> {t("profile_land")}
                 </label>
                 <input
                   type="tel"
@@ -202,7 +202,7 @@ const ProfileSetup = () => {
                   value={form.land_size}
                   onChange={(e) => setForm({ ...form, land_size: e.target.value })}
                   placeholder={t("profile_land_placeholder")}
-                  className="w-full text-farmer-base text-foreground py-4 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
                 />
               </div>
             </div>
@@ -214,7 +214,7 @@ const ProfileSetup = () => {
           {step > 0 && (
             <button
               onClick={() => setStep(step - 1)}
-              className="flex items-center justify-center gap-2 bg-muted text-foreground rounded-2xl py-4 px-6 text-farmer-base font-bold active:scale-[0.97] transition-transform touch-manipulation"
+              className="flex items-center justify-center gap-2 bg-muted text-foreground rounded-xl py-3.5 px-6 text-base font-semibold active:scale-[0.97] transition-transform touch-manipulation"
             >
               <ArrowLeft className="w-5 h-5" />
               {t("profile_back")}
@@ -224,7 +224,7 @@ const ProfileSetup = () => {
             <button
               onClick={() => setStep(step + 1)}
               disabled={!canGoNext()}
-              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
+              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-md"
             >
               {t("profile_next")} <ArrowRight className="w-5 h-5" />
             </button>
@@ -232,7 +232,7 @@ const ProfileSetup = () => {
             <button
               onClick={handleSave}
               disabled={loading || !form.name.trim()}
-              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl py-4 text-farmer-lg font-bold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-elevated"
+              className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-md"
             >
               {loading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
@@ -246,14 +246,14 @@ const ProfileSetup = () => {
         </div>
 
         {error && (
-          <p className="text-destructive text-farmer-sm font-semibold text-center">
+          <p className="text-destructive text-sm font-semibold text-center">
             {error}
           </p>
         )}
 
         <button
           onClick={() => { navigate("/subscription"); }}
-          className="w-full text-center text-farmer-sm text-muted-foreground font-semibold py-2 touch-manipulation"
+          className="w-full text-center text-sm text-muted-foreground font-semibold py-2 touch-manipulation"
         >
           {t("profile_skip")}
         </button>

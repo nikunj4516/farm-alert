@@ -46,22 +46,22 @@ const AboutTab = () => {
           <Globe className="w-3.5 h-3.5" />
           <span>{t("about_tagline")}</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight">
+        <h1 className="text-2xl font-bold leading-tight tracking-tight">
           {t("about_title_1")} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#16A34A] to-emerald-400">{t("about_title_2")}</span>
         </h1>
-        <p className="text-muted-foreground text-[15px] leading-relaxed">
+        <p className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-md mx-auto">
           {t("about_desc")}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Link 
             to="/subscription"
-            className="w-full flex items-center justify-center gap-2 bg-[#16A34A] hover:bg-[#15803d] text-white py-3.5 px-6 rounded-2xl font-semibold shadow-[0_8px_16px_-6px_rgba(22,163,74,0.4)] transition-all active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-2 bg-[#16A34A] hover:bg-[#15803d] text-white py-3.5 px-6 rounded-xl font-semibold shadow-md transition-all active:scale-[0.98]"
           >
             {t("about_explore")}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <button 
-            className="w-full flex items-center justify-center gap-2 bg-card hover:bg-muted text-foreground border border-border py-3.5 px-6 rounded-2xl font-semibold shadow-sm transition-all active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-2 bg-card hover:bg-muted text-foreground border border-border py-3.5 px-6 rounded-xl font-semibold shadow-sm transition-all active:scale-[0.98]"
           >
             {t("about_join")}
           </button>
@@ -74,13 +74,13 @@ const AboutTab = () => {
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
         variants={fadeInUp}
-        className="bg-card rounded-3xl p-6 sm:p-8 shadow-card border border-border"
+        className="bg-card rounded-2xl p-6 sm:p-8 shadow-sm border border-border"
       >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
           <span className="w-1.5 h-6 bg-[#16A34A] rounded-full inline-block"></span>
           {t("about_who_we_are")}
         </h2>
-        <div className="space-y-4 text-muted-foreground text-[15px] leading-relaxed">
+        <div className="space-y-4 text-muted-foreground text-sm sm:text-base leading-relaxed">
           <p>{t("about_who_desc_1")}</p>
           <p>{t("about_who_desc_2")}</p>
           <p>{t("about_who_desc_3")}</p>
@@ -98,12 +98,12 @@ const AboutTab = () => {
         <motion.div 
           variants={fadeInUp}
           whileHover={{ y: -4 }}
-          className="bg-gradient-to-br from-[#16A34A] to-emerald-600 rounded-3xl p-6 sm:p-8 text-white shadow-[0_10px_30px_-10px_rgba(22,163,74,0.4)]"
+          className="bg-gradient-to-br from-[#16A34A] to-emerald-600 rounded-2xl p-6 sm:p-8 text-white shadow-md"
         >
-          <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <span className="text-2xl">👁️</span> {t("about_vision_title")}
           </h3>
-          <p className="text-emerald-50 text-[15px] leading-relaxed">
+          <p className="text-emerald-50 text-sm sm:text-base leading-relaxed">
             {t("about_vision_desc")}
           </p>
         </motion.div>
@@ -111,12 +111,12 @@ const AboutTab = () => {
         <motion.div 
           variants={fadeInUp}
           whileHover={{ y: -4 }}
-          className="bg-card rounded-3xl p-6 sm:p-8 border border-[#DCFCE7] shadow-card"
+          className="bg-card rounded-2xl p-6 sm:p-8 border border-[#DCFCE7] shadow-sm"
         >
-          <h3 className="text-xl font-bold mb-3 text-[#16A34A] flex items-center gap-2">
+          <h3 className="text-lg font-semibold mb-3 text-[#16A34A] flex items-center gap-2">
             <span className="text-2xl">🎯</span> {t("about_mission_title")}
           </h3>
-          <p className="text-muted-foreground text-[15px] leading-relaxed">
+          <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
             {t("about_mission_desc")}
           </p>
         </motion.div>
@@ -130,7 +130,7 @@ const AboutTab = () => {
         variants={staggerContainer}
         className="space-y-6"
       >
-        <motion.h2 variants={fadeInUp} className="text-2xl font-bold text-center text-foreground">
+        <motion.h2 variants={fadeInUp} className="text-lg font-semibold text-center text-foreground">
           {t("about_why_choose")}
         </motion.h2>
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -143,7 +143,7 @@ const AboutTab = () => {
               <div className="w-10 h-10 rounded-full bg-[#DCFCE7] text-[#16A34A] flex items-center justify-center">
                 {feature.icon}
               </div>
-              <span className="text-[13px] font-semibold leading-tight text-foreground">
+              <span className="text-sm font-semibold leading-tight text-foreground">
                 {feature.title}
               </span>
             </motion.div>
@@ -157,11 +157,11 @@ const AboutTab = () => {
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
         variants={fadeInUp}
-        className="bg-card rounded-3xl p-6 sm:p-8 shadow-card border border-border relative overflow-hidden"
+        className="bg-card rounded-2xl p-6 sm:p-8 shadow-sm border border-border relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#DCFCE7] rounded-full blur-3xl -mr-10 -mt-10 opacity-60"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#DCFCE7] rounded-full blur-3xl -mr-10 -mt-10 opacity-60 pointer-events-none"></div>
         
-        <h2 className="text-center text-sm font-bold text-[#16A34A] uppercase tracking-wider mb-6">
+        <h2 className="text-center text-sm font-semibold text-[#16A34A] uppercase tracking-wider mb-6 relative z-10">
           {t("about_founder_title")}
         </h2>
         
@@ -189,11 +189,11 @@ const AboutTab = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-bold text-foreground">{t("founder_name")}</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t("founder_name")}</h3>
             <p className="text-[#16A34A] text-sm font-medium mt-0.5">{t("founder_role")}</p>
           </div>
           
-          <p className="text-muted-foreground text-[14px] leading-relaxed max-w-sm mx-auto">
+          <p className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-sm mx-auto">
             {t("founder_desc")}
           </p>
           

@@ -37,23 +37,23 @@ const WeatherAlertCard = ({ level, title, description, temperature, humidity, wi
         <span className="text-farmer-sm font-bold text-primary-foreground/90 bg-primary-foreground/15 px-3 py-1 rounded-full">
           {t(alertKeys[level])}
         </span>
-        <div className="w-12 h-12 rounded-full bg-primary-foreground/15 flex items-center justify-center text-2xl">
-          {level === "red" ? "🌧️" : level === "orange" ? "⛈️" : level === "yellow" ? "🌤️" : "☀️"}
+        <div className="w-12 h-12 rounded-full bg-primary-foreground/15 flex items-center justify-center text-primary-foreground">
+          {level === "red" ? <CloudRain className="w-6 h-6" /> : level === "orange" ? <CloudSun className="w-6 h-6" /> : level === "yellow" ? <CloudSun className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
         </div>
       </div>
 
-      <h2 className="text-farmer-xl font-extrabold text-primary-foreground mb-1">{title}</h2>
+      <h2 className="text-2xl font-bold text-primary-foreground mb-1">{title}</h2>
       <p className="text-farmer-sm text-primary-foreground/85 mb-4 leading-relaxed">{description}</p>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3">
         {[
-          { emoji: "🌡️", value: temperature },
-          { emoji: "💧", value: humidity },
-          { emoji: "🌬️", value: wind },
-        ].map(({ emoji, value }) => (
-          <div key={value} className="flex flex-col items-center bg-primary-foreground/15 backdrop-blur-sm rounded-xl p-3">
-            <span className="text-xl mb-1">{emoji}</span>
-            <span className="text-farmer-sm font-bold text-primary-foreground">{value}</span>
+          { icon: <Thermometer className="w-5 h-5" />, value: temperature },
+          { icon: <Droplets className="w-5 h-5" />, value: humidity },
+          { icon: <Wind className="w-5 h-5" />, value: wind },
+        ].map(({ icon, value }, i) => (
+          <div key={i} className="flex flex-col items-center bg-primary-foreground/15 backdrop-blur-sm rounded-xl p-3 gap-1">
+            <span className="text-primary-foreground">{icon}</span>
+            <span className="text-sm font-bold text-primary-foreground">{value}</span>
           </div>
         ))}
       </div>
