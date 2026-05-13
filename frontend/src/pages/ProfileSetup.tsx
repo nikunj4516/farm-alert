@@ -26,19 +26,19 @@ const ProfileSetup = () => {
 
   const crops = tArray("crops");
   const cropIconsList = [
-    <Wheat key="wheat" className="w-5 h-5 text-amber-500" />,
-    <Sprout key="sprout" className="w-5 h-5 text-emerald-500" />,
-    <Cloud key="cloud" className="w-5 h-5 text-blue-400" />,
-    <Bean key="bean" className="w-5 h-5 text-orange-600" />,
-    <Trees key="trees" className="w-5 h-5 text-green-600" />,
-    <Carrot key="carrot" className="w-5 h-5 text-orange-500" />,
-    <Package key="package" className="w-5 h-5 text-gray-400" />
+    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="wheat" className="w-5 h-5 drop-shadow-sm" key="wheat" />,
+    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="sprout" className="w-5 h-5 drop-shadow-sm" key="sprout" />,
+    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud.png" alt="cloud" className="w-5 h-5 drop-shadow-sm" key="cloud" />,
+    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Ear%20of%20Corn.png" alt="bean" className="w-5 h-5 drop-shadow-sm" key="bean" />,
+    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Deciduous%20Tree.png" alt="trees" className="w-5 h-5 drop-shadow-sm" key="trees" />,
+    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Carrot.png" alt="carrot" className="w-5 h-5 drop-shadow-sm" key="carrot" />,
+    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Package.png" alt="package" className="w-5 h-5 drop-shadow-sm" key="package" />
   ];
 
   const stepLabels = [
-    { label: t("profile_step_personal"), icon: User },
-    { label: t("profile_step_location"), icon: MapPin },
-    { label: t("profile_step_farming"), icon: Wheat },
+    { label: t("profile_step_personal"), icon: farmerAvatar },
+    { label: t("profile_step_location"), icon: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" },
+    { label: t("profile_step_farming"), icon: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" },
   ];
 
   const handleSave = async () => {
@@ -112,7 +112,7 @@ const ProfileSetup = () => {
                     isActive ? "bg-primary text-primary-foreground shadow-elevated" :
                     "bg-muted text-muted-foreground"
                   }`}>
-                    {isDone ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                    {isDone ? <Check className="w-5 h-5" /> : <img src={s.icon} alt={s.label} className="w-5 h-5 drop-shadow-sm object-cover rounded-full" />}
                   </div>
                   <span className={`text-xs font-semibold ${isActive || isDone ? "text-primary" : "text-muted-foreground"}`}>
                     {s.label}
@@ -130,7 +130,7 @@ const ProfileSetup = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <User className="w-5 h-5 text-primary" />
+                  <img src={farmerAvatar} alt="user" className="w-5 h-5 drop-shadow-sm object-cover rounded-full" />
                   {t("profile_name")}
                 </label>
                 <input
@@ -148,7 +148,7 @@ const ProfileSetup = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <MapPin className="w-5 h-5 text-primary" />
+                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
                   {t("profile_village")}
                 </label>
                 <input
@@ -161,7 +161,7 @@ const ProfileSetup = () => {
               </div>
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <MapPin className="w-5 h-5 text-primary" />
+                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
                   {t("profile_district")}
                 </label>
                 <input
@@ -179,7 +179,7 @@ const ProfileSetup = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <Wheat className="w-5 h-5 text-primary" /> {t("profile_crop")}
+                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="wheat" className="w-5 h-5 drop-shadow-sm" /> {t("profile_crop")}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {crops.map((crop, i) => (
@@ -202,7 +202,7 @@ const ProfileSetup = () => {
 
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <MapPin className="w-5 h-5 text-primary" /> {t("profile_land")}
+                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" /> {t("profile_land")}
                 </label>
                 <input
                   type="tel"

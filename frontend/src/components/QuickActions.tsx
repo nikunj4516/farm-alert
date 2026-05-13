@@ -1,15 +1,14 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
-import { Tractor, Droplets, Bug, ShoppingCart } from "lucide-react";
 
 const QuickActions = () => {
   const { t } = useLanguage();
 
   const actions = [
-    { icon: <Tractor className="w-6 h-6" />, label: t("action_crop_tips"), color: "bg-primary/10 text-primary" },
-    { icon: <Droplets className="w-6 h-6" />, label: t("action_irrigation"), color: "bg-blue-50 text-blue-700" },
-    { icon: <Bug className="w-6 h-6" />, label: t("action_pest_alert"), color: "bg-red-50 text-red-700" },
-    { icon: <ShoppingCart className="w-6 h-6" />, label: t("action_buy_products"), color: "bg-accent/10 text-accent" },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Tractor.png" alt="tractor" className="w-8 h-8 drop-shadow-sm" />, label: t("action_crop_tips"), color: "bg-primary/10 text-primary" },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Droplet.png" alt="droplet" className="w-8 h-8 drop-shadow-sm" />, label: t("action_irrigation"), color: "bg-blue-50 text-blue-700" },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Bug.png" alt="bug" className="w-8 h-8 drop-shadow-sm" />, label: t("action_pest_alert"), color: "bg-red-50 text-red-700" },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shopping%20Cart.png" alt="shopping cart" className="w-8 h-8 drop-shadow-sm" />, label: t("action_buy_products"), color: "bg-accent/10 text-accent" },
   ];
 
   return (

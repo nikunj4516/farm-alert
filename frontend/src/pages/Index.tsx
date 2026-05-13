@@ -185,7 +185,7 @@ const Index = () => {
                 FarmAlert
               </h1>
               <div className="flex items-center gap-1">
-                <MapPin className="w-4 h-4 text-primary-foreground/80" />
+                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-4 h-4 drop-shadow-sm" />
                 <span className="text-xs text-primary-foreground/70 font-medium">
                   {profile?.district ? `${profile.district}, ${profile.state || 'Gujarat'}` : t("location")}
                 </span>
@@ -198,7 +198,7 @@ const Index = () => {
                 onClick={() => setShowLangMenu(!showLangMenu)}
                 className="bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation"
               >
-                <Globe className="w-5 h-5 text-primary-foreground" />
+                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Globe%20Showing%20Asia-Australia.png" alt="language" className="w-5 h-5 drop-shadow-sm" />
               </button>
               {showLangMenu && (
                 <div className="absolute right-0 top-12 bg-card border border-border rounded-2xl shadow-elevated z-50 min-w-[140px] overflow-hidden">
@@ -222,7 +222,7 @@ const Index = () => {
               )}
             </div>
             <button className="relative bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation">
-              <Bell className="w-5 h-5 text-primary-foreground" />
+              <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Bell.png" alt="notifications" className="w-5 h-5 drop-shadow-sm" />
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-alert-red rounded-full border-2 border-primary" />
             </button>
             <VoiceCommandButton
@@ -265,11 +265,11 @@ const Index = () => {
               </h2>
               <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
                 {[
-                  { temp: "34°", icon: <CloudRain className="w-6 h-6" /> },
-                  { temp: "31°", icon: <CloudLightning className="w-6 h-6" /> },
-                  { temp: "29°", icon: <CloudSun className="w-6 h-6" /> },
-                  { temp: "32°", icon: <Cloud className="w-6 h-6" /> },
-                  { temp: "35°", icon: <Sun className="w-6 h-6" /> },
+                  { temp: "34°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Rain.png" alt="rain" className="w-8 h-8 drop-shadow-sm" /> },
+                  { temp: "31°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Lightning.png" alt="lightning" className="w-8 h-8 drop-shadow-sm" /> },
+                  { temp: "29°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Sun%20Behind%20Cloud.png" alt="cloud sun" className="w-8 h-8 drop-shadow-sm" /> },
+                  { temp: "32°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud.png" alt="cloud" className="w-8 h-8 drop-shadow-sm" /> },
+                  { temp: "35°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Sun.png" alt="sun" className="w-8 h-8 drop-shadow-sm" /> },
                 ].map((d, i) => (
                   <div
                     key={i}
@@ -294,7 +294,7 @@ const Index = () => {
               href="tel:18001801551"
               className="flex items-center justify-center gap-3 bg-primary/10 text-primary rounded-xl p-4 text-base font-bold active:scale-[0.97] transition-transform touch-manipulation border border-primary/20"
             >
-              <Phone className="w-5 h-5" />
+              <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Telephone%20Receiver.png" alt="phone" className="w-6 h-6 drop-shadow-sm" />
               <span>{helplineText}</span>
             </a>
           </>

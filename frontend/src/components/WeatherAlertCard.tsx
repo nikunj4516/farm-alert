@@ -1,4 +1,3 @@
-import { CloudRain, CloudSun, Sun, Droplets, Wind, Thermometer } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const alertKeys = {
@@ -29,7 +28,12 @@ interface WeatherAlertCardProps {
 const WeatherAlertCard = ({ level, title, description, temperature, humidity, wind }: WeatherAlertCardProps) => {
   const { t } = useLanguage();
   const isUrgent = level === "red" || level === "orange";
-  const WeatherIcon = level === "red" ? CloudRain : level === "orange" ? CloudSun : Sun;
+  
+  const getAlertIcon = () => {
+    if (level === "red") return <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Rain.png" alt="rain" className="w-7 h-7 drop-shadow-sm" />;
+    if (level === "orange" || level === "yellow") return <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Sun%20Behind%20Cloud.png" alt="cloud sun" className="w-7 h-7 drop-shadow-sm" />;
+    return <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Sun.png" alt="sun" className="w-7 h-7 drop-shadow-sm" />;
+  };
 
   return (
     <div className={`rounded-2xl p-5 ${alertBg[level]} ${isUrgent ? "animate-pulse-alert" : ""} shadow-elevated`}>
@@ -38,7 +42,7 @@ const WeatherAlertCard = ({ level, title, description, temperature, humidity, wi
           {t(alertKeys[level])}
         </span>
         <div className="w-12 h-12 rounded-full bg-primary-foreground/15 flex items-center justify-center text-primary-foreground">
-          {level === "red" ? <CloudRain className="w-6 h-6" /> : level === "orange" ? <CloudSun className="w-6 h-6" /> : level === "yellow" ? <CloudSun className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
+          {getAlertIcon()}
         </div>
       </div>
 
@@ -47,9 +51,9 @@ const WeatherAlertCard = ({ level, title, description, temperature, humidity, wi
 
       <div className="grid grid-cols-3 gap-3">
         {[
-          { icon: <Thermometer className="w-5 h-5" />, value: temperature },
-          { icon: <Droplets className="w-5 h-5" />, value: humidity },
-          { icon: <Wind className="w-5 h-5" />, value: wind },
+          { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Face%20with%20Thermometer.png" alt="temp" className="w-6 h-6 drop-shadow-sm" />, value: temperature },
+          { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Droplet.png" alt="humidity" className="w-6 h-6 drop-shadow-sm" />, value: humidity },
+          { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Wind%20Face.png" alt="wind" className="w-6 h-6 drop-shadow-sm" />, value: wind },
         ].map(({ icon, value }, i) => (
           <div key={i} className="flex flex-col items-center bg-primary-foreground/15 backdrop-blur-sm rounded-xl p-3 gap-1">
             <span className="text-primary-foreground">{icon}</span>

@@ -137,16 +137,16 @@ const SubscriptionPage = () => {
   };
 
   const benefits = [
-    { icon: <CloudRain className="w-6 h-6 text-primary" />, text: t("sub_benefit_1") },
-    { icon: <Wheat className="w-6 h-6 text-primary" />, text: t("sub_benefit_2") },
-    { icon: <Bug className="w-6 h-6 text-primary" />, text: t("sub_benefit_3") },
-    { icon: <MapPin className="w-6 h-6 text-primary" />, text: t("sub_benefit_4") },
-    { icon: <Phone className="w-6 h-6 text-primary" />, text: t("sub_benefit_5") },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Rain.png" alt="weather" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_1") },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="crop" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_2") },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Bug.png" alt="pest" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_3") },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_4") },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Telephone%20Receiver.png" alt="phone" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_5") },
   ];
 
   const testimonials = [
-    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), icon: <Wheat className="w-4 h-4 text-muted-foreground inline" /> },
-    { name: t("sub_testimonial_2_name"), text: t("sub_testimonial_2_text"), icon: <Leaf className="w-4 h-4 text-muted-foreground inline" /> },
+    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="farmer" className="w-4 h-4 inline drop-shadow-sm" /> },
+    { name: t("sub_testimonial_2_name"), text: t("sub_testimonial_2_text"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="farmer" className="w-4 h-4 inline drop-shadow-sm" /> },
   ];
 
   const langToggle = (
@@ -262,7 +262,7 @@ const SubscriptionPage = () => {
         {/* Trust Section */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 justify-center">
-            <Shield className="w-4 h-4 text-primary" />
+            <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shield.png" alt="secure" className="w-4 h-4 drop-shadow-sm" />
             <p className="text-sm font-semibold text-primary text-center">
               {t("sub_trusted")}
             </p>
@@ -319,7 +319,7 @@ const SubscriptionPage = () => {
           <ArrowRight className="w-5 h-5" />
         </motion.button>
         <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-          <Shield className="w-3 h-3" />
+          <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shield.png" alt="secure" className="w-3 h-3 drop-shadow-sm" />
           <span>{t("sub_secure_payment")}</span>
         </div>
       </div>

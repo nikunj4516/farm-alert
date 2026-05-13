@@ -12,35 +12,34 @@ const FarmingTips = ({ tipsData }: FarmingTipsProps) => {
 
   const defaultTips = [
     {
-      icon: <Droplets className="w-6 h-6 text-blue-600" />,
+      icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Droplet.png" alt="water" className="w-8 h-8 drop-shadow-sm" />,
       title: t("tip_water_title"),
       description: t("tip_water_desc"),
       bg: "bg-blue-50",
     },
     {
-      icon: <Bug className="w-6 h-6 text-red-600" />,
+      icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Bug.png" alt="bug" className="w-8 h-8 drop-shadow-sm" />,
       title: t("tip_pest_title"),
       description: t("tip_pest_desc"),
       bg: "bg-red-50",
     },
     {
-      icon: <Wheat className="w-6 h-6 text-amber-600" />,
+      icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="wheat" className="w-8 h-8 drop-shadow-sm" />,
       title: t("tip_harvest_title"),
       description: t("tip_harvest_desc"),
       bg: "bg-amber-50",
     },
     {
-      icon: <Leaf className="w-6 h-6 text-green-600" />,
+      icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="leaf" className="w-8 h-8 drop-shadow-sm" />,
       title: t("tip_fertilizer_title"),
       description: t("tip_fertilizer_desc"),
       bg: "bg-green-50",
     },
   ];
 
-
   const displayTips = tipsData && tipsData.length > 0 
     ? tipsData.map(tip => ({
-        icon: <Leaf className="w-6 h-6 text-green-600" />,
+        icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="leaf" className="w-8 h-8 drop-shadow-sm" />,
         title: tip.title,
         description: tip.content || tip.description,
         bg: "bg-green-50"

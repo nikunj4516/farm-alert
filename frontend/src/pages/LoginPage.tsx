@@ -129,7 +129,7 @@ const LoginPage = () => {
           <div className="space-y-5">
             <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4">
               <label className="text-base font-semibold text-foreground flex items-center gap-2">
-                <Phone className="w-5 h-5 text-primary" />
+                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Telephone%20Receiver.png" alt="phone" className="w-5 h-5 drop-shadow-sm" />
                 {t("login_phone_label")}
               </label>
               <div className="flex items-center border-2 border-border rounded-xl bg-background overflow-hidden focus-within:border-primary transition-colors">
@@ -156,7 +156,7 @@ const LoginPage = () => {
 
             {error && (
               <p className="text-destructive text-sm font-semibold flex items-center justify-center gap-1">
-                <AlertTriangle className="w-4 h-4" /> {error}
+                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Symbols/Warning.png" alt="error" className="w-4 h-4 drop-shadow-sm" /> {error}
               </p>
             )}
 
@@ -179,7 +179,7 @@ const LoginPage = () => {
         ) : (
           <div className="space-y-5">
             <div className="bg-primary/5 rounded-2xl p-4 flex items-center gap-3 border border-primary/20">
-              <ShieldCheck className="w-6 h-6 text-primary flex-shrink-0" />
+              <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shield.png" alt="secure" className="w-6 h-6 drop-shadow-sm flex-shrink-0" />
               <p className="text-sm text-foreground">
                 <strong>+91 {phone}</strong>{" "}
                 {t("login_otp_sent")}
@@ -188,7 +188,7 @@ const LoginPage = () => {
 
             <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4">
               <label className="text-base font-semibold text-foreground flex items-center gap-2">
-                <Key className="w-5 h-5 text-primary" /> {t("login_otp_label")}
+                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Key.png" alt="otp" className="w-5 h-5 drop-shadow-sm" /> {t("login_otp_label")}
               </label>
               <input
                 type="tel"
@@ -206,7 +206,7 @@ const LoginPage = () => {
 
             {error && (
               <p className="text-destructive text-sm font-semibold flex items-center justify-center gap-1">
-                <AlertTriangle className="w-4 h-4" /> {error}
+                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Symbols/Warning.png" alt="error" className="w-4 h-4 drop-shadow-sm" /> {error}
               </p>
             )}
 
@@ -219,7 +219,7 @@ const LoginPage = () => {
                 <Loader2 className="w-6 h-6 animate-spin" />
               ) : (
                 <>
-                  {t("login_verify")} <ShieldCheck className="w-5 h-5" />
+                  {t("login_verify")} <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shield.png" alt="verify" className="w-5 h-5 drop-shadow-sm" />
                 </>
               )}
             </button>
