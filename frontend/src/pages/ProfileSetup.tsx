@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat, Bean, Cloud, Sprout, Trees, Carrot, Package } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
+import farmerAvatar from "@/assets/farmer-1.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Progress } from "@/components/ui/progress";
@@ -26,7 +27,7 @@ const ProfileSetup = () => {
 
   const crops = tArray("crops");
   const cropIconsList = [
-    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="wheat" className="w-5 h-5 drop-shadow-sm" key="wheat" />,
+    <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="wheat" className="w-5 h-5 drop-shadow-sm" key="wheat" />,
     <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="sprout" className="w-5 h-5 drop-shadow-sm" key="sprout" />,
     <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud.png" alt="cloud" className="w-5 h-5 drop-shadow-sm" key="cloud" />,
     <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Ear%20of%20Corn.png" alt="bean" className="w-5 h-5 drop-shadow-sm" key="bean" />,
@@ -38,7 +39,7 @@ const ProfileSetup = () => {
   const stepLabels = [
     { label: t("profile_step_personal"), icon: farmerAvatar },
     { label: t("profile_step_location"), icon: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" },
-    { label: t("profile_step_farming"), icon: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" },
+    { label: t("profile_step_farming"), icon: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" },
   ];
 
   const handleSave = async () => {
@@ -179,7 +180,7 @@ const ProfileSetup = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="wheat" className="w-5 h-5 drop-shadow-sm" /> {t("profile_crop")}
+                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="wheat" className="w-5 h-5 drop-shadow-sm" /> {t("profile_crop")}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {crops.map((crop, i) => (

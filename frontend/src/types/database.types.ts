@@ -115,6 +115,7 @@ export interface Database {
           wind_speed: number | null
           weather_condition: string | null
           uv_index: number | null
+          forecast: Json | null
           fetched_at: string
         }
         Insert: {
@@ -126,6 +127,7 @@ export interface Database {
           wind_speed?: number | null
           weather_condition?: string | null
           uv_index?: number | null
+          forecast?: Json | null
           fetched_at?: string
         }
         Update: {
@@ -136,6 +138,7 @@ export interface Database {
           wind_speed?: number | null
           weather_condition?: string | null
           uv_index?: number | null
+          forecast?: Json | null
           fetched_at?: string
         }
       }

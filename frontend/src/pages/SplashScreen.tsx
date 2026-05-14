@@ -6,10 +6,12 @@ import logo from "@/assets/farmalert-logo.png";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-const languages: { id: Language; flag: string; script: string }[] = [
-  { id: "gu", flag: "🌾", script: "ક" },
-  { id: "hi", flag: "🚜", script: "अ" },
-  { id: "en", flag: "🌐", script: "A" },
+const indiaFlagUrl = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1ee-1f1f3.svg";
+
+const languages: { id: Language; script: string }[] = [
+  { id: "gu", script: "ક" },
+  { id: "hi", script: "अ" },
+  { id: "en", script: "A" },
 ];
 
 const SplashScreen = () => {
@@ -120,8 +122,9 @@ const SplashScreen = () => {
         </motion.button>
       </motion.div>
 
-      <p className="text-muted-foreground text-sm font-medium mt-6">
-        {t("splash_footer")}
+      <p className="text-muted-foreground text-sm font-medium mt-6 flex items-center gap-2">
+        <span>{t("splash_footer")}</span>
+        <img src={indiaFlagUrl} alt="India" className="h-4 w-4" />
       </p>
     </div>
   );

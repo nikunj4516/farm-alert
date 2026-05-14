@@ -129,7 +129,7 @@ const LoginPage = () => {
           <div className="space-y-5">
             <div className="bg-card rounded-2xl p-5 shadow-card border border-border space-y-4">
               <label className="text-base font-semibold text-foreground flex items-center gap-2">
-                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Telephone%20Receiver.png" alt="phone" className="w-5 h-5 drop-shadow-sm" />
+                <span className="text-lg leading-none" aria-hidden="true">📞</span>
                 {t("login_phone_label")}
               </label>
               <div className="flex items-center border-2 border-border rounded-xl bg-background overflow-hidden focus-within:border-primary transition-colors">

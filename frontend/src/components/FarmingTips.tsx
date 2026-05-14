@@ -1,6 +1,5 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
-import { Droplets, Bug, Wheat, Leaf } from "lucide-react";
 import { Database } from "@/types/database.types";
 
 interface FarmingTipsProps {
@@ -12,25 +11,25 @@ const FarmingTips = ({ tipsData }: FarmingTipsProps) => {
 
   const defaultTips = [
     {
-      icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Droplet.png" alt="water" className="w-8 h-8 drop-shadow-sm" />,
+      icon: "💧",
       title: t("tip_water_title"),
       description: t("tip_water_desc"),
       bg: "bg-blue-50",
     },
     {
-      icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Bug.png" alt="bug" className="w-8 h-8 drop-shadow-sm" />,
+      icon: "🐛",
       title: t("tip_pest_title"),
       description: t("tip_pest_desc"),
       bg: "bg-red-50",
     },
     {
-      icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="wheat" className="w-8 h-8 drop-shadow-sm" />,
+      icon: "🌾",
       title: t("tip_harvest_title"),
       description: t("tip_harvest_desc"),
       bg: "bg-amber-50",
     },
     {
-      icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="leaf" className="w-8 h-8 drop-shadow-sm" />,
+      icon: "🌱",
       title: t("tip_fertilizer_title"),
       description: t("tip_fertilizer_desc"),
       bg: "bg-green-50",
@@ -39,7 +38,7 @@ const FarmingTips = ({ tipsData }: FarmingTipsProps) => {
 
   const displayTips = tipsData && tipsData.length > 0 
     ? tipsData.map(tip => ({
-        icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="leaf" className="w-8 h-8 drop-shadow-sm" />,
+        icon: "🌱",
         title: tip.title,
         description: tip.content || tip.description,
         bg: "bg-green-50"
@@ -59,7 +58,7 @@ const FarmingTips = ({ tipsData }: FarmingTipsProps) => {
             className="w-full flex items-start gap-4 bg-card border border-border rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-all"
           >
             <div className={`w-12 h-12 rounded-xl ${tip.bg} flex items-center justify-center shrink-0`}>
-              {tip.icon}
+              <span className="text-3xl leading-none" aria-hidden="true">{tip.icon}</span>
             </div>
             <div>
               <span className="text-base font-semibold text-foreground block">{tip.title}</span>

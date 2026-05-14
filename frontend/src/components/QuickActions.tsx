@@ -5,10 +5,10 @@ const QuickActions = () => {
   const { t } = useLanguage();
 
   const actions = [
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Tractor.png" alt="tractor" className="w-8 h-8 drop-shadow-sm" />, label: t("action_crop_tips"), color: "bg-primary/10 text-primary" },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Droplet.png" alt="droplet" className="w-8 h-8 drop-shadow-sm" />, label: t("action_irrigation"), color: "bg-blue-50 text-blue-700" },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Bug.png" alt="bug" className="w-8 h-8 drop-shadow-sm" />, label: t("action_pest_alert"), color: "bg-red-50 text-red-700" },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shopping%20Cart.png" alt="shopping cart" className="w-8 h-8 drop-shadow-sm" />, label: t("action_buy_products"), color: "bg-accent/10 text-accent" },
+    { icon: "🚜", label: t("action_crop_tips"), color: "bg-primary/10 text-primary" },
+    { icon: "💧", label: t("action_irrigation"), color: "bg-blue-50 text-blue-700" },
+    { icon: "🐛", label: t("action_pest_alert"), color: "bg-red-50 text-red-700" },
+    { icon: "🛒", label: t("action_buy_products"), color: "bg-accent/10 text-accent" },
   ];
 
   return (
@@ -24,7 +24,7 @@ const QuickActions = () => {
             className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-card border border-border shadow-card touch-manipulation hover:shadow-soft transition-shadow"
           >
             <div className={`w-12 h-12 rounded-xl ${action.color} flex items-center justify-center`}>
-              {action.icon}
+              <span className="text-3xl leading-none" aria-hidden="true">{action.icon}</span>
             </div>
             <span className="text-xs font-semibold text-foreground text-center leading-tight">
               {action.label}

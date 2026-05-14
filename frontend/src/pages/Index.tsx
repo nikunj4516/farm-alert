@@ -34,6 +34,21 @@ const Index = () => {
 
   const forecastDays = tArray("forecast_days");
   const helplineText = t("helpline").replace(/^📞\s*/, "");
+  const forecastCards = weather?.forecast?.length
+    ? weather.forecast.slice(0, 7).map((day, index) => ({
+        temp: `${Math.round(day.temperature ?? day.maxTemperature ?? 0)}°`,
+        icon: day.icon,
+        label:
+          forecastDays[index] ||
+          new Intl.DateTimeFormat("en-IN", { weekday: "short" }).format(new Date(day.date)),
+      }))
+    : [
+        { temp: "34°", icon: "🌧️", label: forecastDays[0] },
+        { temp: "31°", icon: "⛈️", label: forecastDays[1] },
+        { temp: "29°", icon: "🌦️", label: forecastDays[2] },
+        { temp: "32°", icon: "⛅", label: forecastDays[3] },
+        { temp: "35°", icon: "☀️", label: forecastDays[4] },
+      ];
 
   const handleVoiceCommand = (transcript: string) => {
     const command = transcript.toLowerCase();
@@ -185,7 +200,7 @@ const Index = () => {
                 FarmAlert
               </h1>
               <div className="flex items-center gap-1">
-                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-4 h-4 drop-shadow-sm" />
+                <span className="text-sm leading-none" aria-hidden="true">📍</span>
                 <span className="text-xs text-primary-foreground/70 font-medium">
                   {profile?.district ? `${profile.district}, ${profile.state || 'Gujarat'}` : t("location")}
                 </span>
@@ -198,7 +213,7 @@ const Index = () => {
                 onClick={() => setShowLangMenu(!showLangMenu)}
                 className="bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation"
               >
-                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Globe%20Showing%20Asia-Australia.png" alt="language" className="w-5 h-5 drop-shadow-sm" />
+                <span className="text-xl leading-none" aria-hidden="true">🌐</span>
               </button>
               {showLangMenu && (
                 <div className="absolute right-0 top-12 bg-card border border-border rounded-2xl shadow-elevated z-50 min-w-[140px] overflow-hidden">
@@ -222,7 +237,7 @@ const Index = () => {
               )}
             </div>
             <button className="relative bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation">
-              <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Bell.png" alt="notifications" className="w-5 h-5 drop-shadow-sm" />
+              <span className="text-xl leading-none" aria-hidden="true">🔔</span>
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-alert-red rounded-full border-2 border-primary" />
             </button>
             <VoiceCommandButton
@@ -249,11 +264,11 @@ const Index = () => {
           <>
             <WeatherAlertCard
               level={weather?.weather_condition?.toLowerCase().includes("rain") ? "red" : "orange"}
-              title={weather ? `${weather.temperature}°C in ${weather.district}` : t("weather_title")}
+              title={weather ? `${Math.round(weather.temperature ?? 0)}°C in ${weather.district}` : t("weather_title")}
               description={weather?.weather_condition || t("weather_desc")}
-              temperature={weather ? `${weather.temperature}°C` : "34°C"}
-              humidity={weather ? `${weather.humidity}%` : "82%"}
-              wind={weather ? `${weather.wind_speed} km/h` : "25 km/h"}
+              temperature={weather ? `${Math.round(weather.temperature ?? 0)}°C` : "34°C"}
+              humidity={weather ? `${Math.round(weather.humidity ?? 0)}%` : "82%"}
+              wind={weather ? `${Math.round(weather.wind_speed ?? 0)} km/h` : "25 km/h"}
             />
 
             <QuickActions />
@@ -264,13 +279,7 @@ const Index = () => {
                 {t("forecast_title")}
               </h2>
               <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-                {[
-                  { temp: "34°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Rain.png" alt="rain" className="w-8 h-8 drop-shadow-sm" /> },
-                  { temp: "31°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Lightning.png" alt="lightning" className="w-8 h-8 drop-shadow-sm" /> },
-                  { temp: "29°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Sun%20Behind%20Cloud.png" alt="cloud sun" className="w-8 h-8 drop-shadow-sm" /> },
-                  { temp: "32°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud.png" alt="cloud" className="w-8 h-8 drop-shadow-sm" /> },
-                  { temp: "35°", icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Sun.png" alt="sun" className="w-8 h-8 drop-shadow-sm" /> },
-                ].map((d, i) => (
+                {forecastCards.map((d, i) => (
                   <div
                     key={i}
                     className={`flex-shrink-0 flex flex-col items-center bg-card border border-border rounded-2xl px-4 py-3 min-w-[76px] shadow-card transition-shadow ${
@@ -278,9 +287,9 @@ const Index = () => {
                     }`}
                   >
                     <span className="text-xs font-semibold text-muted-foreground">
-                      {forecastDays[i]}
+                      {d.label}
                     </span>
-                    <span className="text-muted-foreground my-2">{d.icon}</span>
+                    <span className="text-3xl leading-none my-2" aria-hidden="true">{d.icon}</span>
                     <span className="text-sm font-bold text-foreground">
                       {d.temp}
                     </span>
@@ -294,7 +303,7 @@ const Index = () => {
               href="tel:18001801551"
               className="flex items-center justify-center gap-3 bg-primary/10 text-primary rounded-xl p-4 text-base font-bold active:scale-[0.97] transition-transform touch-manipulation border border-primary/20"
             >
-              <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Telephone%20Receiver.png" alt="phone" className="w-6 h-6 drop-shadow-sm" />
+              <span className="text-2xl leading-none" aria-hidden="true">📞</span>
               <span>{helplineText}</span>
             </a>
           </>

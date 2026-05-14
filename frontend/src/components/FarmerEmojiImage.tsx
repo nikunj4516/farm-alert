@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import farmerAvatar from "@/assets/3d_farmer_avatar.png";
+import farmerAvatar from "@/assets/farmer-1.png";
 
 interface FarmerEmojiImageProps {
   className?: string;

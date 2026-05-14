@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { ProfileService } from "@/services/profileService";
-import { WeatherService } from "@/services/weatherService";
 import { NewsService } from "@/services/newsService";
 import { TipsService } from "@/services/tipsService";
 import { AlertsService } from "@/services/alertsService";
+import { useWeather } from "@/hooks/useWeather";
 
 export const useDashboardData = (userId: string | undefined) => {
   // 1. Fetch Profile
@@ -25,11 +25,8 @@ export const useDashboardData = (userId: string | undefined) => {
   const {
     data: weather,
     isLoading: isWeatherLoading,
-  } = useQuery({
-    queryKey: ["weather", district],
-    queryFn: () => WeatherService.getWeatherForDistrict(district),
-    enabled: !!district,
-  });
+    error: weatherError,
+  } = useWeather(district);
 
   // 3. Fetch Personalized News
   const {
@@ -68,6 +65,6 @@ export const useDashboardData = (userId: string | undefined) => {
     tips,
     alerts,
     isLoading: isProfileLoading || isWeatherLoading || isNewsLoading || isTipsLoading || isAlertsLoading,
-    errors: { profileError }
+    errors: { profileError, weatherError }
   };
 };

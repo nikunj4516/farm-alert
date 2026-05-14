@@ -13,7 +13,7 @@ const AgriNews = ({ newsData }: AgriNewsProps) => {
   const defaultNewsItems = [
     { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Rolled-Up%20Newspaper.png" alt="news" className="w-6 h-6 drop-shadow-sm" />, title: t("news_1_title"), source: t("news_1_source"), time: t("news_1_time") },
     { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Classical%20Building.png" alt="government" className="w-6 h-6 drop-shadow-sm" />, title: t("news_2_title"), source: t("news_2_source"), time: t("news_2_time") },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="market" className="w-6 h-6 drop-shadow-sm" />, title: t("news_3_title"), source: t("news_3_source"), time: t("news_3_time") },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="market" className="w-6 h-6 drop-shadow-sm" />, title: t("news_3_title"), source: t("news_3_source"), time: t("news_3_time") },
     { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Coin.png" alt="price" className="w-6 h-6 drop-shadow-sm" />, title: t("news_4_title"), source: t("news_4_source"), time: t("news_4_time") },
   ];
 

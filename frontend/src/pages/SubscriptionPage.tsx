@@ -138,14 +138,14 @@ const SubscriptionPage = () => {
 
   const benefits = [
     { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Rain.png" alt="weather" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_1") },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="crop" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_2") },
+    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="crop" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_2") },
     { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Bug.png" alt="pest" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_3") },
     { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_4") },
     { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Telephone%20Receiver.png" alt="phone" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_5") },
   ];
 
   const testimonials = [
-    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Food/Sheaf%20of%20Rice.png" alt="farmer" className="w-4 h-4 inline drop-shadow-sm" /> },
+    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="farmer" className="w-4 h-4 inline drop-shadow-sm" /> },
     { name: t("sub_testimonial_2_name"), text: t("sub_testimonial_2_text"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="farmer" className="w-4 h-4 inline drop-shadow-sm" /> },
   ];
 

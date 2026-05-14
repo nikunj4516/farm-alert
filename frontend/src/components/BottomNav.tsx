@@ -1,6 +1,6 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
-import farmerAvatar from "@/assets/3d_farmer_avatar.png";
+import farmerAvatar from "@/assets/farmer-1.png";
 
 type Tab = "weather" | "tips" | "news" | "about" | "profile";
 
@@ -13,10 +13,10 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   const { t } = useLanguage();
 
   const tabs = [
-    { id: "weather" as Tab, label: t("nav_weather"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Sun%20Behind%20Small%20Cloud.png" alt="weather" className="w-7 h-7 drop-shadow-md" /> },
-    { id: "tips" as Tab, label: t("nav_tips"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Light%20Bulb.png" alt="tips" className="w-7 h-7 drop-shadow-md" /> },
-    { id: "news" as Tab, label: t("nav_news"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Rolled-Up%20Newspaper.png" alt="news" className="w-7 h-7 drop-shadow-md" /> },
-    { id: "about" as Tab, label: t("nav_about"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Office%20Building.png" alt="about" className="w-7 h-7 drop-shadow-md" /> },
+    { id: "weather" as Tab, label: t("nav_weather"), icon: <span className="text-3xl leading-none" aria-hidden="true">🌤️</span> },
+    { id: "tips" as Tab, label: t("nav_tips"), icon: <span className="text-3xl leading-none" aria-hidden="true">💡</span> },
+    { id: "news" as Tab, label: t("nav_news"), icon: <span className="text-3xl leading-none" aria-hidden="true">📰</span> },
+    { id: "about" as Tab, label: t("nav_about"), icon: <span className="text-3xl leading-none" aria-hidden="true">🏢</span> },
     { id: "profile" as Tab, label: t("nav_profile"), icon: <img src={farmerAvatar} alt="profile" className="w-7 h-7 drop-shadow-md rounded-full object-cover" /> },
   ];
 
