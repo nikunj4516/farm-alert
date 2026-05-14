@@ -356,12 +356,6 @@ const Index = () => {
             >
               {t("profile_save")}
             </button>
-            <button
-              onClick={() => navigate("/subscription")}
-              className="w-full bg-card text-primary border border-primary/25 rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-all touch-manipulation shadow-card"
-            >
-              {t("sub_cta")}
-            </button>
           </div>
         )}
       </main>
