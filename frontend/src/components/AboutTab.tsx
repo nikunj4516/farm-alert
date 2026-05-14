@@ -5,20 +5,22 @@ import logo from "@/assets/farmalert-logo.png";
 import founderImg from "@/assets/user-dp.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const emojiIcon = (src: string, alt: string, size = "w-6 h-6") => (
-  <img src={src} alt={alt} className={`${size} drop-shadow-sm`} />
+const emojiIcon = (emoji: string, label: string, size = "text-2xl") => (
+  <span role="img" aria-label={label} className={`${size} leading-none drop-shadow-sm`}>
+    {emoji}
+  </span>
 );
 
 const AboutTab = () => {
   const { t } = useLanguage();
 
   const features = [
-    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Lightning.png", "weather"), title: t("feature_weather") },
-    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Mobile%20Phone.png", "mobile"), title: t("feature_interface") },
-    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Chart%20Increasing.png", "growth"), title: t("feature_affordable") },
-    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Globe%20Showing%20Asia-Australia.png", "globe"), title: t("feature_innovation") },
-    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shield.png", "security"), title: t("feature_future") },
-    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/People%20Hugging.png", "support"), title: t("feature_support") },
+    { icon: emojiIcon("🌤️", "weather"), title: t("feature_weather") },
+    { icon: emojiIcon("📱", "mobile"), title: t("feature_interface") },
+    { icon: emojiIcon("📈", "growth"), title: t("feature_affordable") },
+    { icon: emojiIcon("🌏", "globe"), title: t("feature_innovation") },
+    { icon: emojiIcon("🛡️", "security"), title: t("feature_future") },
+    { icon: emojiIcon("🤝", "support"), title: t("feature_support") },
   ];
 
   const fadeInUp = {
@@ -47,7 +49,7 @@ const AboutTab = () => {
         className="text-center space-y-6 pt-4"
       >
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#DCFCE7] text-[#16A34A] text-xs font-bold mb-2">
-          {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Globe%20Showing%20Asia-Australia.png", "globe", "w-4 h-4")}
+          {emojiIcon("🌏", "globe", "text-base")}
           <span>{t("about_tagline")}</span>
         </div>
         <h1 className="text-2xl font-bold leading-tight tracking-tight">
@@ -82,7 +84,7 @@ const AboutTab = () => {
       >
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
           <span className="w-10 h-10 rounded-xl bg-[#DCFCE7] flex items-center justify-center shrink-0">
-            {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Office%20Building.png", "about")}
+            {emojiIcon("🏢", "about")}
           </span>
           {t("about_who_we_are")}
         </h2>
@@ -107,7 +109,7 @@ const AboutTab = () => {
           className="bg-gradient-to-br from-[#16A34A] to-emerald-600 rounded-2xl p-6 sm:p-8 text-white shadow-md"
         >
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Eye.png", "vision", "w-7 h-7")} {t("about_vision_title")}
+            {emojiIcon("👁️", "vision", "text-3xl")} {t("about_vision_title")}
           </h3>
           <p className="text-emerald-50 text-sm sm:text-base leading-relaxed">
             {t("about_vision_desc")}
@@ -120,7 +122,7 @@ const AboutTab = () => {
           className="bg-card rounded-2xl p-6 sm:p-8 border border-[#DCFCE7] shadow-sm"
         >
           <h3 className="text-lg font-semibold mb-3 text-[#16A34A] flex items-center gap-2">
-            {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Direct%20Hit.png", "mission", "w-7 h-7")} {t("about_mission_title")}
+            {emojiIcon("🎯", "mission", "text-3xl")} {t("about_mission_title")}
           </h3>
           <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
             {t("about_mission_desc")}
@@ -137,7 +139,7 @@ const AboutTab = () => {
         className="space-y-6"
       >
         <motion.h2 variants={fadeInUp} className="text-lg font-semibold text-center text-foreground flex items-center justify-center gap-2">
-          {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png", "features", "w-6 h-6")}
+          {emojiIcon("🌱", "features", "text-2xl")}
           <span>{t("about_why_choose")}</span>
         </motion.h2>
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -169,7 +171,7 @@ const AboutTab = () => {
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#DCFCE7] rounded-full blur-3xl -mr-10 -mt-10 opacity-60 pointer-events-none"></div>
         
         <h2 className="text-center text-sm font-semibold text-[#16A34A] uppercase tracking-wider mb-6 relative z-10 flex items-center justify-center gap-2">
-          {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Bust%20in%20Silhouette.png", "founder", "w-5 h-5")}
+          {emojiIcon("👤", "founder", "text-xl")}
           <span>{t("about_founder_title")}</span>
         </h2>
         
