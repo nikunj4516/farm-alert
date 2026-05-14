@@ -5,6 +5,7 @@ import { Check, ArrowRight } from "lucide-react";
 import logo from "@/assets/farmalert-logo.png";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { hasActiveSubscription } from "@/services/subscriptionService";
 
 const indiaFlagUrl = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1ee-1f1f3.svg";
 
@@ -20,9 +21,16 @@ const SplashScreen = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && user) {
-      navigate("/dashboard", { replace: true });
+    if (loading || !user) {
+      return;
     }
+
+    const routeSubscribedUser = async () => {
+      const isSubscribed = await hasActiveSubscription(user.id);
+      navigate(isSubscribed ? "/dashboard" : "/subscription", { replace: true });
+    };
+
+    void routeSubscribedUser();
   }, [user, loading, navigate]);
 
   const handleContinue = () => {

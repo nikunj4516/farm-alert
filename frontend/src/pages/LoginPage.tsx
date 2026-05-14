@@ -5,6 +5,7 @@ import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import logoWide from "@/assets/farmalert-logo-wide.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { hasActiveSubscription } from "@/services/subscriptionService";
 
 
 const getAuthErrorMessage = (message: string) => {
@@ -89,14 +90,16 @@ const LoginPage = () => {
       return;
     }
 
+    const currentUser = (await supabase.auth.getUser()).data.user;
     const { data: profile } = await supabase
       .from("profiles")
       .select("name")
-      .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+      .eq("user_id", currentUser?.id)
       .single();
 
     if (profile?.name) {
-      navigate("/dashboard");
+      const isSubscribed = currentUser ? await hasActiveSubscription(currentUser.id) : false;
+      navigate(isSubscribed ? "/dashboard" : "/subscription");
     } else {
       navigate("/profile-setup");
     }

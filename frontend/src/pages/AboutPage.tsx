@@ -1,19 +1,23 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CloudLightning, Globe, ShieldCheck, Smartphone, TrendingUp, Users, Eye, Target } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import logo from "@/assets/farmalert-logo.png";
 import founderImg from "@/assets/user-dp.jpg";
+
+const emojiIcon = (src: string, alt: string, size = "w-6 h-6") => (
+  <img src={src} alt={alt} className={`${size} drop-shadow-sm`} />
+);
 
 const AboutPage = () => {
   const navigate = useNavigate();
 
   const features = [
-    { icon: <CloudLightning className="w-5 h-5" />, title: "Smart Weather Alerts" },
-    { icon: <Smartphone className="w-5 h-5" />, title: "Farmer-Friendly Interface" },
-    { icon: <TrendingUp className="w-5 h-5" />, title: "Affordable Digital Services" },
-    { icon: <Globe className="w-5 h-5" />, title: "Agriculture-Focused Innovation" },
-    { icon: <ShieldCheck className="w-5 h-5" />, title: "Future-Ready Technology" },
-    { icon: <Users className="w-5 h-5" />, title: "Trusted Support System" },
+    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Lightning.png", "weather"), title: "Smart Weather Alerts" },
+    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Mobile%20Phone.png", "mobile"), title: "Farmer-Friendly Interface" },
+    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Chart%20Increasing.png", "growth"), title: "Affordable Digital Services" },
+    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Globe%20Showing%20Asia-Australia.png", "globe"), title: "Agriculture-Focused Innovation" },
+    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shield.png", "security"), title: "Future-Ready Technology" },
+    { icon: emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/People%20Hugging.png", "support"), title: "Trusted Support System" },
   ];
 
   const fadeInUp = {
@@ -60,7 +64,7 @@ const AboutPage = () => {
           className="text-center space-y-6 pt-4"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#DCFCE7] text-[#16A34A] text-xs font-bold mb-2">
-            <Globe className="w-3.5 h-3.5" />
+            {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Globe%20Showing%20Asia-Australia.png", "globe", "w-4 h-4")}
             <span>Digital Agriculture</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight">
@@ -95,7 +99,9 @@ const AboutPage = () => {
           className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.05)] border border-gray-100"
         >
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <span className="w-1.5 h-6 bg-[#16A34A] rounded-full inline-block"></span>
+            <span className="w-10 h-10 rounded-xl bg-[#DCFCE7] flex items-center justify-center shrink-0">
+              {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Office%20Building.png", "about")}
+            </span>
             Who We Are
           </h2>
           <div className="space-y-4 text-gray-600 text-[15px] leading-relaxed">
@@ -125,7 +131,7 @@ const AboutPage = () => {
             className="bg-gradient-to-br from-[#16A34A] to-emerald-600 rounded-3xl p-6 sm:p-8 text-white shadow-[0_10px_30px_-10px_rgba(22,163,74,0.4)]"
           >
             <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
-              <Eye className="w-6 h-6 text-emerald-100" /> Our Vision
+              {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Eye.png", "vision", "w-7 h-7")} Our Vision
             </h3>
             <p className="text-emerald-50 text-[15px] leading-relaxed">
               To build a smarter and digitally connected agriculture ecosystem that empowers every farmer with accessible technology.
@@ -138,7 +144,7 @@ const AboutPage = () => {
             className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DCFCE7] shadow-[0_4px_20px_-10px_rgba(22,163,74,0.15)]"
           >
             <h3 className="text-xl font-bold mb-3 text-[#16A34A] flex items-center gap-2">
-              <Target className="w-6 h-6 text-[#16A34A]" /> Our Mission
+              {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Direct%20Hit.png", "mission", "w-7 h-7")} Our Mission
             </h3>
             <p className="text-gray-600 text-[15px] leading-relaxed">
               To provide trusted agriculture solutions through innovation, simplicity, and farmer-focused digital services.
@@ -154,8 +160,9 @@ const AboutPage = () => {
           variants={staggerContainer}
           className="space-y-6"
         >
-          <motion.h2 variants={fadeInUp} className="text-2xl font-bold text-center">
-            Why Choose Us
+          <motion.h2 variants={fadeInUp} className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+            {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png", "features", "w-7 h-7")}
+            <span>Why Choose Us</span>
           </motion.h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {features.map((feature, i) => (
@@ -186,8 +193,9 @@ const AboutPage = () => {
           {/* Decorative background element */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#DCFCE7] rounded-full blur-3xl -mr-10 -mt-10 opacity-60"></div>
           
-          <h2 className="text-center text-sm font-bold text-[#16A34A] uppercase tracking-wider mb-6">
-            Meet The Founder
+          <h2 className="text-center text-sm font-bold text-[#16A34A] uppercase tracking-wider mb-6 flex items-center justify-center gap-2">
+            {emojiIcon("https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Bust%20in%20Silhouette.png", "founder", "w-5 h-5")}
+            <span>Meet The Founder</span>
           </h2>
           
           <div className="flex flex-col items-center text-center space-y-4 relative z-10">

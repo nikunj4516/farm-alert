@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { hasActiveSubscription } from "@/services/subscriptionService";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
@@ -30,6 +31,21 @@ const Index = () => {
     if (!loading && !user) {
       navigate("/login", { replace: true });
     }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (loading || !user) {
+      return;
+    }
+
+    const routeUnsubscribedUser = async () => {
+      const isSubscribed = await hasActiveSubscription(user.id);
+      if (!isSubscribed) {
+        navigate("/subscription", { replace: true });
+      }
+    };
+
+    void routeUnsubscribedUser();
   }, [user, loading, navigate]);
 
   const forecastDays = tArray("forecast_days");
@@ -135,6 +151,17 @@ const Index = () => {
       command.includes("khata")
     ) {
       setActiveTab("profile");
+      return;
+    }
+
+    if (
+      command.includes("subscription") ||
+      command.includes("subscribe") ||
+      command.includes("plan") ||
+      command.includes("સબ્સ્ક્રાઇબ") ||
+      command.includes("सब्सक्राइब")
+    ) {
+      navigate("/subscription");
       return;
     }
 
@@ -328,6 +355,12 @@ const Index = () => {
               className="w-full bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-all touch-manipulation shadow-md"
             >
               {t("profile_save")}
+            </button>
+            <button
+              onClick={() => navigate("/subscription")}
+              className="w-full bg-card text-primary border border-primary/25 rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-all touch-manipulation shadow-card"
+            >
+              {t("sub_cta")}
             </button>
           </div>
         )}
