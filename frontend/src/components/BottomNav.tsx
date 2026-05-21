@@ -28,7 +28,10 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
           return (
             <button
               key={tab.id}
+              type="button"
               onClick={() => onTabChange(tab.id)}
+              aria-label={tab.label}
+              aria-current={isActive ? "page" : undefined}
               className={`flex-1 flex flex-col items-center py-3 px-2 min-h-[64px] transition-colors touch-manipulation relative ${
                 isActive ? "text-primary" : "text-muted-foreground hover:text-primary/70"
               }`}

@@ -5,7 +5,7 @@ import { TipsService } from "@/services/tipsService";
 import { AlertsService } from "@/services/alertsService";
 import { useWeather } from "@/hooks/useWeather";
 
-export const useDashboardData = (userId: string | undefined) => {
+export const useDashboardData = (userId: string | undefined, selectedLanguage?: string) => {
   // 1. Fetch Profile
   const { 
     data: profile, 
@@ -18,7 +18,7 @@ export const useDashboardData = (userId: string | undefined) => {
   });
 
   const district = profile?.district || "Ahmedabad";
-  const language = profile?.preferred_language || "gu";
+  const language = selectedLanguage || profile?.preferred_language || "gu";
   const cropType = profile?.crop_type || undefined;
 
   // 2. Fetch Weather based on district

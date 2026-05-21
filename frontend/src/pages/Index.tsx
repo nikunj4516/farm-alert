@@ -6,17 +6,69 @@ import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import QuickActions from "@/components/QuickActions";
 import VoiceCommandButton from "@/components/VoiceCommandButton";
-import WakeWordListener from "@/components/WakeWordListener";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
 import { Bell, LogOut, Globe, Loader2, CloudRain, CloudLightning, CloudSun, Cloud, Sun, Phone, MapPin } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { hasActiveSubscription } from "@/services/subscriptionService";
+import { ProfileService } from "@/services/profileService";
+import type { WeatherReport } from "@/services/weatherService";
+
+const getWeatherAlertLevel = (weather?: WeatherReport | null) => {
+  if (!weather) return "green" as const;
+
+  const condition = weather.weather_condition?.toLowerCase() ?? "";
+  const rainfall = weather.rainfall ?? weather.forecast?.[0]?.rainfall ?? 0;
+  const wind = weather.wind_speed ?? weather.forecast?.[0]?.windSpeed ?? 0;
+  const temperature = weather.temperature ?? 0;
+  const uvIndex = weather.uv_index ?? weather.forecast?.[0]?.uvIndex ?? 0;
+
+  if (
+    condition.includes("thunder") ||
+    condition.includes("storm") ||
+    rainfall >= 64.5 ||
+    wind >= 62 ||
+    temperature >= 45
+  ) {
+    return "red" as const;
+  }
+
+  if (rainfall >= 15.6 || wind >= 40 || temperature >= 40 || uvIndex >= 8) {
+    return "orange" as const;
+  }
+
+  if (rainfall > 0 || wind >= 25 || temperature >= 35 || uvIndex >= 6) {
+    return "yellow" as const;
+  }
+
+  return "green" as const;
+};
+
+const getWeatherSummary = (weather?: WeatherReport | null) => {
+  if (!weather) return null;
+
+  const condition = weather.weather_condition || "Weather update";
+  const rainfall = weather.rainfall ?? weather.forecast?.[0]?.rainfall;
+  const uvIndex = weather.uv_index ?? weather.forecast?.[0]?.uvIndex;
+
+  const details = [
+    rainfall !== null && rainfall !== undefined ? `Rainfall ${Math.round(rainfall)} mm` : null,
+    uvIndex !== null && uvIndex !== undefined ? `UV ${Math.round(uvIndex)}` : null,
+    weather.isStale ? "Showing last available update" : null,
+  ].filter(Boolean);
+
+  return details.length ? `${condition}. ${details.join(" - ")}.` : condition;
+};
+
+const languageBadges: Record<Language, string> = {
+  gu: "ક",
+  hi: "अ",
+  en: "A",
+};
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("weather");
@@ -25,7 +77,7 @@ const Index = () => {
   const { user, loading } = useAuth();
   const [showLangMenu, setShowLangMenu] = useState(false);
 
-  const { profile, weather, news, tips, alerts, isLoading: isDashboardLoading } = useDashboardData(user?.id);
+  const { profile, weather, news, tips, alerts, isLoading: isDashboardLoading } = useDashboardData(user?.id, language);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -65,6 +117,8 @@ const Index = () => {
         { temp: "32°", icon: "⛅", label: forecastDays[3] },
         { temp: "35°", icon: "☀️", label: forecastDays[4] },
       ];
+  const weatherAlertLevel = getWeatherAlertLevel(weather);
+  const weatherSummary = getWeatherSummary(weather);
 
   const handleVoiceCommand = (transcript: string) => {
     const command = transcript.toLowerCase();
@@ -195,15 +249,6 @@ const Index = () => {
     }
   };
 
-  const handleWakeWord = () => {
-    toast.success("Farmalert Assistant Activated!", {
-      description: "Listening for your command...",
-    });
-    // Programmatically click the mic button to start the actual command listener
-    const btn = document.getElementById("voice-command-btn");
-    if (btn) btn.click();
-  };
-
   if (loading || !user || isDashboardLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -214,7 +259,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <WakeWordListener onWakeWord={handleWakeWord} />
       {/* Header */}
       <header className="bg-primary px-4 pt-4 pb-5 sticky top-0 z-40 shadow-elevated rounded-b-3xl">
         <div className="max-w-[600px] mx-auto flex items-center justify-between">
@@ -237,19 +281,28 @@ const Index = () => {
           <div className="flex items-center gap-1.5">
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setShowLangMenu(!showLangMenu)}
-                className="bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation"
+                aria-label="Change language"
+                className="relative w-10 h-10 bg-primary-foreground/15 rounded-xl active:scale-90 transition-transform touch-manipulation flex items-center justify-center"
               >
                 <span className="text-xl leading-none" aria-hidden="true">🌐</span>
+                <span className="absolute -bottom-1 -right-1 min-w-5 h-5 rounded-full bg-primary-foreground text-primary border border-primary/20 px-1 flex items-center justify-center text-[10px] font-bold leading-none">
+                  {languageBadges[language]}
+                </span>
               </button>
               {showLangMenu && (
                 <div className="absolute right-0 top-12 bg-card border border-border rounded-2xl shadow-elevated z-50 min-w-[140px] overflow-hidden">
                   {(["gu", "hi", "en"] as Language[]).map((lang) => (
                     <button
                       key={lang}
-                      onClick={() => {
+                      type="button"
+                      onClick={async () => {
                         setLanguage(lang);
                         setShowLangMenu(false);
+                        if (user) {
+                          await ProfileService.updateProfile(user.id, { preferred_language: lang });
+                        }
                       }}
                       className={`w-full text-left px-4 py-3 text-sm font-semibold transition-colors touch-manipulation ${
                         language === lang
@@ -290,9 +343,9 @@ const Index = () => {
         {activeTab === "weather" && (
           <>
             <WeatherAlertCard
-              level={weather?.weather_condition?.toLowerCase().includes("rain") ? "red" : "orange"}
+              level={weatherAlertLevel}
               title={weather ? `${Math.round(weather.temperature ?? 0)}°C in ${weather.district}` : t("weather_title")}
-              description={weather?.weather_condition || t("weather_desc")}
+              description={weatherSummary || t("weather_desc")}
               temperature={weather ? `${Math.round(weather.temperature ?? 0)}°C` : "34°C"}
               humidity={weather ? `${Math.round(weather.humidity ?? 0)}%` : "82%"}
               wind={weather ? `${Math.round(weather.wind_speed ?? 0)} km/h` : "25 km/h"}

@@ -191,8 +191,10 @@ export interface Database {
           content: string | null
           category: string
           crop_type: string | null
+          dataset_id: number | null
           season: string | null
           language: string
+          source: string | null
           is_active: boolean
           created_at: string
           updated_at: string
@@ -204,8 +206,10 @@ export interface Database {
           content?: string | null
           category?: string
           crop_type?: string | null
+          dataset_id?: number | null
           season?: string | null
           language?: string
+          source?: string | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -216,8 +220,10 @@ export interface Database {
           content?: string | null
           category?: string
           crop_type?: string | null
+          dataset_id?: number | null
           season?: string | null
           language?: string
+          source?: string | null
           is_active?: boolean
         }
       }

@@ -4,7 +4,7 @@ import { Database, Json } from "@/types/database.types";
 type WeatherCacheRow = Database["public"]["Tables"]["weather_cache"]["Row"];
 type WeatherCacheInsert = Database["public"]["Tables"]["weather_cache"]["Insert"];
 
-export type WeatherProvider = "weatherapi" | "openweather";
+export type WeatherProvider = "weatherapi" | "openweather" | "openmeteo";
 
 export interface WeatherForecastDay {
   date: string;
@@ -29,6 +29,47 @@ type WeatherCacheRecord = WeatherCacheRow & {
   forecast?: Json | null;
 };
 
+interface WeatherApiForecastDay {
+  date?: string;
+  day?: {
+    avgtemp_c?: unknown;
+    mintemp_c?: unknown;
+    maxtemp_c?: unknown;
+    avghumidity?: unknown;
+    totalprecip_mm?: unknown;
+    maxwind_kph?: unknown;
+    uv?: unknown;
+    condition?: {
+      text?: string;
+    };
+  };
+}
+
+interface OpenWeatherDailyForecast {
+  dt?: number;
+  temp?: {
+    day?: unknown;
+    min?: unknown;
+    max?: unknown;
+  };
+  humidity?: unknown;
+  rain?: unknown;
+  wind_speed?: unknown;
+  uvi?: unknown;
+  weather?: Array<{
+    description?: string;
+  }>;
+}
+
+interface OpenMeteoLocation {
+  name?: string;
+  admin2?: string;
+  country?: string;
+  country_code?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
 const DEFAULT_DISTRICT = "Ahmedabad";
 const CACHE_DURATION_MS = 60 * 60 * 1000;
 
@@ -42,6 +83,22 @@ const conditionToIcon = (condition?: string | null) => {
   if (normalized.includes("sun") || normalized.includes("clear")) return "☀️";
 
   return "🌦️";
+};
+
+const openMeteoWeatherCode = (code: unknown): string | null => {
+  const numeric = toNumber(code);
+  if (numeric === null) return null;
+
+  if (numeric === 0) return "Clear sky";
+  if ([1, 2].includes(numeric)) return "Partly cloudy";
+  if (numeric === 3) return "Overcast";
+  if ([45, 48].includes(numeric)) return "Fog";
+  if ([51, 53, 55, 56, 57].includes(numeric)) return "Drizzle";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(numeric)) return "Rain";
+  if ([71, 73, 75, 77, 85, 86].includes(numeric)) return "Snow";
+  if ([95, 96, 99].includes(numeric)) return "Thunderstorm";
+
+  return "Cloudy";
 };
 
 const toNumber = (value: unknown): number | null => {
@@ -151,6 +208,7 @@ const fallbackReport = (district: string): WeatherReport => {
 
 const getProvider = (): WeatherProvider => {
   const configured = String(import.meta.env.VITE_WEATHER_PROVIDER || "weatherapi").toLowerCase();
+  if (configured === "openmeteo") return "openmeteo";
   return configured === "openweather" ? "openweather" : "weatherapi";
 };
 
@@ -179,7 +237,10 @@ const fetchWeatherApiForecast = async (district: string): Promise<WeatherCacheIn
 
   const data = await response.json();
   const current = data.current ?? {};
-  const forecast: WeatherForecastDay[] = (data.forecast?.forecastday ?? []).slice(0, 7).map((day: any) => ({
+  const forecastDays: WeatherApiForecastDay[] = Array.isArray(data.forecast?.forecastday)
+    ? data.forecast.forecastday
+    : [];
+  const forecast: WeatherForecastDay[] = forecastDays.slice(0, 7).map((day) => ({
     date: day.date,
     temperature: round(day.day?.avgtemp_c),
     minTemperature: round(day.day?.mintemp_c),
@@ -239,7 +300,8 @@ const fetchOpenWeatherForecast = async (district: string): Promise<WeatherCacheI
   const data = await response.json();
   const current = data.current ?? {};
   const currentRainfall = current.rain?.["1h"] ?? current.rain?.["3h"] ?? 0;
-  const forecast: WeatherForecastDay[] = (data.daily ?? []).slice(0, 7).map((day: any) => {
+  const dailyForecast: OpenWeatherDailyForecast[] = Array.isArray(data.daily) ? data.daily : [];
+  const forecast: WeatherForecastDay[] = dailyForecast.slice(0, 7).map((day) => {
     const weatherCondition = day.weather?.[0]?.description ?? null;
     return {
       date: new Date(day.dt * 1000).toISOString().slice(0, 10),
@@ -270,6 +332,96 @@ const fetchOpenWeatherForecast = async (district: string): Promise<WeatherCacheI
   };
 };
 
+const fetchOpenMeteoForecast = async (district: string): Promise<WeatherCacheInsert> => {
+  const geoParams = new URLSearchParams({
+    name: district,
+    count: "10",
+    language: "en",
+    format: "json",
+  });
+  const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${geoParams.toString()}`);
+
+  if (!geoResponse.ok) {
+    throw new Error(`Open-Meteo geocoding request failed with ${geoResponse.status}.`);
+  }
+
+  const geoData = await geoResponse.json();
+  const locations: OpenMeteoLocation[] = Array.isArray(geoData.results) ? geoData.results : [];
+  const location =
+    locations.find((item) => item.country_code === "IN") ||
+    locations.find((item) => item.country?.toLowerCase() === "india") ||
+    locations[0];
+
+  if (!location) throw new Error(`Open-Meteo could not resolve district "${district}".`);
+
+  const weatherParams = new URLSearchParams({
+    latitude: String(location.latitude),
+    longitude: String(location.longitude),
+    current: [
+      "temperature_2m",
+      "relative_humidity_2m",
+      "precipitation",
+      "weather_code",
+      "wind_speed_10m",
+    ].join(","),
+    daily: [
+      "weather_code",
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "precipitation_sum",
+      "wind_speed_10m_max",
+      "uv_index_max",
+    ].join(","),
+    timezone: "auto",
+    forecast_days: "7",
+  });
+  const response = await fetch(`https://api.open-meteo.com/v1/forecast?${weatherParams.toString()}`);
+
+  if (!response.ok) {
+    throw new Error(`Open-Meteo forecast request failed with ${response.status}.`);
+  }
+
+  const data = await response.json();
+  const current = data.current ?? {};
+  const daily = data.daily ?? {};
+  const dates = Array.isArray(daily.time) ? daily.time : [];
+  const currentCondition = openMeteoWeatherCode(current.weather_code);
+
+  const forecast: WeatherForecastDay[] = dates.slice(0, 7).map((date: string, index: number) => {
+    const weatherCondition = openMeteoWeatherCode(daily.weather_code?.[index]);
+    const minTemperature = round(daily.temperature_2m_min?.[index]);
+    const maxTemperature = round(daily.temperature_2m_max?.[index]);
+
+    return {
+      date,
+      temperature:
+        minTemperature !== null && maxTemperature !== null
+          ? round((minTemperature + maxTemperature) / 2)
+          : maxTemperature,
+      minTemperature,
+      maxTemperature,
+      humidity: index === 0 ? round(current.relative_humidity_2m) : null,
+      rainfall: round(daily.precipitation_sum?.[index]),
+      windSpeed: round(daily.wind_speed_10m_max?.[index]),
+      uvIndex: round(daily.uv_index_max?.[index]),
+      weatherCondition,
+      icon: conditionToIcon(weatherCondition),
+    };
+  });
+
+  return {
+    district: location.admin2 || location.name || district,
+    temperature: round(current.temperature_2m),
+    humidity: round(current.relative_humidity_2m),
+    rainfall: round(current.precipitation),
+    wind_speed: round(current.wind_speed_10m),
+    weather_condition: currentCondition,
+    uv_index: round(daily.uv_index_max?.[0]),
+    forecast: forecast as unknown as Json,
+    fetched_at: new Date().toISOString(),
+  };
+};
+
 export class WeatherService {
   static async getWeatherForDistrict(districtInput?: string | null): Promise<WeatherReport> {
     const district = normalizeDistrict(districtInput);
@@ -289,10 +441,13 @@ export class WeatherService {
     }
 
     try {
+      const provider = getProvider();
       const freshWeather =
-        getProvider() === "openweather"
-          ? await fetchOpenWeatherForecast(district)
-          : await fetchWeatherApiForecast(district);
+        provider === "openmeteo"
+          ? await fetchOpenMeteoForecast(district)
+          : provider === "openweather"
+            ? await fetchOpenWeatherForecast(district)
+            : await fetchWeatherApiForecast(district);
 
       const { data: upsertedWeather, error: upsertError } = await supabase
         .from("weather_cache")
@@ -304,7 +459,22 @@ export class WeatherService {
 
       return toReport(upsertedWeather as WeatherCacheRecord, { isCached: false, isStale: false });
     } catch (error) {
-      console.error("Weather integration failed:", error);
+      console.warn("Configured weather integration failed; trying Open-Meteo fallback.", error);
+
+      try {
+        const freshWeather = await fetchOpenMeteoForecast(district);
+        const { data: upsertedWeather, error: upsertError } = await supabase
+          .from("weather_cache")
+          .upsert(freshWeather, { onConflict: "district" })
+          .select("*")
+          .single();
+
+        if (upsertError) throw upsertError;
+
+        return toReport(upsertedWeather as WeatherCacheRecord, { isCached: false, isStale: false });
+      } catch (fallbackError) {
+        console.error("Open-Meteo weather fallback failed:", fallbackError);
+      }
 
       if (cachedWeather) {
         return toReport(cachedWeather, { isCached: true, isStale: true });
