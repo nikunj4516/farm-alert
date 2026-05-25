@@ -1,0 +1,23 @@
+{
+  "name": "farmalert-backend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "cron:news": "node cron/newsCron.js",
+    "fetch:news": "node scripts/fetchNewsOnce.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.103.0",
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "openai": "^6.10.0",
+    "rss-parser": "^3.13.0"
+  }
+}

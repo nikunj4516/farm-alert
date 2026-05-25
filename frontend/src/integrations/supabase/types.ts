@@ -23,6 +23,12 @@ export type Database = {
           land_size: number | null
           name: string | null
           phone: string | null
+          taluka: string | null
+          state: string | null
+          preferred_language: string | null
+          profile_image_url: string | null
+          farming_type: string | null
+          crop_name: string | null
           updated_at: string
           user_id: string
           village: string | null
@@ -35,6 +41,12 @@ export type Database = {
           land_size?: number | null
           name?: string | null
           phone?: string | null
+          taluka?: string | null
+          state?: string | null
+          preferred_language?: string | null
+          profile_image_url?: string | null
+          farming_type?: string | null
+          crop_name?: string | null
           updated_at?: string
           user_id: string
           village?: string | null
@@ -47,6 +59,12 @@ export type Database = {
           land_size?: number | null
           name?: string | null
           phone?: string | null
+          taluka?: string | null
+          state?: string | null
+          preferred_language?: string | null
+          profile_image_url?: string | null
+          farming_type?: string | null
+          crop_name?: string | null
           updated_at?: string
           user_id?: string
           village?: string | null

@@ -33,9 +33,15 @@ export const useDashboardData = (userId: string | undefined, selectedLanguage?: 
     data: news,
     isLoading: isNewsLoading,
   } = useQuery({
-    queryKey: ["news", language],
-    queryFn: () => NewsService.getLatestNews(language, 5),
-    enabled: !!language,
+    queryKey: ["agriculture-news", cropType, profile?.state, profile?.district],
+    queryFn: () =>
+      NewsService.getPersonalizedNews({
+        cropType,
+        state: profile?.state,
+        district: profile?.district,
+        limit: 5,
+      }),
+    enabled: Boolean(profile),
   });
 
   // 4. Fetch Personalized Tips
@@ -65,6 +71,7 @@ export const useDashboardData = (userId: string | undefined, selectedLanguage?: 
     tips,
     alerts,
     isLoading: isProfileLoading || isWeatherLoading || isNewsLoading || isTipsLoading || isAlertsLoading,
+    isProfileLoading,
     errors: { profileError, weatherError }
   };
 };

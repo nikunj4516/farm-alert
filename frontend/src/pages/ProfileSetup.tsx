@@ -1,29 +1,108 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat, Bean, Cloud, Sprout, Trees, Carrot, Package } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import farmerAvatar from "@/assets/farmer-1.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Progress } from "@/components/ui/progress";
-import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
+import { ProfileService } from "@/services/profileService";
 
 const STEPS = 3;
+const locationCopy = {
+  en: {
+    village: "Village",
+    villagePlaceholder: "e.g. Rampura",
+    taluka: "Taluka",
+    talukaPlaceholder: "e.g. Jambughoda",
+    district: "District",
+    districtPlaceholder: "e.g. Panchmahal",
+    state: "State",
+    statePlaceholder: "e.g. Gujarat",
+  },
+  hi: {
+    village: "गाँव",
+    villagePlaceholder: "जैसे रामपुरा",
+    taluka: "तालुका",
+    talukaPlaceholder: "जैसे जांबुघोड़ा",
+    district: "जिला",
+    districtPlaceholder: "जैसे पंचमहल",
+    state: "राज्य",
+    statePlaceholder: "जैसे गुजरात",
+  },
+  gu: {
+    village: "ગામ",
+    villagePlaceholder: "દા.ત. રામપુરા",
+    taluka: "તાલુકો",
+    talukaPlaceholder: "દા.ત. જાંબુઘોડા",
+    district: "જિલ્લો",
+    districtPlaceholder: "દા.ત. પંચમહાલ",
+    state: "રાજ્ય",
+    statePlaceholder: "દા.ત. ગુજરાત",
+  },
+} as const;
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { t, tArray } = useLanguage();
+  const { language, t, tArray } = useLanguage();
+  const copy = locationCopy[language];
   const [loading, setLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "",
     village: "",
+    taluka: "",
     district: "",
+    state: "",
     crop_type: "",
     land_size: "",
   });
+
+  useEffect(() => {
+    if (!user) return;
+
+    let isMounted = true;
+
+    const loadProfile = async () => {
+      setProfileLoading(true);
+      setError("");
+
+      try {
+        const savedProfile = await ProfileService.getProfile(user.id);
+        if (!isMounted || !savedProfile) return;
+
+        setForm({
+          name: savedProfile.name || "",
+          village: savedProfile.village || "",
+          taluka: (savedProfile as typeof savedProfile & { taluka?: string | null }).taluka || "",
+          district: savedProfile.district || "",
+          state: savedProfile.state || "",
+          crop_type: savedProfile.crop_type || "",
+          land_size: savedProfile.land_size ? String(savedProfile.land_size) : "",
+        });
+      } catch (error) {
+        if (isMounted) {
+          setError(error instanceof Error ? error.message : "Unable to load profile");
+        }
+      } finally {
+        if (isMounted) {
+          setProfileLoading(false);
+        }
+      }
+    };
+
+    void loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   const crops = tArray("crops");
   const cropIconsList = [
@@ -53,30 +132,41 @@ const ProfileSetup = () => {
     setLoading(true);
     setError("");
 
-    const landSize = Number.parseFloat(form.land_size);
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          user_id: user.id,
-          name: form.name.trim().substring(0, 100),
-          village: form.village.trim().substring(0, 100) || null,
-          district: form.district.trim().substring(0, 100) || null,
-          crop_type: form.crop_type || null,
-          land_size: Number.isFinite(landSize) ? landSize : null,
-        },
-        { onConflict: "user_id" }
-      );
-
-    setLoading(false);
-
-    if (error) {
-      setError(error.message);
-      return;
+    try {
+      const landSize = Number.parseFloat(form.land_size);
+      await ProfileService.upsertProfile(user.id, {
+        name: form.name.trim().substring(0, 100),
+        village: form.village.trim().substring(0, 100) || null,
+        taluka: form.taluka.trim().substring(0, 100) || null,
+        district: form.district.trim().substring(0, 100) || null,
+        state: form.state.trim().substring(0, 100) || null,
+        preferred_language: language,
+        crop_type: form.crop_type || null,
+        land_size: Number.isFinite(landSize) ? landSize : null,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+      toast({
+        title: t("profile_save"),
+        description: t("profile_subtitle"),
+      });
+      navigate("/dashboard", { state: { activeTab: "profile" } });
+    } catch (error) {
+      setError(ProfileService.getErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/subscription");
   };
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="rounded-3xl border border-primary/10 bg-card p-6 text-center shadow-card">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <p className="mt-3 text-sm font-semibold text-muted-foreground">{t("profile_subtitle")}</p>
+        </div>
+      </div>
+    );
+  }
 
   const canGoNext = () => {
     if (step === 0) return form.name.trim().length > 0;
@@ -150,26 +240,52 @@ const ProfileSetup = () => {
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
                   <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
-                  {t("profile_village")}
+                  {copy.village}
                 </label>
                 <input
                   type="text"
                   value={form.village}
                   onChange={(e) => setForm({ ...form, village: e.target.value })}
-                  placeholder={t("profile_village_placeholder")}
+                  placeholder={copy.villagePlaceholder}
                   className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
                 />
               </div>
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
                   <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
-                  {t("profile_district")}
+                  {copy.taluka}
+                </label>
+                <input
+                  type="text"
+                  value={form.taluka}
+                  onChange={(e) => setForm({ ...form, taluka: e.target.value })}
+                  placeholder={copy.talukaPlaceholder}
+                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
+                  {copy.district}
                 </label>
                 <input
                   type="text"
                   value={form.district}
                   onChange={(e) => setForm({ ...form, district: e.target.value })}
-                  placeholder={t("profile_district_placeholder")}
+                  placeholder={copy.districtPlaceholder}
+                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  {copy.state}
+                </label>
+                <input
+                  type="text"
+                  value={form.state}
+                  onChange={(e) => setForm({ ...form, state: e.target.value })}
+                  placeholder={copy.statePlaceholder}
                   className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
                 />
               </div>

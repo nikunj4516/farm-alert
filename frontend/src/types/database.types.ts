@@ -16,9 +16,13 @@ export interface Database {
           name: string | null
           phone: string | null
           village: string | null
+          taluka: string | null
           district: string | null
           state: string | null
           preferred_language: string | null
+          profile_image_url: string | null
+          farming_type: string | null
+          crop_name: string | null
           crop_type: string | null
           land_size: number | null
           created_at: string
@@ -30,9 +34,13 @@ export interface Database {
           name?: string | null
           phone?: string | null
           village?: string | null
+          taluka?: string | null
           district?: string | null
           state?: string | null
           preferred_language?: string | null
+          profile_image_url?: string | null
+          farming_type?: string | null
+          crop_name?: string | null
           crop_type?: string | null
           land_size?: number | null
           created_at?: string
@@ -42,9 +50,13 @@ export interface Database {
           name?: string | null
           phone?: string | null
           village?: string | null
+          taluka?: string | null
           district?: string | null
           state?: string | null
           preferred_language?: string | null
+          profile_image_url?: string | null
+          farming_type?: string | null
+          crop_name?: string | null
           crop_type?: string | null
           land_size?: number | null
         }
@@ -181,6 +193,55 @@ export interface Database {
           category?: string | null
           published_at?: string
           is_active?: boolean
+        }
+      }
+      agriculture_news: {
+        Row: {
+          id: string
+          title: string
+          summary: string | null
+          content: string | null
+          source_name: string
+          source_url: string
+          image_url: string | null
+          category: string
+          crop_related: string[]
+          state_related: string[]
+          title_hash: string | null
+          published_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          summary?: string | null
+          content?: string | null
+          source_name: string
+          source_url: string
+          image_url?: string | null
+          category?: string
+          crop_related?: string[]
+          state_related?: string[]
+          title_hash?: string | null
+          published_at: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          title?: string
+          summary?: string | null
+          content?: string | null
+          source_name?: string
+          source_url?: string
+          image_url?: string | null
+          category?: string
+          crop_related?: string[]
+          state_related?: string[]
+          title_hash?: string | null
+          published_at?: string
+          created_at?: string
+          updated_at?: string
         }
       }
       farming_tips: {

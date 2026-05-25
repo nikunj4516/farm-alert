@@ -3,10 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "workspaces": [
-    "frontend"
+    "frontend",
+    "backend"
   ],
   "scripts": {
     "dev": "npm run dev -w frontend -- --host 127.0.0.1 --port 5173",
+    "backend:dev": "npm run dev -w backend",
+    "backend:start": "npm run start -w backend",
+    "news:fetch": "npm run fetch:news -w backend",
+    "news:cron": "npm run cron:news -w backend",
     "build": "npm run build -w frontend",
     "build:dev": "npm run build:dev -w frontend",
     "lint": "npm run lint -w frontend",

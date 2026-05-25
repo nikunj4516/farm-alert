@@ -2,44 +2,202 @@ import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/types/database.types";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
+
+const legacyProfileKeys = new Set(["name", "phone", "village", "district", "state", "crop_type", "land_size"]);
+const profileImageBuckets = ["Profile", "profile storge", "profile-storage", "profile-images"];
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    return String((error as { message?: unknown }).message);
+  }
+  return "Unable to save profile";
+};
+
+const isMissingProfileColumnError = (error: unknown) => {
+  const errorLike = error as { code?: string; message?: string; details?: string } | null;
+  const message = `${errorLike?.message || ""} ${errorLike?.details || ""}`.toLowerCase();
+
+  return (
+    errorLike?.code === "PGRST204" ||
+    (message.includes("column") && message.includes("profiles") && message.includes("schema cache"))
+  );
+};
+
+const toLegacyProfilePayload = (profile: ProfileUpdate) =>
+  Object.fromEntries(Object.entries(profile).filter(([key]) => legacyProfileKeys.has(key))) as ProfileUpdate;
+
+const getImageExtension = (file: File) => {
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  if (extension && ["jpg", "jpeg", "png", "webp"].includes(extension)) return extension;
+  if (file.type === "image/png") return "png";
+  if (file.type === "image/webp") return "webp";
+  return "jpg";
+};
 
 export class ProfileService {
   /**
    * Fetches the user's profile and preferences
    */
   static async getProfile(userId: string): Promise<Profile | null> {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
 
-      if (error) throw error;
-      return data;
-    } catch (error) {
+    if (error) {
       console.error("Error fetching profile:", error);
-      return null;
+      throw error;
     }
+
+    return data;
   }
 
   /**
    * Update the user's profile
    */
-  static async updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | null> {
-    try {
-      const { data, error } = await supabase
+  static async updateProfile(userId: string, updates: ProfileUpdate): Promise<Profile> {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update(updates)
+      .eq("user_id", userId)
+      .select()
+      .single();
+
+    if (error) {
+      if (isMissingProfileColumnError(error)) {
+        const legacyUpdates = toLegacyProfilePayload(updates);
+
+        if (Object.keys(legacyUpdates).length === 0) {
+          throw error;
+        } else {
+          const { data: legacyData, error: legacyError } = await supabase
+            .from("profiles")
+            .update(legacyUpdates)
+            .eq("user_id", userId)
+            .select()
+            .single();
+
+          if (!legacyError) return legacyData;
+          console.error("Error updating legacy profile:", legacyError);
+          throw new Error(getErrorMessage(legacyError));
+        }
+      }
+
+      console.error("Error updating profile:", error);
+      throw new Error(getErrorMessage(error));
+    }
+
+    return data;
+  }
+
+  /**
+   * Create or update the user's profile using user_id as the stable key.
+   */
+  static async upsertProfile(userId: string, profile: ProfileUpdate): Promise<Profile> {
+    const saveProfile = async (payload: ProfileUpdate) =>
+      supabase
         .from("profiles")
-        .update(updates)
-        .eq("user_id", userId)
+        .upsert(
+          {
+            ...payload,
+            user_id: userId,
+          } as ProfileInsert,
+          { onConflict: "user_id" }
+        )
         .select()
         .single();
 
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      return null;
+    const { data, error } = await saveProfile(profile);
+
+    if (error && isMissingProfileColumnError(error)) {
+      const legacyProfile = toLegacyProfilePayload(profile);
+      const { data: legacyData, error: legacyError } = await saveProfile(legacyProfile);
+
+      if (legacyError) {
+        console.error("Error saving legacy profile:", legacyError);
+        throw new Error(getErrorMessage(legacyError));
+      }
+
+      return legacyData;
     }
+
+    if (error) {
+      console.error("Error saving profile:", error);
+      throw new Error(getErrorMessage(error));
+    }
+
+    return data;
+  }
+
+  static getErrorMessage(error: unknown) {
+    return getErrorMessage(error);
+  }
+
+  static async uploadProfileImage(userId: string, file: File): Promise<string> {
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Please choose an image file.");
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      throw new Error("Profile image must be smaller than 2 MB.");
+    }
+
+    const extension = getImageExtension(file);
+    const filePath = `${userId}/profile-${Date.now()}.${extension}`;
+    let uploadedBucket = profileImageBuckets[0];
+    let uploadError: unknown = null;
+
+    for (const bucket of profileImageBuckets) {
+      const { error } = await supabase.storage.from(bucket).upload(filePath, file, {
+        cacheControl: "3600",
+        contentType: file.type || `image/${extension}`,
+        upsert: true,
+      });
+
+      if (!error) {
+        uploadedBucket = bucket;
+        uploadError = null;
+        break;
+      }
+
+      uploadError = error;
+
+      if (!error.message.toLowerCase().includes("bucket not found")) {
+        break;
+      }
+    }
+
+    if (uploadError) {
+      console.error("Error uploading profile image:", uploadError);
+      throw new Error(
+        getErrorMessage(uploadError).includes("Bucket not found")
+          ? "Profile image storage bucket was not found. Create a public bucket named Profile."
+          : getErrorMessage(uploadError)
+      );
+    }
+
+    const { data } = supabase.storage.from(uploadedBucket).getPublicUrl(filePath);
+    const imageUrl = data.publicUrl;
+
+    try {
+      await this.updateProfile(userId, { profile_image_url: imageUrl } as ProfileUpdate);
+    } catch (error) {
+      if (!isMissingProfileColumnError(error)) {
+        throw error;
+      }
+
+      await supabase.auth.updateUser({
+        data: {
+          avatar_url: imageUrl,
+          profile_image_url: imageUrl,
+        },
+      });
+    }
+
+    return imageUrl;
   }
 }

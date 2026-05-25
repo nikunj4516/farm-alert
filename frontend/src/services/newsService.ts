@@ -1,23 +1,34 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/types/database.types";
 
-type AgriNews = Database["public"]["Tables"]["agri_news"]["Row"];
+export type AgricultureNews = Database["public"]["Tables"]["agriculture_news"]["Row"];
+
+export interface NewsQueryOptions {
+  category?: string;
+  cropType?: string | null;
+  state?: string | null;
+  district?: string | null;
+  limit?: number;
+}
+
+const arrayFilterValue = (value: string) =>
+  value.includes(" ") ? `{"${value.replace(/"/g, '\\"')}"}` : `{${value}}`;
 
 export class NewsService {
-  /**
-   * Fetches the latest agriculture news from Supabase
-   * @param language 'en', 'hi', or 'gu'
-   * @param limit maximum number of news items to fetch
-   */
-  static async getLatestNews(language: string = "gu", limit: number = 10): Promise<AgriNews[]> {
+  static async getLatestNews(options: NewsQueryOptions = {}): Promise<AgricultureNews[]> {
     try {
-      const { data, error } = await supabase
-        .from("agri_news")
+      const { category = "all", limit = 10 } = options;
+      let query = supabase
+        .from("agriculture_news")
         .select("*")
-        .eq("is_active", true)
-        .eq("language", language)
         .order("published_at", { ascending: false })
         .limit(limit);
+
+      if (category !== "all") {
+        query = query.eq("category", category);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data || [];
@@ -27,38 +38,38 @@ export class NewsService {
     }
   }
 
-  /**
-   * Syncs external RSS or News API to Supabase.
-   * Typically this would be run in a Supabase Edge Function or cron job.
-   * Provided here as part of scalable architecture design.
-   */
-  static async syncExternalNews(apiKey: string, language: string): Promise<void> {
-    if (!apiKey) return;
-    
+  static async getPersonalizedNews(options: NewsQueryOptions = {}): Promise<AgricultureNews[]> {
     try {
-      // Example NewsAPI integration
-      const res = await fetch(`https://newsapi.org/v2/everything?q=agriculture+farming+india&language=${language}&apiKey=${apiKey}`);
-      if (res.ok) {
-        const data = await res.json();
-        const articles = data.articles.slice(0, 5); // Limit batch processing
-        
-        for (const article of articles) {
-          // Upsert to avoid duplicates by URL
-          await supabase.from("agri_news").upsert({
-            title: article.title,
-            description: article.description,
-            image_url: article.urlToImage,
-            source: article.source.name,
-            url: article.url,
-            language: language,
-            category: "general",
-            published_at: article.publishedAt,
-            is_active: true
-          }, { onConflict: "url" });
-        }
+      const { category = "all", cropType, state, district, limit = 10 } = options;
+      let query = supabase
+        .from("agriculture_news")
+        .select("*")
+        .order("published_at", { ascending: false })
+        .limit(limit);
+
+      if (category !== "all") {
+        query = query.eq("category", category);
       }
+
+      const filters: string[] = [];
+      if (cropType) filters.push(`crop_related.cs.${arrayFilterValue(cropType)}`);
+      if (state) filters.push(`state_related.cs.${arrayFilterValue(state)}`);
+      if (district) {
+        filters.push(`summary.ilike.%${district}%`, `content.ilike.%${district}%`);
+      }
+
+      if (filters.length) {
+        query = query.or(filters.join(","));
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      if (data?.length) return data;
+      return this.getLatestNews({ category, limit });
     } catch (error) {
-      console.error("Error syncing external news:", error);
+      console.error("Error fetching personalized agriculture news:", error);
+      return this.getLatestNews({ category: options.category, limit: options.limit });
     }
   }
 }

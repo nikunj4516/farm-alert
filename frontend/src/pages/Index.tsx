@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import WeatherAlertCard from "@/components/WeatherAlertCard";
-import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
 import QuickActions from "@/components/QuickActions";
 import VoiceCommandButton from "@/components/VoiceCommandButton";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
+import ProfileCard from "@/components/ProfileCard";
 import { Bell, LogOut, Globe, Loader2, CloudRain, CloudLightning, CloudSun, Cloud, Sun, Phone, MapPin } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
@@ -17,6 +18,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { hasActiveSubscription } from "@/services/subscriptionService";
 import { ProfileService } from "@/services/profileService";
 import type { WeatherReport } from "@/services/weatherService";
+import { toast } from "@/components/ui/use-toast";
 
 const getWeatherAlertLevel = (weather?: WeatherReport | null) => {
   if (!weather) return "green" as const;
@@ -71,13 +73,25 @@ const languageBadges: Record<Language, string> = {
 };
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<Tab>("weather");
+  const location = useLocation();
+  const initialTab = (location.state as { activeTab?: Tab } | null)?.activeTab;
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab || "weather");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { language, setLanguage, t, tArray } = useLanguage();
   const { user, loading } = useAuth();
   const [showLangMenu, setShowLangMenu] = useState(false);
 
-  const { profile, weather, news, tips, alerts, isLoading: isDashboardLoading } = useDashboardData(user?.id, language);
+  const {
+    profile,
+    weather,
+    news,
+    tips,
+    alerts,
+    isLoading: isDashboardLoading,
+    isProfileLoading,
+    errors,
+  } = useDashboardData(user?.id, language);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -249,7 +263,33 @@ const Index = () => {
     }
   };
 
-  if (loading || !user || isDashboardLoading) {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem("farmalert_onboarded");
+    navigate("/");
+  };
+
+  const handleProfileImageUpload = async (file: File) => {
+    if (!user) return;
+
+    try {
+      await ProfileService.uploadProfileImage(user.id, file);
+      await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+      toast({
+        title: "Profile photo updated",
+        description: "Your new profile image has been saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Could not update photo",
+        description: ProfileService.getErrorMessage(error),
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -301,7 +341,16 @@ const Index = () => {
                         setLanguage(lang);
                         setShowLangMenu(false);
                         if (user) {
-                          await ProfileService.updateProfile(user.id, { preferred_language: lang });
+                          try {
+                            await ProfileService.upsertProfile(user.id, { preferred_language: lang });
+                            await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+                          } catch (error) {
+                            toast({
+                              title: "Could not save language",
+                              description: error instanceof Error ? error.message : "Please try again.",
+                              variant: "destructive",
+                            });
+                          }
                         }
                       }}
                       className={`w-full text-left px-4 py-3 text-sm font-semibold transition-colors touch-manipulation ${
@@ -326,11 +375,7 @@ const Index = () => {
               className="rounded-xl bg-primary-foreground/15 text-primary-foreground"
             />
             <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                localStorage.removeItem("farmalert_onboarded");
-                navigate("/");
-              }}
+              onClick={handleLogout}
               className="bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation"
             >
               <LogOut className="w-5 h-5 text-primary-foreground" />
@@ -390,26 +435,18 @@ const Index = () => {
         )}
 
         {activeTab === "tips" && <FarmingTips tipsData={tips} />}
-        {activeTab === "news" && <AgriNews newsData={news} />}
+        {activeTab === "news" && <AgriNews newsData={news} isLoading={isDashboardLoading} />}
         {activeTab === "about" && <AboutTab />}
         {activeTab === "profile" && (
-          <div className="space-y-4">
-            <div className="text-center py-8">
-              <FarmerEmojiImage className="mx-auto mb-4 h-24 w-24" />
-              <h2 className="text-2xl font-bold text-foreground">
-                {t("profile_title")}
-              </h2>
-              <p className="text-muted-foreground text-sm mt-1">
-                {t("profile_subtitle")}
-              </p>
-            </div>
-            <button
-              onClick={() => navigate("/profile-setup")}
-              className="w-full bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-all touch-manipulation shadow-md"
-            >
-              {t("profile_save")}
-            </button>
-          </div>
+          <ProfileCard
+            profile={profile}
+            isLoading={isProfileLoading}
+            error={errors.profileError}
+            fallbackImageUrl={user.user_metadata?.profile_image_url || user.user_metadata?.avatar_url}
+            onEdit={() => navigate("/profile-setup")}
+            onLogout={handleLogout}
+            onImageUpload={handleProfileImageUpload}
+          />
         )}
       </main>
 
