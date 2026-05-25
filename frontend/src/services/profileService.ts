@@ -5,7 +5,7 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
 
-const legacyProfileKeys = new Set(["name", "phone", "village", "district", "state", "crop_type", "land_size"]);
+const legacyProfileKeys = new Set(["name", "phone", "village", "district", "crop_type", "land_size"]);
 const profileImageBuckets = ["Profile", "profile storge", "profile-storage", "profile-images"];
 
 const getErrorMessage = (error: unknown) => {
@@ -28,6 +28,16 @@ const isMissingProfileColumnError = (error: unknown) => {
 
 const toLegacyProfilePayload = (profile: ProfileUpdate) =>
   Object.fromEntries(Object.entries(profile).filter(([key]) => legacyProfileKeys.has(key))) as ProfileUpdate;
+
+const getMissingColumnName = (error: unknown) => {
+  const message = getErrorMessage(error);
+  return message.match(/'([^']+)'\s+column/)?.[1];
+};
+
+const withoutColumn = (profile: ProfileUpdate, columnName: string) => {
+  const { [columnName]: _removed, ...rest } = profile as Record<string, unknown>;
+  return rest as ProfileUpdate;
+};
 
 const getImageExtension = (file: File) => {
   const extension = file.name.split(".").pop()?.toLowerCase();
@@ -60,38 +70,34 @@ export class ProfileService {
    * Update the user's profile
    */
   static async updateProfile(userId: string, updates: ProfileUpdate): Promise<Profile> {
-    const { data, error } = await supabase
-      .from("profiles")
-      .update(updates)
-      .eq("user_id", userId)
-      .select()
-      .single();
+    let payload = updates;
+    let lastError: unknown = null;
 
-    if (error) {
-      if (isMissingProfileColumnError(error)) {
-        const legacyUpdates = toLegacyProfilePayload(updates);
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .update(payload)
+        .eq("user_id", userId)
+        .select()
+        .single();
 
-        if (Object.keys(legacyUpdates).length === 0) {
-          throw error;
-        } else {
-          const { data: legacyData, error: legacyError } = await supabase
-            .from("profiles")
-            .update(legacyUpdates)
-            .eq("user_id", userId)
-            .select()
-            .single();
+      if (!error) return data;
 
-          if (!legacyError) return legacyData;
-          console.error("Error updating legacy profile:", legacyError);
-          throw new Error(getErrorMessage(legacyError));
-        }
+      lastError = error;
+
+      if (!isMissingProfileColumnError(error)) {
+        console.error("Error updating profile:", error);
+        throw new Error(getErrorMessage(error));
       }
 
-      console.error("Error updating profile:", error);
-      throw new Error(getErrorMessage(error));
+      const missingColumn = getMissingColumnName(error);
+      payload = missingColumn ? withoutColumn(payload, missingColumn) : toLegacyProfilePayload(payload);
+
+      if (Object.keys(payload).length === 0) break;
     }
 
-    return data;
+    console.error("Error updating profile:", lastError);
+    throw new Error(getErrorMessage(lastError));
   }
 
   /**
@@ -111,26 +117,29 @@ export class ProfileService {
         .select()
         .single();
 
-    const { data, error } = await saveProfile(profile);
+    let payload = profile;
+    let lastError: unknown = null;
 
-    if (error && isMissingProfileColumnError(error)) {
-      const legacyProfile = toLegacyProfilePayload(profile);
-      const { data: legacyData, error: legacyError } = await saveProfile(legacyProfile);
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      const { data, error } = await saveProfile(payload);
 
-      if (legacyError) {
-        console.error("Error saving legacy profile:", legacyError);
-        throw new Error(getErrorMessage(legacyError));
+      if (!error) return data;
+
+      lastError = error;
+
+      if (!isMissingProfileColumnError(error)) {
+        console.error("Error saving profile:", error);
+        throw new Error(getErrorMessage(error));
       }
 
-      return legacyData;
+      const missingColumn = getMissingColumnName(error);
+      payload = missingColumn ? withoutColumn(payload, missingColumn) : toLegacyProfilePayload(payload);
+
+      if (Object.keys(payload).length === 0) break;
     }
 
-    if (error) {
-      console.error("Error saving profile:", error);
-      throw new Error(getErrorMessage(error));
-    }
-
-    return data;
+    console.error("Error saving profile:", lastError);
+    throw new Error(getErrorMessage(lastError));
   }
 
   static getErrorMessage(error: unknown) {
