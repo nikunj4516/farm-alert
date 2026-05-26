@@ -19,13 +19,14 @@ const WeatherCard = ({ weather }: WeatherCardProps) => {
   const { t } = useLanguage();
   const condition = weather.weather_condition;
   const conditionLabel = condition ? t(`weather.conditions.${condition}`) : t("home.weatherUpdate");
+  const providerLabel = t(`weather.intelligence.providers.${weather.provider || "weather"}`);
 
   return (
     <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-emerald-700 p-5 text-primary-foreground shadow-elevated">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-primary-foreground/70">
-            {weather.provider || "weather"} {t("home.weatherIntelligence")}
+            {providerLabel} {t("home.weatherIntelligence")}
           </p>
           <h2 className="mt-1 text-2xl font-black leading-tight">
             {Math.round(weather.temperature ?? 0)}°C
@@ -50,7 +51,7 @@ const WeatherCard = ({ weather }: WeatherCardProps) => {
         {[
           { icon: "💧", label: t("home.humidity"), value: `${Math.round(weather.humidity ?? 0)}%` },
           { icon: "🌧️", label: t("home.rain"), value: `${Math.round(weather.precipitation_probability ?? 0)}%` },
-          { icon: "🌬️", label: t("home.wind"), value: `${Math.round(weather.wind_speed ?? 0)} km/h` },
+          { icon: "🌬️", label: t("home.wind"), value: `${Math.round(weather.wind_speed ?? 0)} ${t("weather.intelligence.units.kmh")}` },
         ].map((item) => (
           <div key={item.label} className="rounded-xl bg-primary-foreground/15 p-3 text-center">
             <span className="text-xl leading-none" aria-hidden="true">{item.icon}</span>

@@ -1,8 +1,12 @@
 import { WeatherReport } from "@/services/weatherService";
-import CropWeatherInsights from "./CropWeatherInsights";
+import CropRiskCard from "./CropRiskCard";
+import FarmingRecommendations from "./FarmingRecommendations";
 import ForecastCard from "./ForecastCard";
-import RainAlertCard from "./RainAlertCard";
+import HeatwaveAlertCard from "./HeatwaveAlertCard";
+import RainPredictionCard from "./RainPredictionCard";
+import SmartWeatherAlerts from "./SmartWeatherAlerts";
 import WeatherCard from "./WeatherCard";
+import WeatherInsights from "./WeatherInsights";
 import WeatherSkeleton from "./WeatherSkeleton";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -29,8 +33,14 @@ const FarmerWeatherDashboard = ({ weather, cropType, isLoading }: FarmerWeatherD
   return (
     <div className="space-y-5">
       <WeatherCard weather={weather} />
-      <RainAlertCard alerts={weather.agricultureAlerts} />
-      <CropWeatherInsights weather={weather} cropType={cropType} />
+      <SmartWeatherAlerts alerts={weather.agricultureAlerts} cropType={cropType} />
+      <CropRiskCard cropType={cropType} alerts={weather.agricultureAlerts} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <RainPredictionCard weather={weather} />
+        <HeatwaveAlertCard weather={weather} cropType={cropType} />
+      </div>
+      <WeatherInsights weather={weather} />
+      <FarmingRecommendations alerts={weather.agricultureAlerts} cropType={cropType} />
       <ForecastCard weather={weather} />
     </div>
   );

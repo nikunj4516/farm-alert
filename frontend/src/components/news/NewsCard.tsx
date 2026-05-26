@@ -164,6 +164,21 @@ const localizedSourceUrl = (url: string | null, language: keyof typeof dateLocal
   return `https://translate.google.com/translate?${params.toString()}`;
 };
 
+const fallbackNewsImages: Record<string, string> = {
+  government: "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=240&q=75",
+  subsidy: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=240&q=75",
+  market: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=240&q=75",
+  weather: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=240&q=75",
+  pest: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=240&q=75",
+  general: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=240&q=75",
+};
+
+const newsImageFor = (article: AgricultureNews) =>
+  article.image_url ||
+  article.image ||
+  fallbackNewsImages[article.category || "general"] ||
+  fallbackNewsImages.general;
+
 const NewsCard = ({ article }: NewsCardProps) => {
   const { language, t } = useLanguage();
   const category = t(`news.categories.${article.category || "general"}`);
@@ -172,6 +187,7 @@ const NewsCard = ({ article }: NewsCardProps) => {
   const sourceLabel =
     sourceLabels[article.source_name as keyof typeof sourceLabels]?.[language] ||
     article.source_name;
+  const imageUrl = newsImageFor(article);
 
   const handleReadSource = () => {
     if (!readUrl) return;
@@ -185,18 +201,13 @@ const NewsCard = ({ article }: NewsCardProps) => {
   return (
     <article className="rounded-2xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start gap-3">
-        {article.image_url ? (
-          <img
-            src={article.image_url}
-            alt=""
-            className="h-16 w-16 shrink-0 rounded-xl object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-2xl">
-            📰
-          </div>
-        )}
+        <img
+          src={imageUrl}
+          alt=""
+          className="h-16 w-16 shrink-0 rounded-xl object-cover"
+          loading="lazy"
+          referrerPolicy="no-referrer"
+        />
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">

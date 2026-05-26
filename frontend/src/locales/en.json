@@ -97,6 +97,130 @@
       "humidityOk": "Humidity risk is moderate right now.",
       "heatHigh": "Plan irrigation during cooler hours to reduce heat stress.",
       "heatOk": "Temperature stress is currently controlled."
+    },
+    "intelligence": {
+      "aiLabel": "AI Weather Intelligence",
+      "smartCropAlerts": "Smart Crop Alerts",
+      "cropRiskProfile": "Crop Risk Profile",
+      "risk": "Risk",
+      "heatLimit": "Heat limit",
+      "humidityRisk": "Humidity risk",
+      "rainTolerance": "Rain tolerance",
+      "windTolerance": "Wind tolerance",
+      "rainPrediction": "Rain Prediction",
+      "chance": "chance",
+      "rainWindow": "Rain risk increases around {time}. Avoid spraying near this window.",
+      "noRainWindow": "No strong rain window detected in the next 12 hours. Keep monitoring before pesticide or fertilizer work.",
+      "heatwaveWatch": "Heatwave Watch",
+      "max": "max",
+      "heatRisk": "{crop} may lose moisture faster. Prefer evening irrigation and avoid afternoon spraying.",
+      "heatSafe": "Heat stress risk is low right now. Continue normal irrigation planning.",
+      "fieldIntelligence": "Field Intelligence",
+      "recommendedActions": "Recommended Actions",
+      "safeStatus": "Safe",
+      "providers": {
+        "google_weather": "Google Weather",
+        "openmeteo": "Open-Meteo",
+        "weather": "Weather"
+      },
+      "units": {
+        "kmh": "km/h",
+        "mm": "mm"
+      },
+      "safeAction1": "Continue normal field monitoring.",
+      "safeAction2": "Check soil moisture before irrigation.",
+      "safeAction3": "Review crop-stage farming tips for the next operation.",
+      "metrics": {
+        "Max temp": "Max temp",
+        "Temp": "Temp",
+        "Rain chance": "Rain chance",
+        "Wind": "Wind",
+        "Humidity": "Humidity",
+        "Min temp": "Min temp",
+        "UV index": "UV index",
+        "Status": "Status"
+      },
+      "severity": {
+        "LOW": "Low",
+        "MEDIUM": "Medium",
+        "HIGH": "High",
+        "CRITICAL": "Critical"
+      },
+      "crops": {
+        "Cotton": "Cotton",
+        "Rice": "Rice",
+        "Wheat": "Wheat",
+        "Groundnut": "Groundnut",
+        "Sugarcane": "Sugarcane",
+        "Vegetables": "Vegetables",
+        "Crop": "Crop",
+        "your crop": "your crop"
+      },
+      "insightLabels": {
+        "humidity": "Humidity",
+        "wind": "Wind",
+        "uv": "UV"
+      },
+      "insightHints": {
+        "diseaseRisk": "Disease risk can rise",
+        "comfortable": "Comfortable range",
+        "avoidSpraying": "Avoid spraying",
+        "fieldWorkPossible": "Field work possible",
+        "highPlantStress": "High plant stress",
+        "normalSunlightRisk": "Normal sunlight risk"
+      },
+      "alerts": {
+        "heatwave": {
+          "title": "Extreme heat risk detected",
+          "message": "{crop} may face moisture stress because temperature may reach {value}.",
+          "recommendation": "Use light irrigation in the evening or early morning. Avoid pesticide spraying during peak afternoon heat."
+        },
+        "irrigation": {
+          "title": "Irrigation planning needed",
+          "message": "{crop} is near its heat tolerance level.",
+          "recommendation": "Check soil moisture and schedule irrigation outside hot afternoon hours."
+        },
+        "heavy_rain": {
+          "title": "Heavy rain may affect field work",
+          "message": "Rain chance is high and {crop} may face waterlogging or spray loss.",
+          "recommendation": "Avoid pesticide and fertilizer spraying. Clean drainage channels before rain starts."
+        },
+        "rain": {
+          "title": "Light to moderate rain possible",
+          "message": "Rain may interrupt spraying or fertilizer work.",
+          "recommendation": "Plan field operations after the rain window and monitor soil moisture."
+        },
+        "strong_wind": {
+          "title": "Strong wind crop damage risk",
+          "message": "{crop} may face lodging, leaf tearing, or support damage during strong winds.",
+          "recommendation": "Support vegetable creepers, sugarcane, and young plants. Avoid spraying in windy hours."
+        },
+        "pest_risk": {
+          "title": "Whitefly and fungal risk in cotton",
+          "message": "High humidity can increase whitefly attacks and fungal disease risk in cotton.",
+          "recommendation": "Inspect leaves carefully this week, improve field aeration, and avoid excess irrigation."
+        },
+        "humidity": {
+          "title": "High humidity disease risk",
+          "message": "High humidity can increase fungal disease risk in {crop}.",
+          "recommendation": "Inspect leaves carefully this week, improve field aeration, and avoid excess irrigation."
+        },
+        "frost": {
+          "title": "Low temperature crop stress risk",
+          "message": "{crop} may face cold stress because temperature may drop near {value}.",
+          "recommendation": "Protect seedlings, avoid late evening irrigation in frost-prone fields, and cover nursery beds where possible."
+        },
+        "uv_stress": {
+          "title": "High UV and plant stress risk",
+          "message": "Strong sunlight can increase moisture loss from soil and crop leaves.",
+          "recommendation": "Plan irrigation early and avoid transplanting or spraying during harsh sunlight."
+        },
+        "safe_weather": {
+          "title": "No major crop-weather risk now",
+          "message": "Current forecast does not show a major danger for your selected crop.",
+          "recommendation": "Continue normal field monitoring and follow crop-stage based farming tips."
+        }
+      }
     }
   },
   "tips": {

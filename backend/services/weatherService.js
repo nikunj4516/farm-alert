@@ -57,7 +57,7 @@ const googleWeatherParams = (location, extra = {}) => ({
 });
 
 export class WeatherService {
-  static async getCurrentWeather(locationInput, cropName) {
+  static async getCurrentWeather(locationInput, cropName, farmerId) {
     const location = await LocationService.getCoordinates(locationInput);
     if (!LocationService.validateLocation(location)) {
       throw new Error("Resolved location is invalid.");
@@ -71,7 +71,9 @@ export class WeatherService {
 
     const googleEnabled = Boolean(googleWeatherApiKey());
     if (cached && isFresh(cached) && (!googleEnabled || cached.provider === "google_weather")) {
-      return this.toWeatherReport(cached, cropName, true);
+      const report = this.toWeatherReport(cached, cropName, true);
+      await this.persistSmartAlerts({ farmerId, cropName, location, report });
+      return report;
     }
 
     const fresh = await this.fetchBestProvider(location);
@@ -109,7 +111,55 @@ export class WeatherService {
       .single();
 
     if (error) throw error;
-    return this.toWeatherReport(data, cropName, false);
+    const report = this.toWeatherReport(data, cropName, false);
+    await this.persistSmartAlerts({ farmerId, cropName, location, report });
+    return report;
+  }
+
+  static async persistSmartAlerts({ farmerId, cropName, location, report }) {
+    if (!farmerId || !report?.agricultureAlerts?.length) return;
+
+    const cutoff = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+    const alertRows = [];
+
+    for (const alert of report.agricultureAlerts) {
+      if (alert.type === "safe_weather") continue;
+
+      const { data: existing } = await supabaseAdmin
+        .from("weather_alerts")
+        .select("id")
+        .eq("farmer_id", farmerId)
+        .eq("alert_type", alert.type)
+        .gte("created_at", cutoff)
+        .limit(1)
+        .maybeSingle();
+
+      if (existing) continue;
+
+      alertRows.push({
+        farmer_id: farmerId,
+        crop_name: cropName || null,
+        location: location.location,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        alert_type: alert.type,
+        severity: alert.severity,
+        alert_title: alert.title,
+        alert_message: alert.message,
+        recommendation: alert.recommendation,
+        weather_condition: report.weatherCondition,
+        metric_label: alert.metricLabel,
+        metric_value: alert.metricValue,
+        priority: alert.priority,
+      });
+    }
+
+    if (!alertRows.length) return;
+
+    const { error } = await supabaseAdmin.from("weather_alerts").insert(alertRows);
+    if (error) {
+      console.warn("Could not persist weather intelligence alerts:", error.message);
+    }
   }
 
   static async fetchBestProvider(location) {

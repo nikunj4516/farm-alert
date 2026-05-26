@@ -12,7 +12,7 @@ router.get("/intelligence", requireAuth, async (req, res, next) => {
       district: req.query.district,
       state: req.query.state,
     };
-    const result = await WeatherService.getCurrentWeather(location, req.query.cropName);
+    const result = await WeatherService.getCurrentWeather(location, req.query.cropName, req.user.id);
     res.json(result);
   } catch (error) {
     next(error);

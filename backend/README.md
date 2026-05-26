@@ -15,3 +15,14 @@ GOOGLE_WEATHER_API_KEY=your_google_weather_api_key
 ```
 
 If the key is missing or Google Weather returns an error, the service falls back to Open-Meteo.
+
+The backend weather intelligence flow is:
+
+```text
+GET /api/weather/intelligence
+  -> resolve farmer location
+  -> fetch/cache weather
+  -> run agricultureWeatherRules.js
+  -> persist non-safe alerts in weather_alerts
+  -> return weather + agricultureAlerts
+```
