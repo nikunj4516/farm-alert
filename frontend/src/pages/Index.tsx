@@ -400,6 +400,46 @@ const Index = () => {
               cropType={profile?.crop_type || profile?.crop_name}
               isLoading={isWeatherLoading}
             />
+
+            <section className="overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-emerald-50 shadow-elevated">
+              <div className="bg-amber-400 px-4 py-2">
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-amber-950">
+                  <Phone className="h-4 w-4" aria-hidden="true" />
+                  {t("helpline_toll_free")}
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+                    <Phone className="h-6 w-6" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-lg font-black leading-tight text-foreground">
+                      {t("helpline_banner_title")}
+                    </p>
+                    <p className="mt-1 text-sm font-semibold leading-relaxed text-muted-foreground">
+                      {t("helpline_banner_desc")}
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <a
+                        href={`tel:${helplineNumber.replace(/-/g, "")}`}
+                        aria-label={`${t("helpline_call_now")} ${helplineText}`}
+                        className="rounded-xl bg-primary px-4 py-2.5 text-base font-black text-primary-foreground shadow-sm active:scale-95 transition-transform touch-manipulation"
+                      >
+                        {helplineNumber}
+                      </a>
+                      <a
+                        href={`tel:${helplineNumber.replace(/-/g, "")}`}
+                        aria-label={`${t("helpline_call_now")} ${helplineText}`}
+                        className="rounded-xl border border-primary/25 bg-white px-4 py-2.5 text-sm font-black text-primary shadow-sm active:scale-95 transition-transform touch-manipulation"
+                      >
+                        {t("helpline_call_now")}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </>
         )}
 
@@ -418,45 +458,6 @@ const Index = () => {
           />
         )}
 
-        <section className="overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-emerald-50 shadow-elevated">
-          <div className="bg-amber-400 px-4 py-2">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-amber-950">
-              <Phone className="h-4 w-4" aria-hidden="true" />
-              {t("helpline_toll_free")}
-            </div>
-          </div>
-          <div className="p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-                <Phone className="h-6 w-6" aria-hidden="true" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-lg font-black leading-tight text-foreground">
-                  {t("helpline_banner_title")}
-                </p>
-                <p className="mt-1 text-sm font-semibold leading-relaxed text-muted-foreground">
-                  {t("helpline_banner_desc")}
-                </p>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <a
-                    href={`tel:${helplineNumber.replace(/-/g, "")}`}
-                    aria-label={`${t("helpline_call_now")} ${helplineText}`}
-                    className="rounded-xl bg-primary px-4 py-2.5 text-base font-black text-primary-foreground shadow-sm active:scale-95 transition-transform touch-manipulation"
-                  >
-                    {helplineNumber}
-                  </a>
-                  <a
-                    href={`tel:${helplineNumber.replace(/-/g, "")}`}
-                    aria-label={`${t("helpline_call_now")} ${helplineText}`}
-                    className="rounded-xl border border-primary/25 bg-white px-4 py-2.5 text-sm font-black text-primary shadow-sm active:scale-95 transition-transform touch-manipulation"
-                  >
-                    {t("helpline_call_now")}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
