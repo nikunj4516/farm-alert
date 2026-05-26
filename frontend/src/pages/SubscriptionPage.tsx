@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Shield, Phone, CloudRain, Wheat, Bug, MapPin, Leaf } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import VoiceCommandButton from "@/components/VoiceCommandButton";
 import { useAuth } from "@/contexts/AuthContext";
@@ -137,16 +137,16 @@ const SubscriptionPage = () => {
   };
 
   const benefits = [
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Cloud%20with%20Rain.png" alt="weather" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_1") },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="crop" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_2") },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Bug.png" alt="pest" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_3") },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_4") },
-    { icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Telephone%20Receiver.png" alt="phone" className="w-6 h-6 drop-shadow-sm" />, text: t("sub_benefit_5") },
+    { icon: "🌧️", text: t("sub_benefit_1") },
+    { icon: "🌾", text: t("sub_benefit_2") },
+    { icon: "🐛", text: t("sub_benefit_3") },
+    { icon: "📍", text: t("sub_benefit_4") },
+    { icon: "📞", text: t("sub_benefit_5") },
   ];
 
   const testimonials = [
-    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="farmer" className="w-4 h-4 inline drop-shadow-sm" /> },
-    { name: t("sub_testimonial_2_name"), text: t("sub_testimonial_2_text"), icon: <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="farmer" className="w-4 h-4 inline drop-shadow-sm" /> },
+    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), icon: "🌾" },
+    { name: t("sub_testimonial_2_name"), text: t("sub_testimonial_2_text"), icon: "🌱" },
   ];
 
   const langToggle = (
@@ -249,7 +249,7 @@ const SubscriptionPage = () => {
                 className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border shadow-card"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  {b.icon}
+                  <span className="text-2xl leading-none" aria-hidden="true">{b.icon}</span>
                 </div>
                 <span className="text-sm font-medium text-foreground leading-snug">
                   {b.text}
@@ -262,7 +262,7 @@ const SubscriptionPage = () => {
         {/* Trust Section */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 justify-center">
-            <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shield.png" alt="secure" className="w-4 h-4 drop-shadow-sm" />
+            <span className="text-base leading-none" aria-hidden="true">🛡️</span>
             <p className="text-sm font-semibold text-primary text-center">
               {t("sub_trusted")}
             </p>
@@ -278,7 +278,7 @@ const SubscriptionPage = () => {
                   "{tm.text}"
                 </p>
                 <p className="text-xs font-semibold text-foreground mt-2">
-                  — {tm.name} <span className="ml-1">{tm.icon}</span>
+                  — {tm.name} <span className="ml-1" aria-hidden="true">{tm.icon}</span>
                 </p>
               </div>
             ))}
@@ -319,7 +319,7 @@ const SubscriptionPage = () => {
           <ArrowRight className="w-5 h-5" />
         </motion.button>
         <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-          <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Shield.png" alt="secure" className="w-3 h-3 drop-shadow-sm" />
+          <span className="text-xs leading-none" aria-hidden="true">🛡️</span>
           <span>{t("sub_secure_payment")}</span>
         </div>
       </div>

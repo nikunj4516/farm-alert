@@ -1,0 +1,116 @@
+{
+  "home": {
+    "newsForYou": "आपके लिए खेती समाचार",
+    "newsForYouSubtitle": "फसल, राज्य और जिले के आधार पर चुने गए समाचार.",
+    "latestVerifiedNews": "ताज़ा सत्यापित समाचार",
+    "trendingNews": "ट्रेंडिंग समाचार",
+    "categoryWiseNews": "श्रेणी अनुसार समाचार",
+    "viewAll": "सभी देखें",
+    "readSource": "स्रोत पढ़ें",
+    "noNewsTitle": "अभी सत्यापित खेती समाचार नहीं हैं",
+    "noNewsBody": "हम विश्वसनीय कृषि स्रोतों की जाँच कर रहे हैं. उपयोगी अपडेट जल्द यहाँ दिखेंगे.",
+    "noPersonalNewsTitle": "अभी व्यक्तिगत सत्यापित समाचार नहीं हैं",
+    "loadingNews": "सत्यापित समाचार लोड हो रहे हैं",
+    "retry": "फिर कोशिश करें",
+    "weatherIntelligence": "मौसम इंटेलिजेंस",
+    "feelsLike": "महसूस",
+    "humidity": "नमी",
+    "rain": "बारिश",
+    "wind": "हवा",
+    "weatherUpdate": "मौसम अपडेट",
+    "smartWeatherAlerts": "स्मार्ट मौसम चेतावनी",
+    "cropWeatherIntelligence": "फसल मौसम सलाह",
+    "recommendations": "सलाह",
+    "farm": "खेत",
+    "hourlyForecast": "घंटेवार पूर्वानुमान",
+    "sevenDayForecast": "7 दिन का पूर्वानुमान",
+    "weatherLoadingTitle": "मौसम जानकारी लोड हो रही है",
+    "weatherLoadingBody": "सटीक पूर्वानुमान के लिए प्रोफ़ाइल में तालुका, जिला और राज्य जोड़ें."
+  },
+  "news": {
+    "categories": {
+      "all": "सभी",
+      "government": "सरकार",
+      "market": "बाज़ार",
+      "weather": "मौसम",
+      "pest": "कीट",
+      "subsidy": "योजनाएँ",
+      "general": "सामान्य"
+    },
+    "sections": {
+      "government": "सरकार",
+      "market": "बाज़ार",
+      "weather": "मौसम",
+      "pest": "कीट चेतावनी",
+      "subsidy": "योजनाएँ"
+    }
+  },
+  "weather": {
+    "conditions": {
+      "Clear sky": "साफ़ आसमान",
+      "Partly cloudy": "आंशिक बादल",
+      "Overcast": "बादल छाए",
+      "Fog": "कोहरा",
+      "Drizzle": "फुहार",
+      "Rain": "बारिश",
+      "Thunderstorm": "आंधी-तूफान",
+      "Cloudy": "बादल"
+    },
+    "alerts": {
+      "heavy_rain": {
+        "message": "भारी बारिश का खतरा है.",
+        "recommendation": "कीटनाशक छिड़काव रोकें और जल निकासी खुली रखें."
+      },
+      "rain": {
+        "message": "जल्द बारिश की संभावना है.",
+        "recommendation": "बारिश निकलने तक छिड़काव और खाद डालना टालें."
+      },
+      "heatwave": {
+        "message": "अधिक तापमान फसल को तनाव दे सकता है.",
+        "recommendation": "सुबह या शाम सिंचाई करें और दोपहर में छिड़काव न करें."
+      },
+      "strong_wind": {
+        "message": "तेज़ हवा से फसल को नुकसान हो सकता है.",
+        "recommendation": "सब्ज़ी बेलों को सहारा दें और तेज़ हवा में छिड़काव न करें."
+      },
+      "whitefly_risk": {
+        "message": "अधिक नमी से कपास में सफेद मक्खी का खतरा बढ़ सकता है.",
+        "recommendation": "पत्तियों के नीचे जाँच करें और अधिक सिंचाई से बचें."
+      },
+      "rice_drainage": {
+        "message": "बारिश से धान खेत में पानी बढ़ सकता है.",
+        "recommendation": "मेड़ ठीक रखें और छोटे पौधों से अतिरिक्त पानी निकालें."
+      },
+      "vegetable_wind_risk": {
+        "message": "सब्ज़ी फसलों को हवा से नुकसान हो सकता है.",
+        "recommendation": "स्टेकिंग, ट्रेलिस और नर्सरी कवर जाँचें."
+      },
+      "safe_weather": {
+        "message": "कोई बड़ा फसल-मौसम जोखिम नहीं मिला.",
+        "recommendation": "सामान्य खेत निगरानी और सिंचाई योजना जारी रखें."
+      }
+    },
+    "insights": {
+      "avoidSpray": "अपेक्षित बारिश से पहले कीटनाशक छिड़काव न करें.",
+      "sprayOk": "हवा कम रहे तो छिड़काव का समय ठीक है.",
+      "humidityHigh": "अधिक नमी में कीट और रोग की नज़दीकी जाँच ज़रूरी है.",
+      "humidityOk": "अभी नमी का जोखिम मध्यम है.",
+      "heatHigh": "गर्मी कम करने के लिए ठंडे समय में सिंचाई करें.",
+      "heatOk": "तापमान तनाव अभी नियंत्रित है."
+    }
+  },
+  "tips": {
+    "category": {
+      "water": "सिंचाई",
+      "irrigation": "सिंचाई",
+      "pest": "कीट",
+      "disease": "रोग",
+      "harvest": "कटाई",
+      "fertilizer": "खाद",
+      "soil": "मिट्टी",
+      "seed": "बीज",
+      "sowing": "बुवाई",
+      "general": "सामान्य"
+    }
+  }
+}

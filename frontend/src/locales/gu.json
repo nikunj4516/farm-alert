@@ -1,0 +1,116 @@
+{
+  "home": {
+    "newsForYou": "તમારા માટે ખેતી સમાચાર",
+    "newsForYouSubtitle": "તમારા પાક, રાજ્ય અને જિલ્લા પ્રમાણે પસંદ કરેલા સમાચાર.",
+    "latestVerifiedNews": "નવીનતમ ચકાસેલા સમાચાર",
+    "trendingNews": "ટ્રેન્ડિંગ સમાચાર",
+    "categoryWiseNews": "કેટેગરી મુજબ સમાચાર",
+    "viewAll": "બધા જુઓ",
+    "readSource": "સ્રોત વાંચો",
+    "noNewsTitle": "હજુ ચકાસેલા ખેતી સમાચાર નથી",
+    "noNewsBody": "અમે વિશ્વસનીય ખેતી સ્રોતો તપાસી રહ્યા છીએ. ઉપયોગી અપડેટ્સ અહીં જલ્દી દેખાશે.",
+    "noPersonalNewsTitle": "હજુ વ્યક્તિગત ચકાસેલા સમાચાર નથી",
+    "loadingNews": "ચકાસેલા સમાચાર લોડ થઈ રહ્યા છે",
+    "retry": "ફરી પ્રયાસ કરો",
+    "weatherIntelligence": "હવામાન ઇન્ટેલિજન્સ",
+    "feelsLike": "અનુભવ",
+    "humidity": "ભેજ",
+    "rain": "વરસાદ",
+    "wind": "પવન",
+    "weatherUpdate": "હવામાન અપડેટ",
+    "smartWeatherAlerts": "સ્માર્ટ હવામાન ચેતવણી",
+    "cropWeatherIntelligence": "પાક હવામાન સલાહ",
+    "recommendations": "ભલામણો",
+    "farm": "ખેતર",
+    "hourlyForecast": "કલાકવાર અનુમાન",
+    "sevenDayForecast": "7 દિવસનું અનુમાન",
+    "weatherLoadingTitle": "હવામાન માહિતી લોડ થઈ રહી છે",
+    "weatherLoadingBody": "સચોટ અનુમાન માટે પ્રોફાઇલમાં તાલુકો, જિલ્લો અને રાજ્ય ઉમેરો."
+  },
+  "news": {
+    "categories": {
+      "all": "બધા",
+      "government": "સરકાર",
+      "market": "બજાર",
+      "weather": "હવામાન",
+      "pest": "જીવાત",
+      "subsidy": "યોજનાઓ",
+      "general": "સામાન્ય"
+    },
+    "sections": {
+      "government": "સરકાર",
+      "market": "બજાર",
+      "weather": "હવામાન",
+      "pest": "જીવાત ચેતવણી",
+      "subsidy": "યોજનાઓ"
+    }
+  },
+  "weather": {
+    "conditions": {
+      "Clear sky": "સાફ આકાશ",
+      "Partly cloudy": "થોડા વાદળ",
+      "Overcast": "વાદળછાયું",
+      "Fog": "ધુમ્મસ",
+      "Drizzle": "ઝરમર વરસાદ",
+      "Rain": "વરસાદ",
+      "Thunderstorm": "વીજળી સાથે વાવાઝોડું",
+      "Cloudy": "વાદળછાયું"
+    },
+    "alerts": {
+      "heavy_rain": {
+        "message": "ભારે વરસાદનો ખતરો છે.",
+        "recommendation": "કીટનાશક છંટકાવ ટાળો અને પાણી નિકાલ ખુલ્લો રાખો."
+      },
+      "rain": {
+        "message": "જલ્દી વરસાદની શક્યતા છે.",
+        "recommendation": "વરસાદ પસાર થાય ત્યાં સુધી છંટકાવ અને ખાતર આપવાનું મુલતવી રાખો."
+      },
+      "heatwave": {
+        "message": "વધુ તાપમાન પાકને તણાવ આપી શકે છે.",
+        "recommendation": "સવારે અથવા સાંજે સિંચાઈ કરો અને બપોરે છંટકાવ ન કરો."
+      },
+      "strong_wind": {
+        "message": "તેજ પવનથી પાકને નુકસાન થઈ શકે છે.",
+        "recommendation": "શાકભાજીના વેલા મજબૂત બાંધો અને પવનમાં છંટકાવ ટાળો."
+      },
+      "whitefly_risk": {
+        "message": "વધુ ભેજથી કપાસમાં સફેદ માખીનો ખતરો વધી શકે છે.",
+        "recommendation": "પાનની નીચે તપાસો અને વધુ સિંચાઈ ટાળો."
+      },
+      "rice_drainage": {
+        "message": "વરસાદથી ડાંગર ખેતરમાં પાણી વધી શકે છે.",
+        "recommendation": "પાળા મજબૂત રાખો અને નાની રોપણીમાંથી વધારાનું પાણી કાઢો."
+      },
+      "vegetable_wind_risk": {
+        "message": "શાકભાજી પાકને પવનથી નુકસાન થઈ શકે છે.",
+        "recommendation": "સ્ટેકિંગ, ટ્રેલિસ અને નર્સરી કવર તપાસો."
+      },
+      "safe_weather": {
+        "message": "મોટો પાક-હવામાન જોખમ મળ્યું નથી.",
+        "recommendation": "સામાન્ય ખેતર નિરીક્ષણ અને સિંચાઈ આયોજન ચાલુ રાખો."
+      }
+    },
+    "insights": {
+      "avoidSpray": "અપેક્ષિત વરસાદ પહેલાં કીટનાશક છંટકાવ ન કરો.",
+      "sprayOk": "પવન ઓછો હોય તો છંટકાવનો સમય યોગ્ય છે.",
+      "humidityHigh": "વધુ ભેજમાં જીવાત અને રોગની નજીકથી તપાસ જરૂરી છે.",
+      "humidityOk": "હાલ ભેજનું જોખમ મધ્યમ છે.",
+      "heatHigh": "ગરમીનો તણાવ ઘટાડવા ઠંડા સમયે સિંચાઈ કરો.",
+      "heatOk": "તાપમાન તણાવ હાલ નિયંત્રણમાં છે."
+    }
+  },
+  "tips": {
+    "category": {
+      "water": "સિંચાઈ",
+      "irrigation": "સિંચાઈ",
+      "pest": "જીવાત",
+      "disease": "રોગ",
+      "harvest": "લણણી",
+      "fertilizer": "ખાતર",
+      "soil": "માટી",
+      "seed": "બીજ",
+      "sowing": "વાવણી",
+      "general": "સામાન્ય"
+    }
+  }
+}

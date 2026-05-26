@@ -5,7 +5,7 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
 
-const legacyProfileKeys = new Set(["name", "phone", "village", "district", "crop_type", "land_size"]);
+const legacyProfileKeys = new Set(["name", "phone", "village", "taluka", "district", "state", "crop_type", "land_size"]);
 const profileImageBuckets = ["Profile", "profile storge", "profile-storage", "profile-images"];
 
 const getErrorMessage = (error: unknown) => {
@@ -93,7 +93,11 @@ export class ProfileService {
       const missingColumn = getMissingColumnName(error);
       payload = missingColumn ? withoutColumn(payload, missingColumn) : toLegacyProfilePayload(payload);
 
-      if (Object.keys(payload).length === 0) break;
+      if (Object.keys(payload).length === 0) {
+        const currentProfile = await this.getProfile(userId);
+        if (currentProfile) return currentProfile;
+        break;
+      }
     }
 
     console.error("Error updating profile:", lastError);

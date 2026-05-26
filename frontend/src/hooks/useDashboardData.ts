@@ -6,6 +6,8 @@ import { AlertsService } from "@/services/alertsService";
 import { useWeather } from "@/hooks/useWeather";
 
 export const useDashboardData = (userId: string | undefined, selectedLanguage?: string) => {
+  const newsLanguageFeedVersion = "language-first-v2";
+
   // 1. Fetch Profile
   const { 
     data: profile, 
@@ -26,19 +28,26 @@ export const useDashboardData = (userId: string | undefined, selectedLanguage?: 
     data: weather,
     isLoading: isWeatherLoading,
     error: weatherError,
-  } = useWeather(district);
+  } = useWeather({
+    village: profile?.village,
+    taluka: profile?.taluka,
+    district,
+    state: profile?.state || "Gujarat",
+    cropType,
+  });
 
   // 3. Fetch Personalized News
   const {
     data: news,
     isLoading: isNewsLoading,
   } = useQuery({
-    queryKey: ["agriculture-news", cropType, profile?.state, profile?.district],
+    queryKey: ["agriculture-news", newsLanguageFeedVersion, cropType, profile?.state, profile?.district, language],
     queryFn: () =>
       NewsService.getPersonalizedNews({
         cropType,
         state: profile?.state,
         district: profile?.district,
+        language,
         limit: 5,
       }),
     enabled: Boolean(profile),
@@ -72,6 +81,8 @@ export const useDashboardData = (userId: string | undefined, selectedLanguage?: 
     alerts,
     isLoading: isProfileLoading || isWeatherLoading || isNewsLoading || isTipsLoading || isAlertsLoading,
     isProfileLoading,
+    isWeatherLoading,
+    isNewsLoading,
     errors: { profileError, weatherError }
   };
 };

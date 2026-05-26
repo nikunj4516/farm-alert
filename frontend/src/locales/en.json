@@ -1,0 +1,116 @@
+{
+  "home": {
+    "newsForYou": "Personalized Agriculture News",
+    "newsForYouSubtitle": "Matched by your crop, state, and district when available.",
+    "latestVerifiedNews": "Latest Verified News",
+    "trendingNews": "Trending News",
+    "categoryWiseNews": "Category-wise News",
+    "viewAll": "View all",
+    "readSource": "Read source",
+    "noNewsTitle": "No verified agriculture news yet",
+    "noNewsBody": "We are checking trusted agriculture sources. Useful updates will appear here shortly.",
+    "noPersonalNewsTitle": "No personalized verified news yet",
+    "loadingNews": "Loading verified news",
+    "retry": "Retry",
+    "weatherIntelligence": "weather intelligence",
+    "feelsLike": "Feels like",
+    "humidity": "Humidity",
+    "rain": "Rain",
+    "wind": "Wind",
+    "weatherUpdate": "Weather update",
+    "smartWeatherAlerts": "Smart Weather Alerts",
+    "cropWeatherIntelligence": "Crop Weather Intelligence",
+    "recommendations": "recommendations",
+    "farm": "Farm",
+    "hourlyForecast": "Hourly Forecast",
+    "sevenDayForecast": "7 Day Forecast",
+    "weatherLoadingTitle": "Weather intelligence is loading",
+    "weatherLoadingBody": "Add taluka, district, and state in your profile for accurate forecasts."
+  },
+  "news": {
+    "categories": {
+      "all": "All",
+      "government": "Govt",
+      "market": "Market",
+      "weather": "Weather",
+      "pest": "Pest",
+      "subsidy": "Schemes",
+      "general": "General"
+    },
+    "sections": {
+      "government": "Government",
+      "market": "Market",
+      "weather": "Weather",
+      "pest": "Pest Alerts",
+      "subsidy": "Schemes"
+    }
+  },
+  "weather": {
+    "conditions": {
+      "Clear sky": "Clear sky",
+      "Partly cloudy": "Partly cloudy",
+      "Overcast": "Overcast",
+      "Fog": "Fog",
+      "Drizzle": "Drizzle",
+      "Rain": "Rain",
+      "Thunderstorm": "Thunderstorm",
+      "Cloudy": "Cloudy"
+    },
+    "alerts": {
+      "heavy_rain": {
+        "message": "Heavy rain risk detected.",
+        "recommendation": "Avoid pesticide spraying and keep drainage channels open."
+      },
+      "rain": {
+        "message": "Rain is likely soon.",
+        "recommendation": "Delay spraying and fertilizer application until the rain window passes."
+      },
+      "heatwave": {
+        "message": "High temperature may stress crops.",
+        "recommendation": "Irrigate early morning or evening and avoid mid-day spraying."
+      },
+      "strong_wind": {
+        "message": "Strong wind may damage crops.",
+        "recommendation": "Support vegetable creepers and avoid field spraying in windy hours."
+      },
+      "whitefly_risk": {
+        "message": "High humidity can increase whitefly risk in cotton.",
+        "recommendation": "Inspect leaf undersides and avoid excess irrigation."
+      },
+      "rice_drainage": {
+        "message": "Rain may increase water levels in rice fields.",
+        "recommendation": "Maintain bunds and drain excess water from young seedlings."
+      },
+      "vegetable_wind_risk": {
+        "message": "Vegetable crops may face wind damage.",
+        "recommendation": "Check staking, trellis support, and nursery covers."
+      },
+      "safe_weather": {
+        "message": "No major crop-weather risk detected.",
+        "recommendation": "Continue normal field monitoring and irrigation planning."
+      }
+    },
+    "insights": {
+      "avoidSpray": "Avoid pesticide spray before expected rain.",
+      "sprayOk": "Spray window looks manageable if wind stays low.",
+      "humidityHigh": "High humidity means closer pest and disease scouting is needed.",
+      "humidityOk": "Humidity risk is moderate right now.",
+      "heatHigh": "Plan irrigation during cooler hours to reduce heat stress.",
+      "heatOk": "Temperature stress is currently controlled."
+    }
+  },
+  "tips": {
+    "category": {
+      "water": "Irrigation",
+      "irrigation": "Irrigation",
+      "pest": "Pest",
+      "disease": "Disease",
+      "harvest": "Harvest",
+      "fertilizer": "Fertilizer",
+      "soil": "Soil",
+      "seed": "Seed",
+      "sowing": "Sowing",
+      "general": "General"
+    }
+  }
+}

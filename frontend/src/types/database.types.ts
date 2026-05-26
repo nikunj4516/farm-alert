@@ -121,36 +121,72 @@ export interface Database {
         Row: {
           id: string
           district: string
+          location: string | null
+          latitude: number | null
+          longitude: number | null
           temperature: number | null
+          feels_like: number | null
           humidity: number | null
           rainfall: number | null
           wind_speed: number | null
           weather_condition: string | null
           uv_index: number | null
           forecast: Json | null
+          forecast_json: Json | null
+          hourly_json: Json | null
+          alerts_json: Json | null
+          precipitation_probability: number | null
+          cloud_coverage: number | null
+          visibility: number | null
+          provider: string | null
+          stale_after: string | null
           fetched_at: string
         }
         Insert: {
           id?: string
           district: string
+          location?: string | null
+          latitude?: number | null
+          longitude?: number | null
           temperature?: number | null
+          feels_like?: number | null
           humidity?: number | null
           rainfall?: number | null
           wind_speed?: number | null
           weather_condition?: string | null
           uv_index?: number | null
           forecast?: Json | null
+          forecast_json?: Json | null
+          hourly_json?: Json | null
+          alerts_json?: Json | null
+          precipitation_probability?: number | null
+          cloud_coverage?: number | null
+          visibility?: number | null
+          provider?: string | null
+          stale_after?: string | null
           fetched_at?: string
         }
         Update: {
           district?: string
+          location?: string | null
+          latitude?: number | null
+          longitude?: number | null
           temperature?: number | null
+          feels_like?: number | null
           humidity?: number | null
           rainfall?: number | null
           wind_speed?: number | null
           weather_condition?: string | null
           uv_index?: number | null
           forecast?: Json | null
+          forecast_json?: Json | null
+          hourly_json?: Json | null
+          alerts_json?: Json | null
+          precipitation_probability?: number | null
+          cloud_coverage?: number | null
+          visibility?: number | null
+          provider?: string | null
+          stale_after?: string | null
           fetched_at?: string
         }
       }

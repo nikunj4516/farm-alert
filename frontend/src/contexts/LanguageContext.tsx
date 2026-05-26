@@ -1,6 +1,20 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import en from "@/locales/en.json";
+import gu from "@/locales/gu.json";
+import hi from "@/locales/hi.json";
 
 export type Language = "gu" | "hi" | "en";
+
+type LocaleValue = string | string[] | Record<string, unknown>;
+type LocaleDictionary = Record<string, LocaleValue>;
+
+const localeDictionaries: Record<Language, LocaleDictionary> = { en, hi, gu };
+
+const getNestedValue = (dictionary: LocaleDictionary, key: string): unknown =>
+  key.split(".").reduce<unknown>((current, segment) => {
+    if (!current || typeof current !== "object" || Array.isArray(current)) return undefined;
+    return (current as Record<string, unknown>)[segment];
+  }, dictionary);
 
 const translations = {
   // Splash Screen
@@ -204,6 +218,26 @@ const translations = {
     gu: "કિસાન હેલ્પલાઇન: 1800-180-1551",
     hi: "किसान हेल्पलाइन: 1800-180-1551",
     en: "Farmer Helpline: 1800-180-1551",
+  },
+  helpline_banner_title: {
+    gu: "ખેડૂત સહાય માટે મહત્વપૂર્ણ નંબર",
+    hi: "किसान सहायता के लिए महत्वपूर्ण नंबर",
+    en: "Important Farmer Support Number",
+  },
+  helpline_banner_desc: {
+    gu: "વધુ માહિતી, ખેતી માર્ગદર્શન અથવા સરકારી યોજનાઓ માટે આ ટોલ ફ્રી નંબર પર સંપર્ક કરો.",
+    hi: "अधिक जानकारी, खेती मार्गदर्शन या सरकारी योजनाओं के लिए इस टोल फ्री नंबर पर संपर्क करें।",
+    en: "For more information, farming guidance, or government schemes, contact this toll-free number.",
+  },
+  helpline_call_now: {
+    gu: "હમણાં કોલ કરો",
+    hi: "अभी कॉल करें",
+    en: "Call now",
+  },
+  helpline_toll_free: {
+    gu: "ટોલ ફ્રી",
+    hi: "टोल फ्री",
+    en: "Toll free",
   },
   forecast_days: {
     gu: ["આજે", "કાલે", "ગુરુ", "શુક્ર", "શનિ"],
@@ -572,8 +606,8 @@ type TranslationKey = keyof typeof translations;
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: TranslationKey) => string;
-  tArray: (key: TranslationKey) => string[];
+  t: (key: TranslationKey | string) => string;
+  tArray: (key: TranslationKey | string) => string[];
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -588,14 +622,21 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("farmalert_lang", lang);
   };
 
-  const t = (key: TranslationKey): string => {
-    const val = translations[key]?.[language];
+  const t = (key: TranslationKey | string): string => {
+    const localeValue = getNestedValue(localeDictionaries[language], key);
+    if (typeof localeValue === "string") return localeValue;
+    if (Array.isArray(localeValue)) return localeValue.join(", ");
+
+    const val = translations[key as TranslationKey]?.[language];
     if (Array.isArray(val)) return (val as readonly string[]).join(", ");
     return (val as string) || key;
   };
 
-  const tArray = (key: TranslationKey): string[] => {
-    const val = translations[key]?.[language];
+  const tArray = (key: TranslationKey | string): string[] => {
+    const localeValue = getNestedValue(localeDictionaries[language], key);
+    if (Array.isArray(localeValue)) return localeValue as string[];
+
+    const val = translations[key as TranslationKey]?.[language];
     if (Array.isArray(val)) return val as unknown as string[];
     return [];
   };

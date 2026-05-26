@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import agricultureNewsRoutes from "./routes/agricultureNewsRoutes.js";
+import weatherRoutes from "./routes/weatherRoutes.js";
 import { logger } from "./utils/logger.js";
 
 const app = express();
@@ -15,6 +16,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/agriculture-news", agricultureNewsRoutes);
+app.use("/api/weather", weatherRoutes);
 
 app.use((error, _req, res, _next) => {
   logger.error("API error.", { error: error.message });

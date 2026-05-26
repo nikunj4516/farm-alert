@@ -3,6 +3,39 @@ import { Database } from "@/types/database.types";
 
 type FarmingTip = Database["public"]["Tables"]["farming_tips"]["Row"];
 
+const normalizeCropType = (cropType?: string) => {
+  const normalized = cropType?.trim();
+  if (!normalized) return undefined;
+
+  const cropAliases: Record<string, string> = {
+    wheat: "Wheat",
+    rice: "Rice",
+    paddy: "Rice",
+    cotton: "Cotton",
+    groundnut: "Groundnut",
+    peanut: "Groundnut",
+    sugarcane: "Sugarcane",
+    vegetables: "Vegetables",
+    vegetable: "Vegetables",
+    ઘઉં: "Wheat",
+    ડાંગર: "Rice",
+    કપાસ: "Cotton",
+    મગફળી: "Groundnut",
+    શેરડી: "Sugarcane",
+    શાકભાજી: "Vegetables",
+    गेहूँ: "Wheat",
+    गेहूं: "Wheat",
+    धान: "Rice",
+    कपास: "Cotton",
+    मूंगफली: "Groundnut",
+    गन्ना: "Sugarcane",
+    सब्ज़ी: "Vegetables",
+    सब्जी: "Vegetables",
+  };
+
+  return cropAliases[normalized.toLowerCase()] || normalized;
+};
+
 export class TipsService {
   /**
    * Fetches personalized farming tips
@@ -15,6 +48,7 @@ export class TipsService {
   }): Promise<FarmingTip[]> {
     try {
       const { cropType, language = "gu", season, limit = 5 } = options;
+      const normalizedCrop = normalizeCropType(cropType);
 
       let query = supabase
         .from("farming_tips")
@@ -22,9 +56,9 @@ export class TipsService {
         .eq("is_active", true)
         .eq("language", language);
 
-      if (cropType) {
+      if (normalizedCrop) {
         // Fetch tips specific to crop OR general tips
-        query = query.or(`crop_type.eq.${cropType},crop_type.is.null`);
+        query = query.or(`crop_type.eq.${normalizedCrop},crop_type.is.null`);
       }
 
       if (season) {
@@ -36,7 +70,18 @@ export class TipsService {
         .limit(limit);
 
       if (error) throw error;
-      return data || [];
+      if (data?.length || !normalizedCrop) return data || [];
+
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from("farming_tips")
+        .select("*")
+        .eq("is_active", true)
+        .eq("language", language)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      if (fallbackError) throw fallbackError;
+      return fallbackData || [];
     } catch (error) {
       console.error("Error fetching tips:", error);
       return [];

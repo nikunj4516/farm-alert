@@ -6,6 +6,39 @@ interface FarmingTipsProps {
   tipsData?: Database["public"]["Tables"]["farming_tips"]["Row"][];
 }
 
+const categoryIcon = (category?: string | null) => {
+  const normalized = category?.toLowerCase() || "";
+  if (normalized.includes("water") || normalized.includes("irrigation")) return "💧";
+  if (normalized.includes("pest") || normalized.includes("disease")) return "🐛";
+  if (normalized.includes("harvest")) return "🌾";
+  if (normalized.includes("fertilizer") || normalized.includes("soil")) return "🌱";
+  if (normalized.includes("seed") || normalized.includes("sowing")) return "🌰";
+  return "🌿";
+};
+
+const categoryBg = (category?: string | null) => {
+  const normalized = category?.toLowerCase() || "";
+  if (normalized.includes("water") || normalized.includes("irrigation")) return "bg-blue-50";
+  if (normalized.includes("pest") || normalized.includes("disease")) return "bg-red-50";
+  if (normalized.includes("harvest")) return "bg-amber-50";
+  if (normalized.includes("fertilizer") || normalized.includes("soil")) return "bg-green-50";
+  return "bg-emerald-50";
+};
+
+const categoryKey = (category?: string | null) => {
+  const normalized = category?.toLowerCase() || "general";
+  if (normalized.includes("water")) return "water";
+  if (normalized.includes("irrigation")) return "irrigation";
+  if (normalized.includes("pest")) return "pest";
+  if (normalized.includes("disease")) return "disease";
+  if (normalized.includes("harvest")) return "harvest";
+  if (normalized.includes("fertilizer")) return "fertilizer";
+  if (normalized.includes("soil")) return "soil";
+  if (normalized.includes("seed")) return "seed";
+  if (normalized.includes("sowing")) return "sowing";
+  return "general";
+};
+
 const FarmingTips = ({ tipsData }: FarmingTipsProps) => {
   const { t } = useLanguage();
 
@@ -38,10 +71,12 @@ const FarmingTips = ({ tipsData }: FarmingTipsProps) => {
 
   const displayTips = tipsData && tipsData.length > 0 
     ? tipsData.map(tip => ({
-        icon: "🌱",
+        icon: categoryIcon(tip.category),
         title: tip.title,
         description: tip.content || tip.description,
-        bg: "bg-green-50"
+        category: tip.category,
+        source: tip.source,
+        bg: categoryBg(tip.category)
       }))
     : defaultTips;
 
@@ -63,6 +98,11 @@ const FarmingTips = ({ tipsData }: FarmingTipsProps) => {
             <div>
               <span className="text-base font-semibold text-foreground block">{tip.title}</span>
               <span className="text-sm text-muted-foreground mt-0.5 block leading-relaxed">{tip.description}</span>
+              {"category" in tip && (
+                <span className="mt-2 inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
+                  {t(`tips.category.${categoryKey(tip.category)}`)}
+                </span>
+              )}
             </div>
           </motion.div>
         ))}

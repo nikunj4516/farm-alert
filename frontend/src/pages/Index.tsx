@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import WeatherAlertCard from "@/components/WeatherAlertCard";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
-import QuickActions from "@/components/QuickActions";
 import VoiceCommandButton from "@/components/VoiceCommandButton";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
 import ProfileCard from "@/components/ProfileCard";
+import FarmerWeatherDashboard from "@/components/weather/FarmerWeatherDashboard";
 import { Bell, LogOut, Globe, Loader2, CloudRain, CloudLightning, CloudSun, Cloud, Sun, Phone, MapPin } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
@@ -72,6 +71,29 @@ const languageBadges: Record<Language, string> = {
   en: "A",
 };
 
+const isMissingProfileLanguageColumn = (error: unknown) => {
+  const message =
+    error instanceof Error
+      ? error.message
+      : error && typeof error === "object" && "message" in error
+        ? String((error as { message?: unknown }).message)
+        : String(error || "");
+
+  return message.toLowerCase().includes("preferred_language") && message.toLowerCase().includes("profiles");
+};
+
+const savePreferredLanguage = async (userId: string, lang: Language) => {
+  try {
+    await ProfileService.upsertProfile(userId, { preferred_language: lang });
+    return true;
+  } catch (error) {
+    if (isMissingProfileLanguageColumn(error)) {
+      return false;
+    }
+    throw error;
+  }
+};
+
 const Index = () => {
   const location = useLocation();
   const initialTab = (location.state as { activeTab?: Tab } | null)?.activeTab;
@@ -88,8 +110,9 @@ const Index = () => {
     news,
     tips,
     alerts,
-    isLoading: isDashboardLoading,
     isProfileLoading,
+    isWeatherLoading,
+    isNewsLoading,
     errors,
   } = useDashboardData(user?.id, language);
 
@@ -114,25 +137,7 @@ const Index = () => {
     void routeUnsubscribedUser();
   }, [user, loading, navigate]);
 
-  const forecastDays = tArray("forecast_days");
   const helplineText = t("helpline").replace(/^📞\s*/, "");
-  const forecastCards = weather?.forecast?.length
-    ? weather.forecast.slice(0, 7).map((day, index) => ({
-        temp: `${Math.round(day.temperature ?? day.maxTemperature ?? 0)}°`,
-        icon: day.icon,
-        label:
-          forecastDays[index] ||
-          new Intl.DateTimeFormat("en-IN", { weekday: "short" }).format(new Date(day.date)),
-      }))
-    : [
-        { temp: "34°", icon: "🌧️", label: forecastDays[0] },
-        { temp: "31°", icon: "⛈️", label: forecastDays[1] },
-        { temp: "29°", icon: "🌦️", label: forecastDays[2] },
-        { temp: "32°", icon: "⛅", label: forecastDays[3] },
-        { temp: "35°", icon: "☀️", label: forecastDays[4] },
-      ];
-  const weatherAlertLevel = getWeatherAlertLevel(weather);
-  const weatherSummary = getWeatherSummary(weather);
 
   const handleVoiceCommand = (transcript: string) => {
     const command = transcript.toLowerCase();
@@ -342,8 +347,10 @@ const Index = () => {
                         setShowLangMenu(false);
                         if (user) {
                           try {
-                            await ProfileService.upsertProfile(user.id, { preferred_language: lang });
-                            await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+                            const savedToProfile = await savePreferredLanguage(user.id, lang);
+                            if (savedToProfile) {
+                              await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+                            }
                           } catch (error) {
                             toast({
                               title: "Could not save language",
@@ -387,55 +394,52 @@ const Index = () => {
       <main className="max-w-[600px] mx-auto px-4 py-5 space-y-5">
         {activeTab === "weather" && (
           <>
-            <WeatherAlertCard
-              level={weatherAlertLevel}
-              title={weather ? `${Math.round(weather.temperature ?? 0)}°C in ${weather.district}` : t("weather_title")}
-              description={weatherSummary || t("weather_desc")}
-              temperature={weather ? `${Math.round(weather.temperature ?? 0)}°C` : "34°C"}
-              humidity={weather ? `${Math.round(weather.humidity ?? 0)}%` : "82%"}
-              wind={weather ? `${Math.round(weather.wind_speed ?? 0)} km/h` : "25 km/h"}
+            <FarmerWeatherDashboard
+              weather={weather}
+              cropType={profile?.crop_type || profile?.crop_name}
+              isLoading={isWeatherLoading}
             />
 
-            <QuickActions />
-
-            {/* 5-day forecast */}
-            <div className="space-y-3">
-              <h2 className="text-lg font-semibold text-foreground">
-                {t("forecast_title")}
-              </h2>
-              <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-                {forecastCards.map((d, i) => (
-                  <div
-                    key={i}
-                    className={`flex-shrink-0 flex flex-col items-center bg-card border border-border rounded-2xl px-4 py-3 min-w-[76px] shadow-card transition-shadow ${
-                      i === 0 ? "border-primary/40 bg-primary/5" : ""
-                    }`}
-                  >
-                    <span className="text-xs font-semibold text-muted-foreground">
-                      {d.label}
-                    </span>
-                    <span className="text-3xl leading-none my-2" aria-hidden="true">{d.icon}</span>
-                    <span className="text-sm font-bold text-foreground">
-                      {d.temp}
-                    </span>
+            {/* Helpline */}
+            <div className="overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/15 via-emerald-50 to-amber-50 p-4 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+                  <span className="text-2xl leading-none" aria-hidden="true">📞</span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-amber-800">
+                    {t("helpline_toll_free")}
                   </div>
-                ))}
+                  <p className="text-base font-black leading-snug text-foreground">
+                    {t("helpline_banner_title")}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold leading-relaxed text-muted-foreground">
+                    {t("helpline_banner_desc")}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <a
+                      href="tel:18001801551"
+                      aria-label={`${t("helpline_call_now")} ${helplineText}`}
+                      className="rounded-xl bg-white px-3 py-2 text-base font-black text-primary shadow-sm active:scale-95 transition-transform touch-manipulation"
+                    >
+                      {helplineText}
+                    </a>
+                    <a
+                      href="tel:18001801551"
+                      aria-label={`${t("helpline_call_now")} ${helplineText}`}
+                      className="rounded-xl bg-primary px-3 py-2 text-sm font-black text-primary-foreground shadow-sm active:scale-95 transition-transform touch-manipulation"
+                    >
+                      {t("helpline_call_now")}
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Helpline */}
-            <a
-              href="tel:18001801551"
-              className="flex items-center justify-center gap-3 bg-primary/10 text-primary rounded-xl p-4 text-base font-bold active:scale-[0.97] transition-transform touch-manipulation border border-primary/20"
-            >
-              <span className="text-2xl leading-none" aria-hidden="true">📞</span>
-              <span>{helplineText}</span>
-            </a>
           </>
         )}
 
         {activeTab === "tips" && <FarmingTips tipsData={tips} />}
-        {activeTab === "news" && <AgriNews newsData={news} isLoading={isDashboardLoading} />}
+        {activeTab === "news" && <AgriNews newsData={news} isLoading={isNewsLoading} />}
         {activeTab === "about" && <AboutTab />}
         {activeTab === "profile" && (
           <ProfileCard

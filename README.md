@@ -23,6 +23,22 @@ npm install
 npm run dev
 ```
 
+## Weather Provider
+
+FarmAlert prefers Google Maps Platform Weather API when a key is configured, then falls back to Open-Meteo.
+
+Frontend local env:
+
+```text
+VITE_GOOGLE_WEATHER_API_KEY=your_google_weather_api_key
+```
+
+For production, prefer calling the backend weather route and keep the key server-side:
+
+```text
+GOOGLE_WEATHER_API_KEY=your_google_weather_api_key
+```
+
 ## Supabase Database
 
 The Supabase schema lives in:
