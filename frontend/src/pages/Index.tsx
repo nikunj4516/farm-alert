@@ -393,6 +393,31 @@ const Index = () => {
       </header>
 
       <main className="max-w-[600px] mx-auto px-4 py-5 space-y-5">
+        {activeTab === "weather" && (
+          <>
+            <FarmerWeatherDashboard
+              weather={weather}
+              cropType={profile?.crop_type || profile?.crop_name}
+              isLoading={isWeatherLoading}
+            />
+          </>
+        )}
+
+        {activeTab === "tips" && <FarmingTips tipsData={tips} />}
+        {activeTab === "news" && <AgriNews newsData={news} isLoading={isNewsLoading} />}
+        {activeTab === "about" && <AboutTab />}
+        {activeTab === "profile" && (
+          <ProfileCard
+            profile={profile}
+            isLoading={isProfileLoading}
+            error={errors.profileError}
+            fallbackImageUrl={user.user_metadata?.profile_image_url || user.user_metadata?.avatar_url}
+            onEdit={() => navigate("/profile-setup")}
+            onLogout={handleLogout}
+            onImageUpload={handleProfileImageUpload}
+          />
+        )}
+
         <section className="overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-emerald-50 shadow-elevated">
           <div className="bg-amber-400 px-4 py-2">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-amber-950">
@@ -432,31 +457,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {activeTab === "weather" && (
-          <>
-            <FarmerWeatherDashboard
-              weather={weather}
-              cropType={profile?.crop_type || profile?.crop_name}
-              isLoading={isWeatherLoading}
-            />
-          </>
-        )}
-
-        {activeTab === "tips" && <FarmingTips tipsData={tips} />}
-        {activeTab === "news" && <AgriNews newsData={news} isLoading={isNewsLoading} />}
-        {activeTab === "about" && <AboutTab />}
-        {activeTab === "profile" && (
-          <ProfileCard
-            profile={profile}
-            isLoading={isProfileLoading}
-            error={errors.profileError}
-            fallbackImageUrl={user.user_metadata?.profile_image_url || user.user_metadata?.avatar_url}
-            onEdit={() => navigate("/profile-setup")}
-            onLogout={handleLogout}
-            onImageUpload={handleProfileImageUpload}
-          />
-        )}
       </main>
 
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
