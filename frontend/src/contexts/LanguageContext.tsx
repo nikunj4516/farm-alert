@@ -220,9 +220,9 @@ const translations = {
     en: "Farmer Helpline: 1800-180-1551",
   },
   helpline_banner_title: {
-    gu: "ખેડૂત સહાય માટે મહત્વપૂર્ણ નંબર",
-    hi: "किसान सहायता के लिए महत्वपूर्ण नंबर",
-    en: "Important Farmer Support Number",
+    gu: "મહત્વપૂર્ણ ખેડૂત હેલ્પલાઇન",
+    hi: "महत्वपूर्ण किसान हेल्पलाइन",
+    en: "Important Farmer Helpline",
   },
   helpline_banner_desc: {
     gu: "વધુ માહિતી, ખેતી માર્ગદર્શન અથવા સરકારી યોજનાઓ માટે આ ટોલ ફ્રી નંબર પર સંપર્ક કરો.",

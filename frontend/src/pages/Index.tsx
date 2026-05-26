@@ -137,6 +137,7 @@ const Index = () => {
     void routeUnsubscribedUser();
   }, [user, loading, navigate]);
 
+  const helplineNumber = "1800-180-1551";
   const helplineText = t("helpline").replace(/^📞\s*/, "");
 
   const handleVoiceCommand = (transcript: string) => {
@@ -392,6 +393,46 @@ const Index = () => {
       </header>
 
       <main className="max-w-[600px] mx-auto px-4 py-5 space-y-5">
+        <section className="overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-emerald-50 shadow-elevated">
+          <div className="bg-amber-400 px-4 py-2">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-amber-950">
+              <Phone className="h-4 w-4" aria-hidden="true" />
+              {t("helpline_toll_free")}
+            </div>
+          </div>
+          <div className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+                <Phone className="h-6 w-6" aria-hidden="true" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-black leading-tight text-foreground">
+                  {t("helpline_banner_title")}
+                </p>
+                <p className="mt-1 text-sm font-semibold leading-relaxed text-muted-foreground">
+                  {t("helpline_banner_desc")}
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <a
+                    href={`tel:${helplineNumber.replace(/-/g, "")}`}
+                    aria-label={`${t("helpline_call_now")} ${helplineText}`}
+                    className="rounded-xl bg-primary px-4 py-2.5 text-base font-black text-primary-foreground shadow-sm active:scale-95 transition-transform touch-manipulation"
+                  >
+                    {helplineNumber}
+                  </a>
+                  <a
+                    href={`tel:${helplineNumber.replace(/-/g, "")}`}
+                    aria-label={`${t("helpline_call_now")} ${helplineText}`}
+                    className="rounded-xl border border-primary/25 bg-white px-4 py-2.5 text-sm font-black text-primary shadow-sm active:scale-95 transition-transform touch-manipulation"
+                  >
+                    {t("helpline_call_now")}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {activeTab === "weather" && (
           <>
             <FarmerWeatherDashboard
@@ -399,42 +440,6 @@ const Index = () => {
               cropType={profile?.crop_type || profile?.crop_name}
               isLoading={isWeatherLoading}
             />
-
-            {/* Helpline */}
-            <div className="overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/15 via-emerald-50 to-amber-50 p-4 shadow-sm">
-              <div className="flex items-start gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-                  <span className="text-2xl leading-none" aria-hidden="true">📞</span>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="mb-1 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-amber-800">
-                    {t("helpline_toll_free")}
-                  </div>
-                  <p className="text-base font-black leading-snug text-foreground">
-                    {t("helpline_banner_title")}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold leading-relaxed text-muted-foreground">
-                    {t("helpline_banner_desc")}
-                  </p>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <a
-                      href="tel:18001801551"
-                      aria-label={`${t("helpline_call_now")} ${helplineText}`}
-                      className="rounded-xl bg-white px-3 py-2 text-base font-black text-primary shadow-sm active:scale-95 transition-transform touch-manipulation"
-                    >
-                      {helplineText}
-                    </a>
-                    <a
-                      href="tel:18001801551"
-                      aria-label={`${t("helpline_call_now")} ${helplineText}`}
-                      className="rounded-xl bg-primary px-3 py-2 text-sm font-black text-primary-foreground shadow-sm active:scale-95 transition-transform touch-manipulation"
-                    >
-                      {t("helpline_call_now")}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
           </>
         )}
 
