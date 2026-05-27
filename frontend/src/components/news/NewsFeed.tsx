@@ -8,6 +8,7 @@ interface NewsFeedProps {
   isLoading?: boolean;
   emptyTitle?: string;
   onRetry?: () => void;
+  onRead?: (article: AgricultureNews) => void;
 }
 
 const NewsSkeleton = () => (
@@ -23,7 +24,7 @@ const NewsSkeleton = () => (
   </div>
 );
 
-const NewsFeed = ({ articles, isLoading, emptyTitle, onRetry }: NewsFeedProps) => {
+const NewsFeed = ({ articles, isLoading, emptyTitle, onRetry, onRead }: NewsFeedProps) => {
   const { t } = useLanguage();
   if (isLoading) {
     return (
@@ -63,7 +64,7 @@ const NewsFeed = ({ articles, isLoading, emptyTitle, onRetry }: NewsFeedProps) =
   return (
     <div className="space-y-3">
       {articles.map((article) => (
-        <NewsCard key={article.id} article={article} />
+        <NewsCard key={article.id} article={article} onRead={onRead} />
       ))}
     </div>
   );

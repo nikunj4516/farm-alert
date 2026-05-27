@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NewsCardProps {
   article: AgricultureNews;
+  onRead?: (article: AgricultureNews) => void;
 }
 
 const dateLocales = {
@@ -164,26 +165,116 @@ const localizedSourceUrl = (url: string | null, language: keyof typeof dateLocal
   return `https://translate.google.com/translate?${params.toString()}`;
 };
 
-const fallbackNewsImages: Record<string, string> = {
-  government: "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=240&q=75",
-  subsidy: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=240&q=75",
-  market: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=240&q=75",
-  weather: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=240&q=75",
-  pest: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=240&q=75",
-  general: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=240&q=75",
+const fallbackNewsImages: Record<string, string[]> = {
+  government: [
+    "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=240&q=75",
+  ],
+  subsidy: [
+    "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=240&q=75",
+  ],
+  market: [
+    "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=240&q=75",
+  ],
+  weather: [
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1519692933481-e162a57d6721?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1501691223387-dd0500403074?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?auto=format&fit=crop&w=240&q=75",
+  ],
+  pest: [
+    "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=240&q=75",
+  ],
+  general: [
+    "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1492496913980-501348b61469?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?auto=format&fit=crop&w=240&q=75",
+  ],
 };
 
-const newsImageFor = (article: AgricultureNews) =>
-  article.image_url ||
-  article.image ||
-  fallbackNewsImages[article.category || "general"] ||
-  fallbackNewsImages.general;
+const cropNewsImages: Record<string, string[]> = {
+  cotton: [
+    "https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=240&q=75",
+  ],
+  rice: [
+    "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=240&q=75",
+  ],
+  wheat: [
+    "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1501430654243-c934cec2e1c0?auto=format&fit=crop&w=240&q=75",
+  ],
+  groundnut: [
+    "https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?auto=format&fit=crop&w=240&q=75",
+  ],
+  sugarcane: [
+    "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=240&q=75",
+  ],
+  vegetable: [
+    "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=240&q=75",
+    "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=240&q=75",
+  ],
+};
 
-const NewsCard = ({ article }: NewsCardProps) => {
+const hashImageIndex = (value: string, total: number) => {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) hash = (hash * 31 + value.charCodeAt(index)) | 0;
+  return Math.abs(hash) % total;
+};
+
+const isUsableNewsImage = (url?: string | null) => {
+  if (!url) return false;
+  const normalized = url.toLowerCase();
+  return !(
+    normalized.includes("favicon") ||
+    normalized.includes("logo") ||
+    normalized.includes("icon") ||
+    normalized.includes("1x1") ||
+    normalized.includes("blank") ||
+    normalized.endsWith(".svg")
+  );
+};
+
+const keywordImagePool = (article: AgricultureNews) => {
+  const text = `${article.title} ${article.summary || ""} ${article.content || ""} ${(article.crop_related || []).join(" ")}`.toLowerCase();
+  if (/(cotton|કપાસ|कपास)/.test(text)) return cropNewsImages.cotton;
+  if (/(rice|paddy|ડાંગર|धान)/.test(text)) return cropNewsImages.rice;
+  if (/(wheat|ઘઉં|गेहूं|गेहूँ)/.test(text)) return cropNewsImages.wheat;
+  if (/(groundnut|peanut|મગફળી|मूंगफली)/.test(text)) return cropNewsImages.groundnut;
+  if (/(sugarcane|શેરડી|गन्ना)/.test(text)) return cropNewsImages.sugarcane;
+  if (/(vegetable|tomato|onion|potato|શાકભાજી|सब्ज)/.test(text)) return cropNewsImages.vegetable;
+  return null;
+};
+
+const newsImageFor = (article: AgricultureNews) => {
+  const directImage = article.image_url || article.image;
+  if (isUsableNewsImage(directImage)) return directImage;
+
+  const keywordImages = keywordImagePool(article);
+  const images = keywordImages || fallbackNewsImages[article.category || "general"] || fallbackNewsImages.general;
+  return images[hashImageIndex(`${article.id}-${article.title}-${article.source_name}`, images.length)];
+};
+
+const NewsCard = ({ article, onRead }: NewsCardProps) => {
   const { language, t } = useLanguage();
   const category = t(`news.categories.${article.category || "general"}`);
   const sourceUrl = normalizeSourceUrl(article.source_url);
-  const readUrl = localizedSourceUrl(sourceUrl, language);
   const sourceLabel =
     sourceLabels[article.source_name as keyof typeof sourceLabels]?.[language] ||
     article.source_name;
@@ -192,12 +283,7 @@ const NewsCard = ({ article }: NewsCardProps) => {
   const summary = article.translatedDescription || article.description || article.summary;
 
   const handleReadSource = () => {
-    if (!readUrl) return;
-
-    const opened = window.open(readUrl, "_blank", "noopener,noreferrer");
-    if (!opened) {
-      window.location.href = readUrl;
-    }
+    onRead?.({ ...article, source_url: sourceUrl || article.source_url });
   };
 
   return (
@@ -228,7 +314,7 @@ const NewsCard = ({ article }: NewsCardProps) => {
 
       <div className="mt-3 flex items-center justify-between gap-3 border-t border-border/70 pt-3">
         <span className="text-xs font-medium text-muted-foreground">{formatDate(article.published_at, language)}</span>
-        {sourceUrl && (
+        {(sourceUrl || article.summary || article.content) && (
           <button
             type="button"
             onClick={handleReadSource}

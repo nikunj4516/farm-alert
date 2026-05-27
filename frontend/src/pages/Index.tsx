@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import FarmingTips from "@/components/FarmingTips";
 import AgriNews from "@/components/AgriNews";
-import VoiceCommandButton from "@/components/VoiceCommandButton";
+import VoiceAssistantButton from "@/components/voice/VoiceAssistantButton";
 import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
 import ProfileCard from "@/components/ProfileCard";
@@ -17,6 +17,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { hasActiveSubscription } from "@/services/subscriptionService";
 import { ProfileService } from "@/services/profileService";
 import type { WeatherReport } from "@/services/weatherService";
+import type { VoiceCommandResult } from "@/services/voiceCommandEngine";
 import { toast } from "@/components/ui/use-toast";
 
 const getWeatherAlertLevel = (weather?: WeatherReport | null) => {
@@ -140,132 +141,20 @@ const Index = () => {
   const helplineNumber = "1800-180-1551";
   const helplineText = t("helpline").replace(/^📞\s*/, "");
 
-  const handleVoiceCommand = (transcript: string) => {
-    const command = transcript.toLowerCase();
-
-    // Check for Wake Word
-    if (command.includes("hey farm") || command.includes("hey farmalert") || command.includes("farm alert")) {
-      // It's a wake word command, user might say "hey farmalert weather"
-      // the string will contain both. We just let it fall through to the specific handlers.
-    }
-
-    if (
-      command.includes("weather") ||
-      command.includes("મોસમ") ||
-      command.includes("હવામાન") ||
-      command.includes("मौसम") ||
-      command.includes("havaman") ||
-      command.includes("mausam") ||
-      command.includes("mosam") ||
-      command.includes("tapman") ||
-      command.includes("વરસાદ") ||
-      command.includes("varsad") ||
-      command.includes("baarish") ||
-      command.includes("barish") ||
-      command.includes("rain") ||
-      command.includes("બારીશ")
-    ) {
-      setActiveTab("weather");
-      return;
-    }
-
-    if (
-      command.includes("tips") ||
-      command.includes("tip") ||
-      command.includes("ટિપ્સ") ||
-      command.includes("सलाह") ||
-      command.includes("टिप्स") ||
-      command.includes("salah") ||
-      command.includes("sujav") ||
-      command.includes("sujhav") ||
-      command.includes("mahiti") ||
-      command.includes("kheti") ||
-      command.includes("ખેતી") ||
-      command.includes("खेती")
-    ) {
-      setActiveTab("tips");
-      return;
-    }
-
-    if (
-      command.includes("news") ||
-      command.includes("સમાચાર") ||
-      command.includes("न्यूज़") ||
-      command.includes("समाचार") ||
-      command.includes("samachar") ||
-      command.includes("khabar") ||
-      command.includes("taaja") ||
-      command.includes("bajar") ||
-      command.includes("bhav") ||
-      command.includes("ખબર") ||
-      command.includes("खबर")
-    ) {
-      setActiveTab("news");
-      return;
-    }
-
-    if (
-      command.includes("about") ||
-      command.includes("અમારા વિશે") ||
-      command.includes("हमारे बारे में") ||
-      command.includes("company") ||
-      command.includes("founder")
-    ) {
-      setActiveTab("about");
-      return;
-    }
-
-    if (
-      command.includes("profile") ||
-      command.includes("પ્રોફાઇલ") ||
-      command.includes("प्रोफाइल") ||
-      command.includes("profil") ||
-      command.includes("maru") ||
-      command.includes("mera") ||
-      command.includes("khata")
-    ) {
-      setActiveTab("profile");
-      return;
-    }
-
-    if (
-      command.includes("subscription") ||
-      command.includes("subscribe") ||
-      command.includes("plan") ||
-      command.includes("સબ્સ્ક્રાઇબ") ||
-      command.includes("सब्सक्राइब")
-    ) {
-      navigate("/subscription");
-      return;
-    }
-
-    if (
-      command.includes("setup") ||
-      command.includes("edit profile") ||
-      command.includes("માહિતી") ||
-      command.includes("जानकारी") ||
-      command.includes("jankari") ||
-      command.includes("badlo") ||
-      command.includes("sudharo")
-    ) {
-      navigate("/profile-setup");
-      return;
-    }
-
-    if (
-      command.includes("call") ||
-      command.includes("helpline") ||
-      command.includes("કોલ") ||
-      command.includes("હેલ્પલાઇન") ||
-      command.includes("हेल्पलाइन") ||
-      command.includes("phone") ||
-      command.includes("fon") ||
-      command.includes("fone") ||
-      command.includes("madad") ||
-      command.includes("મદદ") ||
-      command.includes("मदद")
-    ) {
-      window.location.href = "tel:18001801551";
+  const handleVoiceCommand = (command: VoiceCommandResult) => {
+    switch (command.action) {
+      case "weather":
+      case "tips":
+      case "news":
+      case "about":
+      case "profile":
+        setActiveTab(command.action);
+        break;
+      case "helpline":
+        window.location.href = "tel:18001801551";
+        break;
+      default:
+        break;
     }
   };
 
@@ -373,8 +262,8 @@ const Index = () => {
                 </div>
               )}
             </div>
-            <VoiceCommandButton
-              helpText="Say: weather, tips, news, profile, call helpline"
+            <VoiceAssistantButton
+              language={language}
               onCommand={handleVoiceCommand}
               className="rounded-xl bg-primary-foreground/15 text-primary-foreground"
             />

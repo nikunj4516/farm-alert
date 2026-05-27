@@ -4,6 +4,8 @@ import NewsFeed from "@/components/news/NewsFeed";
 import PersonalizedNews from "@/components/news/PersonalizedNews";
 import TrendingNews from "@/components/news/TrendingNews";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ArticleReader from "@/components/news/ArticleReader";
+import { useState } from "react";
 
 interface AgriNewsProps {
   newsData?: AgricultureNews[];
@@ -12,6 +14,7 @@ interface AgriNewsProps {
 
 const AgriNews = ({ newsData, isLoading }: AgriNewsProps) => {
   const { language, t } = useLanguage();
+  const [selectedArticle, setSelectedArticle] = useState<AgricultureNews | null>(null);
   const { data: latestNews } = useAgricultureNews({
     category: "all",
     language,
@@ -40,8 +43,8 @@ const AgriNews = ({ newsData, isLoading }: AgriNewsProps) => {
 
   return (
     <div className="space-y-5">
-      <PersonalizedNews articles={newsData} isLoading={isLoading} />
-      <TrendingNews articles={latestNews} />
+      <PersonalizedNews articles={newsData} isLoading={isLoading} onRead={setSelectedArticle} />
+      <TrendingNews articles={latestNews} onRead={setSelectedArticle} />
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-foreground">{t("home.categoryWiseNews")}</h2>
         {categorySections.map((section) => {
@@ -57,11 +60,13 @@ const AgriNews = ({ newsData, isLoading }: AgriNewsProps) => {
                 articles={articles}
                 isLoading={sectionQuery.isLoading}
                 onRetry={() => void sectionQuery.refetch()}
+                onRead={setSelectedArticle}
               />
             </div>
           );
         })}
       </section>
+      <ArticleReader article={selectedArticle} onClose={() => setSelectedArticle(null)} />
     </div>
   );
 };

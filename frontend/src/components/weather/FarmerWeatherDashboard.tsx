@@ -1,6 +1,7 @@
 import { WeatherReport } from "@/services/weatherService";
 import CropRiskCard from "./CropRiskCard";
 import EmergencyWarningCard from "./EmergencyWarningCard";
+import EmergencyVoiceAlert from "@/components/voice/EmergencyVoiceAlert";
 import FarmingRecommendations from "./FarmingRecommendations";
 import ForecastCard from "./ForecastCard";
 import HeatwaveAlertCard from "./HeatwaveAlertCard";
@@ -33,6 +34,7 @@ const FarmerWeatherDashboard = ({ weather, cropType, isLoading }: FarmerWeatherD
 
   return (
     <div className="space-y-5">
+      <EmergencyVoiceAlert weather={weather} />
       <EmergencyWarningCard weather={weather} cropType={cropType} />
       <WeatherCard weather={weather} />
       <SmartWeatherAlerts alerts={weather.agricultureAlerts} cropType={cropType} />

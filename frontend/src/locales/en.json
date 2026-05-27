@@ -27,7 +27,47 @@
     "weatherLoadingTitle": "Weather intelligence is loading",
     "weatherLoadingBody": "Add taluka, district, and state in your profile for accurate forecasts."
   },
+  "voice": {
+    "unsupportedShort": "Voice is not available in this browser",
+    "status": {
+      "idle": "Tap mic to speak",
+      "listening": "Listening",
+      "processing": "Understanding command",
+      "speaking": "Speaking",
+      "error": "Try again"
+    },
+    "responses": {
+      "weather": "Opening weather dashboard",
+      "tips": "Opening farming tips",
+      "news": "Opening agriculture news",
+      "profile": "Opening profile",
+      "about": "Opening about us",
+      "helpline": "Calling farmer helpline",
+      "unknown": "Sorry, I did not understand that command",
+      "unsupported": "Voice is not supported in this browser",
+      "error": "There was a problem hearing you. Please try again",
+      "emergency": "Warning. Dangerous crop weather may affect your area. Please check the recommended actions now."
+    },
+    "errors": {
+      "microphone_permission": "Please allow microphone access.",
+      "no_speech": "Tap the mic and speak clearly.",
+      "microphone_missing": "Microphone was not found.",
+      "network": "Voice needs browser speech access. Try again.",
+      "unclear": "Could not hear clearly. Try again.",
+      "unsupported": "Voice is not supported in this browser."
+    }
+  },
   "news": {
+    "reader": {
+      "title": "Translated article",
+      "close": "Close article",
+      "loading": "Preparing translated article",
+      "fullArticle": "Full article",
+      "summaryFallback": "Summary view",
+      "translationUnavailable": "Translation temporarily unavailable.",
+      "openOriginal": "Open original source",
+      "noSource": "Original source is not available"
+    },
     "categories": {
       "all": "All",
       "government": "Govt",

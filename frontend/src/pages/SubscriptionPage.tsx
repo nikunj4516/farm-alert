@@ -175,8 +175,6 @@ const SubscriptionPage = () => {
         <div className="flex items-center gap-2">
           {langToggle}
           <VoiceCommandButton
-            lang="en-IN"
-            helpText="Say: benefits, daily, monthly, subscribe, English"
             onCommand={handleVoiceCommand}
           />
         </div>

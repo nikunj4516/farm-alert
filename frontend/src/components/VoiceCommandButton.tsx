@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
 import { Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Language, useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getSpeechLocale } from "@/services/languageDetectionService";
+import { getVoiceText } from "@/services/textToSpeechService";
 
 type SpeechRecognitionConstructor = new () => SpeechRecognition;
 
@@ -38,30 +40,24 @@ interface VoiceCommandButtonProps {
   onCommand: (transcript: string) => void;
 }
 
-const speechLanguage: Record<Language, string> = {
-  gu: "gu-IN",
-  hi: "hi-IN",
-  en: "en-IN",
-};
-
-const voiceErrorMessage = (error: string) => {
+const voiceErrorMessage = (error: string, language: ReturnType<typeof useLanguage>["language"]) => {
   if (error === "not-allowed" || error === "service-not-allowed") {
-    return "Please allow microphone permission.";
+    return getVoiceText("responses.error", language);
   }
 
   if (error === "no-speech") {
-    return "No voice detected. Tap mic and speak clearly.";
+    return getVoiceText("status.idle", language);
   }
 
   if (error === "audio-capture") {
-    return "Microphone not found. Check your mic.";
+    return getVoiceText("responses.error", language);
   }
 
   if (error === "network") {
-    return "Voice needs internet in this browser. Try again.";
+    return getVoiceText("responses.error", language);
   }
 
-  return "Could not hear clearly. Try again.";
+  return getVoiceText("responses.error", language);
 };
 
 const VoiceCommandButton = ({ className, helpText, lang, onCommand }: VoiceCommandButtonProps) => {
@@ -76,13 +72,13 @@ const VoiceCommandButton = ({ className, helpText, lang, onCommand }: VoiceComma
       (window as typeof window & { webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition;
 
     if (!SpeechRecognitionApi) {
-      setMessage("Voice is not supported in this browser.");
+      setMessage(getVoiceText("responses.unsupported", language));
       return;
     }
 
     const recognition = new SpeechRecognitionApi();
     recognitionRef.current = recognition;
-    recognition.lang = lang || speechLanguage[language] || "en-IN";
+    recognition.lang = lang || getSpeechLocale(language);
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
@@ -96,14 +92,14 @@ const VoiceCommandButton = ({ className, helpText, lang, onCommand }: VoiceComma
 
     recognition.onerror = (event) => {
       setListening(false);
-      setMessage(voiceErrorMessage(event.error));
+      setMessage(voiceErrorMessage(event.error, language));
     };
 
     recognition.onend = () => {
       setListening(false);
     };
 
-    setMessage(helpText || "Listening...");
+    setMessage(helpText || getVoiceText("status.listening", language));
     setListening(true);
     recognition.start();
   };
