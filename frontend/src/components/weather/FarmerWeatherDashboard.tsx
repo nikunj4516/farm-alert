@@ -34,13 +34,13 @@ const FarmerWeatherDashboard = ({ weather, cropType, isLoading }: FarmerWeatherD
     <div className="space-y-5">
       <WeatherCard weather={weather} />
       <SmartWeatherAlerts alerts={weather.agricultureAlerts} cropType={cropType} />
-      <CropRiskCard cropType={cropType} alerts={weather.agricultureAlerts} />
+      <CropRiskCard cropType={cropType} alerts={weather.agricultureAlerts} riskProfile={weather.cropRiskProfile} />
       <div className="grid gap-4 sm:grid-cols-2">
         <RainPredictionCard weather={weather} />
         <HeatwaveAlertCard weather={weather} cropType={cropType} />
       </div>
       <WeatherInsights weather={weather} />
-      <FarmingRecommendations alerts={weather.agricultureAlerts} cropType={cropType} />
+      <FarmingRecommendations alerts={weather.agricultureAlerts} cropType={cropType} recommendations={weather.recommendations} />
       <ForecastCard weather={weather} />
     </div>
   );

@@ -169,6 +169,12 @@
         "highPlantStress": "પાક તણાવ વધુ",
         "normalSunlightRisk": "સામાન્ય સૂર્યપ્રકાશ જોખમ"
       },
+      "riskProfile": {
+        "heatRisk": "ગરમી જોખમ",
+        "pestRisk": "જીવાત જોખમ",
+        "rainfallRisk": "વરસાદ જોખમ",
+        "diseaseRisk": "રોગ જોખમ"
+      },
       "alerts": {
         "heatwave": {
           "title": "અતિ ગરમીનું જોખમ મળ્યું",

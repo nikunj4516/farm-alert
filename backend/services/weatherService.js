@@ -2,6 +2,8 @@ import axios from "axios";
 import { supabaseAdmin } from "../utils/supabaseClient.js";
 import { LocationService } from "./locationService.js";
 import { AgricultureAlertEngine } from "./agricultureAlertEngine.js";
+import { CropRiskEngine } from "./cropRiskEngine.js";
+import { RecommendationEngine } from "./recommendationEngine.js";
 
 const CACHE_MINUTES = Number(process.env.WEATHER_CACHE_MINUTES || 30);
 const GOOGLE_WEATHER_BASE_URL = "https://weather.googleapis.com/v1";
@@ -121,6 +123,31 @@ export class WeatherService {
 
     const cutoff = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
     const alertRows = [];
+    const recommendedActions = report.recommendations || [];
+
+    if (report.cropRiskProfile?.cropName) {
+      const profile = report.cropRiskProfile;
+      const { error: riskError } = await supabaseAdmin
+        .from("crop_risk_profiles")
+        .upsert(
+          {
+            crop_name: profile.cropName,
+            heat_risk: profile.heatRisk,
+            pest_risk: profile.pestRisk,
+            rainfall_risk: profile.rainfallRisk,
+            disease_risk: profile.diseaseRisk,
+            irrigation_stress: profile.irrigationStress,
+            wind_damage_risk: profile.windDamageRisk,
+            crop_damage_probability: profile.cropDamageProbability,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "crop_name" }
+        );
+
+      if (riskError) {
+        console.warn("Could not persist crop risk profile:", riskError.message);
+      }
+    }
 
     for (const alert of report.agricultureAlerts) {
       if (alert.type === "safe_weather") continue;
@@ -147,6 +174,7 @@ export class WeatherService {
         alert_title: alert.title,
         alert_message: alert.message,
         recommendation: alert.recommendation,
+        recommended_actions: recommendedActions.filter((item) => item.sourceAlertType === alert.type),
         weather_condition: report.weatherCondition,
         metric_label: alert.metricLabel,
         metric_value: alert.metricValue,
@@ -356,10 +384,13 @@ export class WeatherService {
       fetchedAt: row.fetched_at,
       isCached,
     };
+    const agricultureAlerts = AgricultureAlertEngine.generate({ weather: report, cropName });
 
     return {
       ...report,
-      agricultureAlerts: AgricultureAlertEngine.generate({ weather: report, cropName }),
+      agricultureAlerts,
+      cropRiskProfile: CropRiskEngine.calculate(report, cropName),
+      recommendations: RecommendationEngine.generate(report, cropName, agricultureAlerts),
     };
   }
 }

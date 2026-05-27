@@ -22,7 +22,10 @@ The backend weather intelligence flow is:
 GET /api/weather/intelligence
   -> resolve farmer location
   -> fetch/cache weather
-  -> run agricultureWeatherRules.js
-  -> persist non-safe alerts in weather_alerts
-  -> return weather + agricultureAlerts
+  -> run cropWeatherRulesEngine.js
+  -> generate smart crop alerts
+  -> calculate crop risk profile
+  -> generate recommended actions
+  -> persist non-safe alerts + crop risk profiles
+  -> return weather + agricultureAlerts + cropRiskProfile + recommendations
 ```

@@ -169,6 +169,12 @@
         "highPlantStress": "High plant stress",
         "normalSunlightRisk": "Normal sunlight risk"
       },
+      "riskProfile": {
+        "heatRisk": "Heat risk",
+        "pestRisk": "Pest risk",
+        "rainfallRisk": "Rainfall risk",
+        "diseaseRisk": "Disease risk"
+      },
       "alerts": {
         "heatwave": {
           "title": "Extreme heat risk detected",

@@ -1,6 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Database, Json } from "@/types/database.types";
-import { generateSmartAgricultureAlerts, SmartAgricultureAlert } from "@/services/agricultureWeatherRules";
+import { SmartAgricultureAlert } from "@/services/agricultureWeatherRules";
+import { CropRiskEngine, type CropRiskProfile } from "@/services/cropRiskEngine";
+import { RecommendationEngine, type FarmingRecommendation } from "@/services/recommendationEngine";
+import { SmartCropAlertService } from "@/services/smartCropAlertService";
 
 type WeatherCacheRow = Database["public"]["Tables"]["weather_cache"]["Row"];
 type WeatherCacheInsert = Database["public"]["Tables"]["weather_cache"]["Insert"];
@@ -65,6 +68,8 @@ export interface WeatherReport extends Omit<WeatherCacheRow, "forecast" | "forec
   forecast: WeatherForecastDay[];
   hourlyForecast: HourlyForecast[];
   agricultureAlerts: SmartAgricultureAlert[];
+  cropRiskProfile: CropRiskProfile;
+  recommendations: FarmingRecommendation[];
   isCached: boolean;
   isStale: boolean;
 }
@@ -603,9 +608,12 @@ const toReport = (row: WeatherCacheRecord, input: WeatherLocationInput, flags: P
     hourlyForecast,
     ...flags,
   };
+  const agricultureAlerts = SmartCropAlertService.generate(base, input.cropType);
   return {
     ...base,
-    agricultureAlerts: generateSmartAgricultureAlerts(base, input.cropType),
+    agricultureAlerts,
+    cropRiskProfile: CropRiskEngine.calculate(base, input.cropType),
+    recommendations: RecommendationEngine.generate(base, input.cropType, agricultureAlerts),
   };
 };
 

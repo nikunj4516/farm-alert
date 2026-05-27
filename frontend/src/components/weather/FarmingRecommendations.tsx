@@ -1,18 +1,24 @@
 import type { SmartAgricultureAlert } from "@/services/agricultureWeatherRules";
 import { getCropWeatherThreshold } from "@/services/agricultureWeatherRules";
+import type { FarmingRecommendation } from "@/services/recommendationEngine";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FarmingRecommendationsProps {
   alerts: SmartAgricultureAlert[];
   cropType?: string | null;
+  recommendations?: FarmingRecommendation[];
 }
 
-const FarmingRecommendations = ({ alerts, cropType }: FarmingRecommendationsProps) => {
+const FarmingRecommendations = ({ alerts, cropType, recommendations: generatedRecommendations }: FarmingRecommendationsProps) => {
   const { t } = useLanguage();
   const crop = t(`weather.intelligence.crops.${getCropWeatherThreshold(cropType).cropName}`);
-  const recommendations = alerts
-    .filter((alert) => alert.type !== "safe_weather")
-    .map((alert) => t(`weather.intelligence.alerts.${alert.type}.recommendation`).replace("{crop}", crop).replace("{value}", alert.metricValue))
+  const recommendations = (generatedRecommendations || [])
+    .map((item) => {
+      const alert = alerts.find((candidate) => candidate.type === item.sourceAlertType);
+      return alert
+        ? t(`weather.intelligence.alerts.${alert.type}.recommendation`).replace("{crop}", crop).replace("{value}", alert.metricValue)
+        : item.message;
+    })
     .slice(0, 3);
 
   const safeRecommendations = [

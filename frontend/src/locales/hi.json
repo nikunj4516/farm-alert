@@ -169,6 +169,12 @@
         "highPlantStress": "फसल तनाव अधिक",
         "normalSunlightRisk": "सामान्य धूप जोखिम"
       },
+      "riskProfile": {
+        "heatRisk": "गर्मी जोखिम",
+        "pestRisk": "कीट जोखिम",
+        "rainfallRisk": "बारिश जोखिम",
+        "diseaseRisk": "रोग जोखिम"
+      },
       "alerts": {
         "heatwave": {
           "title": "अत्यधिक गर्मी का जोखिम मिला",
