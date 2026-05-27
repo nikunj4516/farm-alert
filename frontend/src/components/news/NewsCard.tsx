@@ -188,6 +188,8 @@ const NewsCard = ({ article }: NewsCardProps) => {
     sourceLabels[article.source_name as keyof typeof sourceLabels]?.[language] ||
     article.source_name;
   const imageUrl = newsImageFor(article);
+  const title = article.translatedTitle || article.title;
+  const summary = article.translatedDescription || article.description || article.summary;
 
   const handleReadSource = () => {
     if (!readUrl) return;
@@ -217,9 +219,9 @@ const NewsCard = ({ article }: NewsCardProps) => {
               {category}
             </span>
           </div>
-          <h3 className="text-base font-bold leading-snug text-foreground">{article.title}</h3>
-          {article.summary && (
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{article.summary}</p>
+          <h3 className="text-base font-bold leading-snug text-foreground">{title}</h3>
+          {summary && (
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{summary}</p>
           )}
         </div>
       </div>

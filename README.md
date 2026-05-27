@@ -58,11 +58,14 @@ Core modules:
 - `frontend/src/services/smartCropAlertService.ts` - generates smart crop alerts from rule signals.
 - `frontend/src/services/cropRiskEngine.ts` - calculates heat, pest, rainfall, disease, irrigation, and wind risk.
 - `frontend/src/services/recommendationEngine.ts` - turns risk signals into preventive farming actions.
+- `frontend/src/services/weatherDangerEngine.ts` - classifies weather danger as GREEN, YELLOW, or RED.
+- `frontend/src/services/emergencyAlertEngine.ts` - prepares dashboard, WhatsApp, and SMS emergency payloads.
 - `frontend/src/services/agricultureWeatherRules.ts` - crop thresholds and client-side smart alert generation.
 - `backend/services/agricultureWeatherRules.js` - server-side rule engine used for persisted alerts.
 - `frontend/src/components/weather/SmartWeatherAlerts.tsx` - primary actionable alert feed.
 - `supabase/migrations/20260526120000_crop_weather_thresholds_and_smart_alerts.sql` - crop threshold table and richer alert fields.
 - `supabase/migrations/20260526143000_crop_risk_profiles.sql` - crop risk profile table and structured recommended actions.
+- `supabase/migrations/20260527113000_weather_danger_emergency_alerts.sql` - crop weather rules and emergency alert readiness.
 
 ## Supabase Database
 

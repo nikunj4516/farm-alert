@@ -8,7 +8,7 @@ import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
 import ProfileCard from "@/components/ProfileCard";
 import FarmerWeatherDashboard from "@/components/weather/FarmerWeatherDashboard";
-import { Bell, LogOut, Globe, Loader2, CloudRain, CloudLightning, CloudSun, Cloud, Sun, Phone, MapPin } from "lucide-react";
+import { LogOut, Loader2, Phone } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
 import { supabase } from "@/integrations/supabase/client";
@@ -373,10 +373,6 @@ const Index = () => {
                 </div>
               )}
             </div>
-            <button className="relative bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation">
-              <span className="text-xl leading-none" aria-hidden="true">🔔</span>
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-alert-red rounded-full border-2 border-primary" />
-            </button>
             <VoiceCommandButton
               helpText="Say: weather, tips, news, profile, call helpline"
               onCommand={handleVoiceCommand}

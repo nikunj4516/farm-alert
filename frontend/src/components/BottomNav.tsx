@@ -32,14 +32,14 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
               onClick={() => onTabChange(tab.id)}
               aria-label={tab.label}
               aria-current={isActive ? "page" : undefined}
-              className={`flex-1 flex flex-col items-center py-3 px-2 min-h-[64px] transition-colors touch-manipulation relative ${
+              className={`flex-1 flex flex-col items-center pt-4 pb-3 px-2 min-h-[72px] transition-colors touch-manipulation relative ${
                 isActive ? "text-primary" : "text-muted-foreground hover:text-primary/70"
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="bottomNavIndicator"
-                  className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-b-full"
+                  className="absolute top-1 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full"
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}

@@ -98,6 +98,25 @@
       "heatHigh": "Plan irrigation during cooler hours to reduce heat stress.",
       "heatOk": "Temperature stress is currently controlled."
     },
+    "danger": {
+      "score": "Danger score",
+      "openApp": "Open the app and act immediately. Emergency crop protection steps are recommended.",
+      "status": {
+        "GREEN": "GREEN SAFE",
+        "YELLOW": "MEDIUM RISK",
+        "RED": "RED ALERT"
+      },
+      "title": {
+        "GREEN": "Weather is safe for farming",
+        "YELLOW": "Stay alert for crop risk",
+        "RED": "Emergency crop danger detected"
+      },
+      "message": {
+        "green": "Weather conditions are favorable for {crop} today.",
+        "yellow": "Weather is changing. {crop} may need closer monitoring today.",
+        "red": "High danger weather is expected. {crop} may face serious crop damage risk."
+      }
+    },
     "intelligence": {
       "aiLabel": "AI Weather Intelligence",
       "smartCropAlerts": "Smart Crop Alerts",

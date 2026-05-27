@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { NewsQueryOptions, NewsService } from "@/services/newsService";
 
-const NEWS_LANGUAGE_FEED_VERSION = "language-first-v2";
+const NEWS_LANGUAGE_FEED_VERSION = "language-first-v3";
 
 export const useAgricultureNews = (options: NewsQueryOptions = {}) =>
   useQuery({

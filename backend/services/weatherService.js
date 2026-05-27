@@ -3,7 +3,9 @@ import { supabaseAdmin } from "../utils/supabaseClient.js";
 import { LocationService } from "./locationService.js";
 import { AgricultureAlertEngine } from "./agricultureAlertEngine.js";
 import { CropRiskEngine } from "./cropRiskEngine.js";
+import { EmergencyAlertEngine } from "./emergencyAlertEngine.js";
 import { RecommendationEngine } from "./recommendationEngine.js";
+import { WeatherDangerEngine } from "./weatherDangerEngine.js";
 
 const CACHE_MINUTES = Number(process.env.WEATHER_CACHE_MINUTES || 30);
 const GOOGLE_WEATHER_BASE_URL = "https://weather.googleapis.com/v1";
@@ -74,7 +76,7 @@ export class WeatherService {
     const googleEnabled = Boolean(googleWeatherApiKey());
     if (cached && isFresh(cached) && (!googleEnabled || cached.provider === "google_weather")) {
       const report = this.toWeatherReport(cached, cropName, true);
-      await this.persistSmartAlerts({ farmerId, cropName, location, report });
+      await this.persistSmartAlerts({ farmerId, cropName, village: locationInput.village, location, report });
       return report;
     }
 
@@ -114,16 +116,17 @@ export class WeatherService {
 
     if (error) throw error;
     const report = this.toWeatherReport(data, cropName, false);
-    await this.persistSmartAlerts({ farmerId, cropName, location, report });
+    await this.persistSmartAlerts({ farmerId, cropName, village: locationInput.village, location, report });
     return report;
   }
 
-  static async persistSmartAlerts({ farmerId, cropName, location, report }) {
+  static async persistSmartAlerts({ farmerId, cropName, village, location, report }) {
     if (!farmerId || !report?.agricultureAlerts?.length) return;
 
     const cutoff = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
     const alertRows = [];
     const recommendedActions = report.recommendations || [];
+    const danger = report.dangerAssessment;
 
     if (report.cropRiskProfile?.cropName) {
       const profile = report.cropRiskProfile;
@@ -166,15 +169,22 @@ export class WeatherService {
       alertRows.push({
         farmer_id: farmerId,
         crop_name: cropName || null,
+        village: village || null,
         location: location.location,
         latitude: location.latitude,
         longitude: location.longitude,
         alert_type: alert.type,
+        alert_level: danger?.status || null,
+        danger_score: danger?.dangerScore || null,
         severity: alert.severity,
         alert_title: alert.title,
         alert_message: alert.message,
         recommendation: alert.recommendation,
         recommended_actions: recommendedActions.filter((item) => item.sourceAlertType === alert.type),
+        notification_channels: report.emergencyAlert?.notificationChannels || ["dashboard"],
+        whatsapp_message: report.emergencyAlert?.whatsappMessage || null,
+        sms_message: report.emergencyAlert?.smsMessage || null,
+        emergency_pinned: Boolean(report.dangerAssessment?.shouldPin),
         weather_condition: report.weatherCondition,
         metric_label: alert.metricLabel,
         metric_value: alert.metricValue,
@@ -385,12 +395,21 @@ export class WeatherService {
       isCached,
     };
     const agricultureAlerts = AgricultureAlertEngine.generate({ weather: report, cropName });
+    const recommendations = RecommendationEngine.generate(report, cropName, agricultureAlerts);
+    const dangerAssessment = WeatherDangerEngine.assess(report, cropName);
 
     return {
       ...report,
       agricultureAlerts,
       cropRiskProfile: CropRiskEngine.calculate(report, cropName),
-      recommendations: RecommendationEngine.generate(report, cropName, agricultureAlerts),
+      recommendations,
+      dangerAssessment,
+      emergencyAlert: EmergencyAlertEngine.buildPayload({
+        danger: dangerAssessment,
+        location: report.location,
+        cropName,
+        recommendations,
+      }),
     };
   }
 }

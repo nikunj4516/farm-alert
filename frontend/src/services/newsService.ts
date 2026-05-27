@@ -135,18 +135,22 @@ const localizedSourceNames: Record<string, Record<string, string>> = {
   },
 };
 
-const getTrustedLiveSources = (language?: string): TrustedLiveSource[] => {
+const getLocalizedLiveSources = (language?: string): TrustedLiveSource[] => {
   const lang = language === "gu" || language === "hi" ? language : "en";
-  if (lang === "en") return englishTrustedLiveSources;
+  if (lang === "en") return [];
 
-  const localizedSources = Object.entries(localizedQueries[lang]).map(([category, query]) => ({
+  return Object.entries(localizedQueries[lang]).map(([category, query]) => ({
     name: localizedSourceNames[lang][category],
     feedUrl: googleNewsFeed(query, lang),
     category,
     nativeLanguage: lang,
   }));
+};
 
-  return [...localizedSources, ...englishTrustedLiveSources];
+const getTrustedLiveSources = (language?: string): TrustedLiveSource[] => {
+  const lang = language === "gu" || language === "hi" ? language : "en";
+  if (lang === "en") return englishTrustedLiveSources;
+  return getLocalizedLiveSources(lang);
 };
 
 const cropKeywords: Record<string, string[]> = {
@@ -201,6 +205,26 @@ const translateText = async (text: string | null | undefined, language?: string)
 
     const payload = await response.json();
     const translated = cleanText(payload?.responseData?.translatedText);
+    const value = translated || clean;
+    translationCache.set(cacheKey, value);
+    return value;
+  } catch (error) {
+    console.warn("MyMemory news translation failed, trying Google translate fallback:", error);
+  }
+
+  try {
+    const params = new URLSearchParams({
+      client: "gtx",
+      sl: "auto",
+      tl: target,
+      dt: "t",
+      q: clean.slice(0, 480),
+    });
+    const response = await fetch(`https://translate.googleapis.com/translate_a/single?${params}`);
+    if (!response.ok) return clean;
+
+    const payload = await response.json();
+    const translated = cleanText(Array.isArray(payload?.[0]) ? payload[0].map((part: unknown[]) => part?.[0] || "").join("") : "");
     const value = translated || clean;
     translationCache.set(cacheKey, value);
     return value;
@@ -374,11 +398,14 @@ const localizeArticles = async (articles: AgricultureNews[], language?: string) 
   Promise.all(articles.map((article) => localizeArticle(article, language)));
 
 export class NewsService {
-  private static async getLiveTrustedRssNews(options: NewsQueryOptions = {}, allowFallback = true): Promise<AgricultureNews[]> {
+  private static async fetchRssNewsFromSources(
+    sources: TrustedLiveSource[],
+    options: NewsQueryOptions = {}
+  ): Promise<AgricultureNews[]> {
     const { category = "all", limit = 10 } = options;
     const articles: AgricultureNews[] = [];
 
-    for (const source of getTrustedLiveSources(options.language)) {
+    for (const source of sources) {
       if (category !== "all" && source.category !== category) continue;
 
       try {
@@ -422,8 +449,34 @@ export class NewsService {
       }
     }
 
-    const latestArticles = dedupeArticles(articles)
+    return dedupeArticles(articles)
       .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+      .slice(0, limit);
+  }
+
+  private static async getLiveTrustedRssNews(options: NewsQueryOptions = {}, allowFallback = true): Promise<AgricultureNews[]> {
+    const { category = "all", limit = 10 } = options;
+    const isLocalizedLanguage = options.language === "gu" || options.language === "hi";
+    const primarySources = getTrustedLiveSources(options.language);
+    const primaryArticles = await this.fetchRssNewsFromSources(primarySources, options);
+
+    if (isLocalizedLanguage && primaryArticles.length >= Math.min(limit, 3)) {
+      return localizeArticles(primaryArticles, options.language);
+    }
+
+    const fallbackSources = isLocalizedLanguage ? englishTrustedLiveSources : [];
+    const fallbackArticles = fallbackSources.length
+      ? await this.fetchRssNewsFromSources(fallbackSources, {
+          ...options,
+          limit: Math.max(limit - primaryArticles.length, 3),
+        })
+      : [];
+
+    const latestArticles = dedupeArticles([...primaryArticles, ...fallbackArticles])
+      .sort((a, b) => {
+        const languageScore = (article: AgricultureNews) => (isLocalizedLanguage && article.language === options.language ? 1_000_000_000_000_000 : 0);
+        return languageScore(b) + new Date(b.published_at).getTime() - (languageScore(a) + new Date(a.published_at).getTime());
+      })
       .slice(0, limit);
 
     if (latestArticles.length) {

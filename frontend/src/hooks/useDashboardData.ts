@@ -6,7 +6,7 @@ import { AlertsService } from "@/services/alertsService";
 import { useWeather } from "@/hooks/useWeather";
 
 export const useDashboardData = (userId: string | undefined, selectedLanguage?: string) => {
-  const newsLanguageFeedVersion = "language-first-v2";
+  const newsLanguageFeedVersion = "language-first-v3";
 
   // 1. Fetch Profile
   const { 

@@ -25,7 +25,9 @@ GET /api/weather/intelligence
   -> run cropWeatherRulesEngine.js
   -> generate smart crop alerts
   -> calculate crop risk profile
+  -> classify GREEN/YELLOW/RED weather danger
   -> generate recommended actions
-  -> persist non-safe alerts + crop risk profiles
-  -> return weather + agricultureAlerts + cropRiskProfile + recommendations
+  -> prepare WhatsApp/SMS emergency payloads for RED alerts
+  -> persist non-safe alerts + crop risk profiles + danger score
+  -> return weather + agricultureAlerts + cropRiskProfile + recommendations + dangerAssessment
 ```
