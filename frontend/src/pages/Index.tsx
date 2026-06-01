@@ -361,7 +361,7 @@ const Index = () => {
             profile={profileWithSavedLocation}
             isLoading={isProfileLoading}
             error={errors.profileError}
-            fallbackImageUrl={user.user_metadata?.profile_image_url || user.user_metadata?.avatar_url}
+            fallbackImageUrl={null}
             onEdit={() => navigate("/profile-setup", { state: { mode: "edit" } })}
             onLogout={handleLogout}
             onImageUpload={handleProfileImageUpload}
