@@ -34,6 +34,8 @@ export interface WeatherForecastDay {
   precipitationProbability: number | null;
   windSpeed: number | null;
   uvIndex: number | null;
+  sunrise?: string | null;
+  sunset?: string | null;
   weatherCondition: string | null;
   icon: string;
 }
@@ -47,6 +49,9 @@ export interface HourlyForecast {
   windSpeed: number | null;
   cloudCoverage: number | null;
   visibility: number | null;
+  pressure: number | null;
+  dewPoint: number | null;
+  windDirection: number | null;
   weatherCondition: string | null;
   icon: string;
 }
@@ -77,6 +82,12 @@ export interface WeatherReport extends Omit<WeatherCacheRow, "forecast" | "forec
   recommendations: FarmingRecommendation[];
   dangerAssessment: WeatherDangerAssessment;
   emergencyAlert: EmergencyAlertPayload;
+  pressure: number | null;
+  dew_point: number | null;
+  wind_direction: number | null;
+  sunrise: string | null;
+  sunset: string | null;
+  air_quality_index: number | null;
   isCached: boolean;
   isStale: boolean;
 }
@@ -120,8 +131,41 @@ const GUJARAT_VILLAGE_TALUKA_HINTS: Record<string, string> = {
   "rampura|panchmahal": "jambughoda",
 };
 
+const GUJARAT_TALUKA_COORDINATES: Record<string, { name: string; district: string; latitude: number; longitude: number }> = {
+  jambughoda: { name: "Jambughoda", district: "Panchmahal", latitude: 22.3667, longitude: 73.7333 },
+  godhra: { name: "Godhra", district: "Panchmahal", latitude: 22.7755, longitude: 73.6149 },
+  halol: { name: "Halol", district: "Panchmahal", latitude: 22.5036, longitude: 73.4728 },
+  kalol: { name: "Kalol", district: "Panchmahal", latitude: 22.6077, longitude: 73.4633 },
+  balasinor: { name: "Balasinor", district: "Mahisagar", latitude: 22.9559, longitude: 73.3365 },
+  kadana: { name: "Kadana", district: "Mahisagar", latitude: 23.2824, longitude: 73.8442 },
+  khanpur: { name: "Khanpur", district: "Mahisagar", latitude: 23.2924, longitude: 73.6156 },
+  lunawada: { name: "Lunawada", district: "Mahisagar", latitude: 23.1284, longitude: 73.6105 },
+  santrampur: { name: "Santrampur", district: "Mahisagar", latitude: 23.1892, longitude: 73.8960 },
+  virpur: { name: "Virpur", district: "Mahisagar", latitude: 23.1862, longitude: 73.4798 },
+  anand: { name: "Anand", district: "Anand", latitude: 22.5645, longitude: 72.9289 },
+  borsad: { name: "Borsad", district: "Anand", latitude: 22.4079, longitude: 72.8982 },
+  petlad: { name: "Petlad", district: "Anand", latitude: 22.4768, longitude: 72.8006 },
+  umreth: { name: "Umreth", district: "Anand", latitude: 22.6988, longitude: 73.1156 },
+  vadodara: { name: "Vadodara", district: "Vadodara", latitude: 22.3072, longitude: 73.1812 },
+  dabhoi: { name: "Dabhoi", district: "Vadodara", latitude: 22.1836, longitude: 73.4336 },
+  desar: { name: "Desar", district: "Vadodara", latitude: 22.6814, longitude: 73.2477 },
+  karjan: { name: "Karjan", district: "Vadodara", latitude: 22.0536, longitude: 73.1230 },
+  padra: { name: "Padra", district: "Vadodara", latitude: 22.2380, longitude: 73.0840 },
+  savli: { name: "Savli", district: "Vadodara", latitude: 22.5608, longitude: 73.2214 },
+  vaghodia: { name: "Vaghodia", district: "Vadodara", latitude: 22.3055, longitude: 73.3977 },
+  ahmedabad: { name: "Ahmedabad", district: "Ahmedabad", latitude: 23.0225, longitude: 72.5714 },
+  sanand: { name: "Sanand", district: "Ahmedabad", latitude: 22.9920, longitude: 72.3810 },
+  dholka: { name: "Dholka", district: "Ahmedabad", latitude: 22.7273, longitude: 72.4413 },
+  surat: { name: "Surat", district: "Surat", latitude: 21.1702, longitude: 72.8311 },
+  bardoli: { name: "Bardoli", district: "Surat", latitude: 21.1220, longitude: 73.1115 },
+  rajkot: { name: "Rajkot", district: "Rajkot", latitude: 22.3039, longitude: 70.8022 },
+  gondal: { name: "Gondal", district: "Rajkot", latitude: 21.9619, longitude: 70.7927 },
+};
+
 const DEFAULT_LOCATION: WeatherLocationInput = { state: "Gujarat" };
-const CACHE_DURATION_MS = 30 * 60 * 1000;
+const CACHE_DURATION_MS = 10 * 60 * 1000;
+const OFFLINE_CACHE_KEY_PREFIX = "farmalert_weather_offline_v3:";
+const MAX_TEMPERATURE_DELTA = 8;
 const GOOGLE_WEATHER_BASE_URL = "https://weather.googleapis.com/v1";
 
 const getGoogleWeatherApiKey = () =>
@@ -266,6 +310,22 @@ const resolveKnownGujaratLocation = (input: WeatherLocationInput): ResolvedLocat
   }
 
   const validated = validateGujaratLocation(input);
+  const talukaCoordinates = GUJARAT_TALUKA_COORDINATES[normalizePlace(validated.taluka || input.taluka)];
+  if (talukaCoordinates) {
+    return {
+      location: buildLocationDisplay({
+        village: input.village || null,
+        taluka: talukaCoordinates.name,
+        district: validated.district || talukaCoordinates.district,
+        state: "Gujarat",
+      }),
+      latitude: talukaCoordinates.latitude,
+      longitude: talukaCoordinates.longitude,
+      district: validated.district || talukaCoordinates.district,
+      taluka: talukaCoordinates.name,
+    };
+  }
+
   if (validated.latitude && validated.longitude && (validated.taluka || validated.district)) {
     return {
       location: buildLocationDisplay(validated),
@@ -310,6 +370,8 @@ const parseForecast = (forecast: Json | null | undefined): WeatherForecastDay[] 
         precipitationProbability: round(record.precipitationProbability),
         windSpeed: round(record.windSpeed),
         uvIndex: round(record.uvIndex),
+        sunrise: typeof record.sunrise === "string" ? record.sunrise : null,
+        sunset: typeof record.sunset === "string" ? record.sunset : null,
         weatherCondition: condition,
         icon: typeof record.icon === "string" ? record.icon : conditionToIcon(condition),
       };
@@ -334,6 +396,9 @@ const parseHourly = (hourly: Json | null | undefined): HourlyForecast[] => {
         windSpeed: round(record.windSpeed),
         cloudCoverage: round(record.cloudCoverage),
         visibility: round(record.visibility),
+        pressure: round(record.pressure),
+        dewPoint: round(record.dewPoint),
+        windDirection: round(record.windDirection),
         weatherCondition: condition,
         icon: typeof record.icon === "string" ? record.icon : conditionToIcon(condition),
       };
@@ -355,7 +420,46 @@ const cacheMatchesInput = (row: WeatherCacheRecord | null, input: WeatherLocatio
   return stateMatches && (input.taluka ? talukaMatches : districtMatches);
 };
 
+const offlineCacheKey = (input: WeatherLocationInput) =>
+  `${OFFLINE_CACHE_KEY_PREFIX}${normalizePlace(input.taluka) || "district"}:${normalizePlace(input.district) || "gujarat"}`;
+
+const readOfflineWeather = (input: WeatherLocationInput): WeatherCacheRecord | null => {
+  try {
+    const raw = localStorage.getItem(offlineCacheKey(input));
+    return raw ? (JSON.parse(raw) as WeatherCacheRecord) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeOfflineWeather = (input: WeatherLocationInput, weather: WeatherCacheInsert) => {
+  try {
+    localStorage.setItem(offlineCacheKey(input), JSON.stringify({ id: "offline", ...weather }));
+  } catch {
+    // Local cache is a best-effort safety net.
+  }
+};
+
+const smoothFreshWeather = (fresh: WeatherCacheInsert, cached: WeatherCacheRecord | null): WeatherCacheInsert => {
+  const freshTemp = toNumber(fresh.temperature);
+  const cachedTemp = toNumber(cached?.temperature);
+  if (freshTemp === null || cachedTemp === null) return fresh;
+  if (Math.abs(freshTemp - cachedTemp) <= MAX_TEMPERATURE_DELTA) return fresh;
+
+  return {
+    ...fresh,
+    temperature: round((freshTemp + cachedTemp) / 2),
+    feels_like:
+      toNumber(fresh.feels_like) !== null && toNumber(cached?.feels_like) !== null
+        ? round((Number(fresh.feels_like) + Number(cached?.feels_like)) / 2)
+        : fresh.feels_like,
+  };
+};
+
 const resolveLocation = async (input: WeatherLocationInput): Promise<ResolvedLocation> => {
+  const knownLocation = resolveKnownGujaratLocation(input);
+  if (knownLocation) return knownLocation;
+
   const candidates = uniqueCandidates(input);
   const expectedState = normalizePlace(input.state);
   const expectedDistrict = normalizePlace(input.district);
@@ -413,9 +517,6 @@ const resolveLocation = async (input: WeatherLocationInput): Promise<ResolvedLoc
     }
   }
 
-  const knownLocation = resolveKnownGujaratLocation(input);
-  if (knownLocation) return knownLocation;
-
   throw new Error(`Could not resolve ${locationQuery(input)}.`);
 };
 
@@ -433,17 +534,23 @@ const fetchOpenMeteoForecast = async (input: WeatherLocationInput): Promise<Weat
       "weather_code",
       "cloud_cover",
       "wind_speed_10m",
+      "wind_direction_10m",
+      "pressure_msl",
+      "surface_pressure",
       "visibility",
     ].join(","),
     hourly: [
       "temperature_2m",
       "relative_humidity_2m",
+      "dew_point_2m",
       "precipitation_probability",
       "precipitation",
       "rain",
       "weather_code",
       "cloud_cover",
       "wind_speed_10m",
+      "wind_direction_10m",
+      "pressure_msl",
       "visibility",
     ].join(","),
     daily: [
@@ -454,6 +561,8 @@ const fetchOpenMeteoForecast = async (input: WeatherLocationInput): Promise<Weat
       "precipitation_probability_max",
       "wind_speed_10m_max",
       "uv_index_max",
+      "sunrise",
+      "sunset",
     ].join(","),
     forecast_days: "7",
     timezone: "auto",
@@ -479,6 +588,8 @@ const fetchOpenMeteoForecast = async (input: WeatherLocationInput): Promise<Weat
       precipitationProbability: round(daily.precipitation_probability_max?.[index]),
       windSpeed: round(daily.wind_speed_10m_max?.[index]),
       uvIndex: round(daily.uv_index_max?.[index]),
+      sunrise: typeof daily.sunrise?.[index] === "string" ? daily.sunrise[index] : null,
+      sunset: typeof daily.sunset?.[index] === "string" ? daily.sunset[index] : null,
       weatherCondition: condition,
       icon: conditionToIcon(condition),
     };
@@ -495,6 +606,9 @@ const fetchOpenMeteoForecast = async (input: WeatherLocationInput): Promise<Weat
       windSpeed: round(hourly.wind_speed_10m?.[index]),
       cloudCoverage: round(hourly.cloud_cover?.[index]),
       visibility: round(hourly.visibility?.[index]),
+      pressure: round(hourly.pressure_msl?.[index]),
+      dewPoint: round(hourly.dew_point_2m?.[index]),
+      windDirection: round(hourly.wind_direction_10m?.[index]),
       weatherCondition: condition,
       icon: conditionToIcon(condition),
     };
@@ -618,6 +732,7 @@ const fetchGoogleWeatherForecast = async (input: WeatherLocationInput): Promise<
 const toReport = (row: WeatherCacheRecord, input: WeatherLocationInput, flags: Pick<WeatherReport, "isCached" | "isStale">): WeatherReport => {
   const forecast = parseForecast(row.forecast_json || row.forecast);
   const hourlyForecast = parseHourly(row.hourly_json);
+  const currentHour = hourlyForecast[0];
   const base = {
     id: row.id,
     district: row.district,
@@ -634,6 +749,12 @@ const toReport = (row: WeatherCacheRecord, input: WeatherLocationInput, flags: P
     precipitation_probability: row.precipitation_probability,
     cloud_coverage: row.cloud_coverage,
     visibility: row.visibility,
+    pressure: currentHour?.pressure ?? null,
+    dew_point: currentHour?.dewPoint ?? null,
+    wind_direction: currentHour?.windDirection ?? null,
+    sunrise: forecast[0]?.sunrise ?? null,
+    sunset: forecast[0]?.sunset ?? null,
+    air_quality_index: null,
     provider: row.provider,
     stale_after: row.stale_after,
     fetched_at: row.fetched_at,
@@ -680,6 +801,10 @@ export class WeatherService {
       console.warn("Weather cache lookup failed, using live forecast:", error);
     }
 
+    if (!cachedWeather) {
+      cachedWeather = readOfflineWeather(input);
+    }
+
     if (cachedWeather) {
       const hasForecast = hasUsableForecast(cachedWeather);
       const matchesLocation = cacheMatchesInput(cachedWeather, input);
@@ -695,8 +820,18 @@ export class WeatherService {
       freshWeather = await fetchGoogleWeatherForecast(input);
     } catch (error) {
       console.warn("Google Weather forecast unavailable, falling back to Open-Meteo:", error);
-      freshWeather = await fetchOpenMeteoForecast(input);
+      try {
+        freshWeather = await fetchOpenMeteoForecast(input);
+      } catch (fallbackError) {
+        console.warn("Open-Meteo forecast unavailable, using cached weather:", fallbackError);
+        if (cachedWeather && cacheMatchesInput(cachedWeather, input) && hasUsableForecast(cachedWeather)) {
+          return toReport(cachedWeather, input, { isCached: true, isStale: true });
+        }
+        throw fallbackError;
+      }
     }
+    freshWeather = smoothFreshWeather(freshWeather, cachedWeather);
+    writeOfflineWeather(input, freshWeather);
 
     try {
       const { data: upsertedWeather, error } = await supabase

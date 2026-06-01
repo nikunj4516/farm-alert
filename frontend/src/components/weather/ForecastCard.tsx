@@ -9,6 +9,17 @@ const ForecastCard = ({ weather }: ForecastCardProps) => {
   const { language, t } = useLanguage();
   const hourly = weather.hourlyForecast.slice(0, 8);
   const locale = language === "hi" ? "hi-IN" : language === "gu" ? "gu-IN" : "en-IN";
+  const graphCopy = {
+    en: { temp: "Temperature graph", rain: "Rain graph", humidity: "Humidity graph", wind: "Wind graph" },
+    hi: { temp: "तापमान ग्राफ", rain: "बारिश ग्राफ", humidity: "नमी ग्राफ", wind: "हवा ग्राफ" },
+    gu: { temp: "તાપમાન ગ્રાફ", rain: "વરસાદ ગ્રાફ", humidity: "ભેજ ગ્રાફ", wind: "પવન ગ્રાફ" },
+  }[language];
+  const graphMetrics = [
+    { label: graphCopy.temp, color: "bg-orange-500", values: hourly.map((hour) => hour.temperature ?? 0), suffix: "°" },
+    { label: graphCopy.rain, color: "bg-blue-500", values: hourly.map((hour) => hour.precipitationProbability ?? 0), suffix: "%" },
+    { label: graphCopy.humidity, color: "bg-emerald-500", values: hourly.map((hour) => hour.humidity ?? 0), suffix: "%" },
+    { label: graphCopy.wind, color: "bg-sky-500", values: hourly.map((hour) => hour.windSpeed ?? 0), suffix: ` ${t("weather.intelligence.units.kmh")}` },
+  ];
 
   return (
     <section className="space-y-3">
@@ -24,6 +35,28 @@ const ForecastCard = ({ weather }: ForecastCardProps) => {
             <p className="mt-1 text-[11px] font-semibold text-blue-600">{Math.round(hour.precipitationProbability ?? 0)}%</p>
           </div>
         ))}
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {graphMetrics.map((metric) => {
+          const maxValue = Math.max(...metric.values, 1);
+          return (
+            <div key={metric.label} className="rounded-2xl border border-border bg-card p-3 shadow-card">
+              <p className="text-xs font-black uppercase tracking-wide text-muted-foreground">{metric.label}</p>
+              <div className="mt-3 flex h-20 items-end gap-1.5">
+                {metric.values.map((value, index) => (
+                  <div key={`${metric.label}-${index}`} className="flex flex-1 flex-col items-center gap-1">
+                    <div className={`w-full rounded-t-lg ${metric.color}`} style={{ height: `${Math.max(8, (value / maxValue) * 64)}px` }} />
+                    <span className="text-[9px] font-bold text-muted-foreground">{Math.round(value)}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-xs font-bold text-foreground">
+                {Math.round(metric.values[0] || 0)}{metric.suffix}
+              </p>
+            </div>
+          );
+        })}
       </div>
 
       <h2 className="text-lg font-semibold text-foreground">{t("home.sevenDayForecast")}</h2>

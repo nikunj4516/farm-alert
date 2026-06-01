@@ -43,7 +43,7 @@ const FarmerWeatherDashboard = ({ weather, cropType, isLoading }: FarmerWeatherD
         <RainPredictionCard weather={weather} />
         <HeatwaveAlertCard weather={weather} cropType={cropType} />
       </div>
-      <WeatherInsights weather={weather} />
+      <WeatherInsights weather={weather} cropType={cropType} />
       <FarmingRecommendations alerts={weather.agricultureAlerts} cropType={cropType} recommendations={weather.recommendations} />
       <ForecastCard weather={weather} />
     </div>
