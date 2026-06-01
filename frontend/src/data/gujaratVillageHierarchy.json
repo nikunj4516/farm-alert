@@ -1,0 +1,73 @@
+{
+  "Ahmedabad": {
+    "Daskroi": ["Aslali", "Bareja", "Bopal", "Ghuma", "Kathwada"],
+    "Dholka": ["Bavaliyari", "Koth", "Nesda", "Saragwala"],
+    "Sanand": ["Bol", "Chekhla", "Goraghuma", "Iyava", "Nidhrad"]
+  },
+  "Anand": {
+    "Anand": ["Karamsad", "Mogri", "Vallabh Vidyanagar", "Vasad"],
+    "Borsad": ["Borsad", "Dahewan", "Kinkhlod", "Ras"],
+    "Petlad": ["Dharmaj", "Petlad", "Sunav", "Virsol"]
+  },
+  "Banaskantha": {
+    "Palanpur": ["Chandisar", "Gathaman", "Jagana", "Palanpur"],
+    "Deesa": ["Bhildi", "Deesa", "Juna Deesa", "Mudetha"],
+    "Vadgam": ["Chhapi", "Jalotra", "Vadgam"]
+  },
+  "Bharuch": {
+    "Bharuch": ["Bharuch", "Dahej", "Shuklatirth", "Zadeshwar"],
+    "Ankleshwar": ["Ankleshwar", "Panoli", "Piraman"],
+    "Jhagadia": ["Jhagadia", "Rajpardi", "Umalla"]
+  },
+  "Chhota Udepur": {
+    "Bodeli": ["Bodeli", "Dhokaliya", "Jabugam"],
+    "Chhota Udepur": ["Chhota Udepur", "Raski", "Tejgadh"],
+    "Jetpur Pavi": ["Jetpur Pavi", "Kawant Road", "Moti Rasli"]
+  },
+  "Dahod": {
+    "Dahod": ["Dahod", "Raliyati", "Usarvan"],
+    "Jhalod": ["Jhalod", "Limdi", "Mirakhedi"],
+    "Limkheda": ["Limkheda", "Palli", "Singvad"]
+  },
+  "Gandhinagar": {
+    "Gandhinagar": ["Adalaj", "Kudasan", "Pethapur", "Raysan"],
+    "Kalol": ["Chhatral", "Kalol", "Saij"],
+    "Dehgam": ["Dehgam", "Rakhiyal"]
+  },
+  "Kheda": {
+    "Nadiad": ["Nadiad", "Piplag", "Uttarsanda"],
+    "Kapadvanj": ["Antroli", "Kapadvanj", "Kathlal"],
+    "Matar": ["Limbasi", "Matar", "Traj"]
+  },
+  "Mehsana": {
+    "Mehsana": ["Jagudan", "Mehsana", "Panchot"],
+    "Unjha": ["Brahmanwada", "Unjha"],
+    "Visnagar": ["Kansa", "Vadnagar", "Visnagar"]
+  },
+  "Panchmahal": {
+    "Halol": ["Baska", "Ravaliya", "Vavdi"],
+    "Jambughoda": ["Bhanpura", "Narukot", "Rampura"],
+    "Kalol": ["Alindra", "Arad", "Delol"],
+    "Godhra": ["Chikhodra", "Godhra", "Vavdi Buzarg"]
+  },
+  "Rajkot": {
+    "Rajkot": ["Kotharia", "Mavdi", "Metoda", "Shapar"],
+    "Gondal": ["Bharudi", "Gondal", "Ribda"],
+    "Jetpur": ["Jetpur", "Navagadh", "Pithadiya"]
+  },
+  "Surat": {
+    "Bardoli": ["Bardoli", "Kadod", "Varad"],
+    "Kamrej": ["Kamrej", "Kathor", "Velanja"],
+    "Olpad": ["Olpad", "Sayan", "Takarma"]
+  },
+  "Vadodara": {
+    "Vadodara": ["Bajwa", "Harni", "Sevasi", "Tarsali"],
+    "Dabhoi": ["Dabhoi", "Kayavarohan", "Thuvavi"],
+    "Padra": ["Padra", "Sokhda", "Vadu"]
+  },
+  "Valsad": {
+    "Valsad": ["Atul", "Dharampur", "Valsad"],
+    "Pardi": ["Pardi", "Udvada", "Vapi"],
+    "Umbergaon": ["Bhilad", "Sanjan", "Umbergaon"]
+  }
+}

@@ -27,6 +27,10 @@ export type Database = {
           state: string | null
           preferred_language: string | null
           profile_image_url: string | null
+          latitude: number | null
+          longitude: number | null
+          profile_completed: boolean
+          onboarding_completed: boolean
           farming_type: string | null
           crop_name: string | null
           updated_at: string
@@ -45,6 +49,10 @@ export type Database = {
           state?: string | null
           preferred_language?: string | null
           profile_image_url?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          profile_completed?: boolean
+          onboarding_completed?: boolean
           farming_type?: string | null
           crop_name?: string | null
           updated_at?: string
@@ -63,6 +71,10 @@ export type Database = {
           state?: string | null
           preferred_language?: string | null
           profile_image_url?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          profile_completed?: boolean
+          onboarding_completed?: boolean
           farming_type?: string | null
           crop_name?: string | null
           updated_at?: string

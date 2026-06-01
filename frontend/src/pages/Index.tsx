@@ -19,6 +19,7 @@ import { ProfileService } from "@/services/profileService";
 import type { WeatherReport } from "@/services/weatherService";
 import type { VoiceCommandResult } from "@/services/voiceCommandEngine";
 import { toast } from "@/components/ui/use-toast";
+import { getSavedSelectedLocation } from "@/services/gujaratLocationService";
 
 const getWeatherAlertLevel = (weather?: WeatherReport | null) => {
   if (!weather) return "green" as const;
@@ -138,8 +139,29 @@ const Index = () => {
     void routeUnsubscribedUser();
   }, [user, loading, navigate]);
 
+  useEffect(() => {
+    if (loading || !user || isProfileLoading) return;
+
+    if (!ProfileService.isProfileComplete(profile)) {
+      navigate("/profile-setup", { replace: true });
+      return;
+    }
+
+    localStorage.setItem("farmalert_profile_completed", "true");
+    localStorage.setItem("farmalert_onboarding_completed", "true");
+  }, [profile, isProfileLoading, user, loading, navigate]);
+
   const helplineNumber = "1800-180-1551";
   const helplineText = t("helpline").replace(/^📞\s*/, "");
+  const savedLocation = getSavedSelectedLocation();
+  const profileWithSavedLocation = profile
+    ? {
+        ...profile,
+        village: profile.village || savedLocation?.village || null,
+        taluka: profile.taluka || savedLocation?.taluka || null,
+        district: profile.district || savedLocation?.district || null,
+      }
+    : profile;
 
   const handleVoiceCommand = (command: VoiceCommandResult) => {
     switch (command.action) {
@@ -165,15 +187,16 @@ const Index = () => {
   };
 
   const handleProfileImageUpload = async (file: File) => {
-    if (!user) return;
+    if (!user) return undefined;
 
     try {
-      await ProfileService.uploadProfileImage(user.id, file);
+      const imageUrl = await ProfileService.uploadProfileImage(user.id, file);
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       toast({
         title: "Profile photo updated",
         description: "Your new profile image has been saved.",
       });
+      return imageUrl;
     } catch (error) {
       toast({
         title: "Could not update photo",
@@ -208,7 +231,7 @@ const Index = () => {
               <div className="flex items-center gap-1">
                 <span className="text-sm leading-none" aria-hidden="true">📍</span>
                 <span className="text-xs text-primary-foreground/70 font-medium">
-                  {profile?.district ? `${profile.district}, ${profile.state || 'Gujarat'}` : t("location")}
+                  {profileWithSavedLocation?.district ? `${profileWithSavedLocation.district}, Gujarat` : t("location")}
                 </span>
               </div>
             </div>
@@ -282,7 +305,7 @@ const Index = () => {
           <>
             <FarmerWeatherDashboard
               weather={weather}
-              cropType={profile?.crop_type || profile?.crop_name}
+            cropType={profileWithSavedLocation?.crop_type || profileWithSavedLocation?.crop_name}
               isLoading={isWeatherLoading}
             />
 
@@ -333,7 +356,7 @@ const Index = () => {
         {activeTab === "about" && <AboutTab />}
         {activeTab === "profile" && (
           <ProfileCard
-            profile={profile}
+            profile={profileWithSavedLocation}
             isLoading={isProfileLoading}
             error={errors.profileError}
             fallbackImageUrl={user.user_metadata?.profile_image_url || user.user_metadata?.avatar_url}

@@ -9,6 +9,14 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
 import { ProfileService } from "@/services/profileService";
+import {
+  GUJARAT_DISTRICTS,
+  getTalukasForDistrict,
+  getVillagesForTaluka,
+  getSavedSelectedLocation,
+  saveSelectedLocation,
+  validateGujaratLocation,
+} from "@/services/gujaratLocationService";
 
 const STEPS = 3;
 const locationCopy = {
@@ -21,6 +29,8 @@ const locationCopy = {
     districtPlaceholder: "e.g. Panchmahal",
     state: "State",
     statePlaceholder: "e.g. Gujarat",
+    requiredLocation: "Select district, taluka, and village.",
+    requiredFarm: "Select crop and enter farm size.",
   },
   hi: {
     village: "गाँव",
@@ -31,6 +41,8 @@ const locationCopy = {
     districtPlaceholder: "जैसे पंचमहल",
     state: "राज्य",
     statePlaceholder: "जैसे गुजरात",
+    requiredLocation: "जिला, तालुका और गाँव चुनें.",
+    requiredFarm: "फसल चुनें और खेत का आकार दर्ज करें.",
   },
   gu: {
     village: "ગામ",
@@ -41,6 +53,8 @@ const locationCopy = {
     districtPlaceholder: "દા.ત. પંચમહાલ",
     state: "રાજ્ય",
     statePlaceholder: "દા.ત. ગુજરાત",
+    requiredLocation: "જિલ્લો, તાલુકો અને ગામ પસંદ કરો.",
+    requiredFarm: "પાક પસંદ કરો અને જમીનનું ક્ષેત્રફળ લખો.",
   },
 } as const;
 
@@ -59,7 +73,7 @@ const ProfileSetup = () => {
     village: "",
     taluka: "",
     district: "",
-    state: "",
+    state: "Gujarat",
     crop_type: "",
     land_size: "",
   });
@@ -75,16 +89,17 @@ const ProfileSetup = () => {
 
       try {
         const savedProfile = await ProfileService.getProfile(user.id);
-        if (!isMounted || !savedProfile) return;
+        if (!isMounted) return;
+        const savedLocation = getSavedSelectedLocation();
 
         setForm({
-          name: savedProfile.name || "",
-          village: savedProfile.village || "",
-          taluka: (savedProfile as typeof savedProfile & { taluka?: string | null }).taluka || "",
-          district: savedProfile.district || "",
-          state: savedProfile.state || "",
-          crop_type: savedProfile.crop_type || "",
-          land_size: savedProfile.land_size ? String(savedProfile.land_size) : "",
+          name: savedProfile?.name || "",
+          village: savedProfile?.village || savedLocation?.village || "",
+          taluka: (savedProfile as typeof savedProfile & { taluka?: string | null } | null)?.taluka || savedLocation?.taluka || "",
+          district: savedProfile?.district || savedLocation?.district || "",
+          state: "Gujarat",
+          crop_type: savedProfile?.crop_type || "",
+          land_size: savedProfile?.land_size ? String(savedProfile.land_size) : "",
         });
       } catch (error) {
         if (isMounted) {
@@ -105,6 +120,9 @@ const ProfileSetup = () => {
   }, [user]);
 
   const crops = tArray("crops");
+  const cropValues = ["Wheat", "Rice", "Cotton", "Groundnut", "Sugarcane", "Vegetables", "Other"];
+  const talukaOptions = getTalukasForDistrict(form.district);
+  const villageOptions = getVillagesForTaluka(form.district, form.taluka);
   const cropIconsList = [
     <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="wheat" className="w-5 h-5 drop-shadow-sm" key="wheat" />,
     <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="sprout" className="w-5 h-5 drop-shadow-sm" key="sprout" />,
@@ -134,12 +152,19 @@ const ProfileSetup = () => {
 
     try {
       const landSize = Number.parseFloat(form.land_size);
+      const validatedLocation = validateGujaratLocation(form);
+      localStorage.setItem("farmalert_profile_completed", "true");
+      localStorage.setItem("farmalert_onboarding_completed", "true");
+      saveSelectedLocation(validatedLocation);
       await ProfileService.upsertProfile(user.id, {
         name: form.name.trim().substring(0, 100),
-        village: form.village.trim().substring(0, 100) || null,
-        taluka: form.taluka.trim().substring(0, 100) || null,
-        district: form.district.trim().substring(0, 100) || null,
-        state: form.state.trim().substring(0, 100) || null,
+        village: validatedLocation.village,
+        taluka: validatedLocation.taluka,
+        district: validatedLocation.district,
+        latitude: validatedLocation.latitude,
+        longitude: validatedLocation.longitude,
+        profile_completed: true,
+        onboarding_completed: true,
         preferred_language: language,
         crop_type: form.crop_type || null,
         land_size: Number.isFinite(landSize) ? landSize : null,
@@ -170,7 +195,8 @@ const ProfileSetup = () => {
 
   const canGoNext = () => {
     if (step === 0) return form.name.trim().length > 0;
-    return true;
+    if (step === 1) return Boolean(form.district && form.taluka && form.village.trim());
+    return Boolean(form.crop_type && Number.parseFloat(form.land_size) > 0);
   };
 
   const progress = ((step + 1) / STEPS) * 100;
@@ -239,55 +265,69 @@ const ProfileSetup = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
-                  {copy.village}
+                  <MapPin className="w-5 h-5 text-primary" />
+                  {copy.state}
                 </label>
-                <input
-                  type="text"
-                  value={form.village}
-                  onChange={(e) => setForm({ ...form, village: e.target.value })}
-                  placeholder={copy.villagePlaceholder}
-                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
-                />
-              </div>
-              <div>
-                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
-                  {copy.taluka}
-                </label>
-                <input
-                  type="text"
-                  value={form.taluka}
-                  onChange={(e) => setForm({ ...form, taluka: e.target.value })}
-                  placeholder={copy.talukaPlaceholder}
-                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
-                />
+                <div className="flex w-full items-center justify-between rounded-xl border-2 border-primary/15 bg-primary/5 px-4 py-3.5 text-base font-bold text-foreground">
+                  <span>{language === "gu" ? "ગુજરાત" : language === "hi" ? "गुजरात" : "Gujarat"}</span>
+                  <Check className="h-5 w-5 text-primary" aria-hidden="true" />
+                </div>
               </div>
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
                   <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
                   {copy.district}
                 </label>
-                <input
-                  type="text"
+                <select
                   value={form.district}
-                  onChange={(e) => setForm({ ...form, district: e.target.value })}
-                  placeholder={copy.districtPlaceholder}
+                  onChange={(e) => setForm({ ...form, district: e.target.value, taluka: "", village: "" })}
                   className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
-                />
+                >
+                  <option value="">{copy.districtPlaceholder}</option>
+                  {GUJARAT_DISTRICTS.map((district) => (
+                    <option key={district.name} value={district.name}>
+                      {district.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  {copy.state}
+                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
+                  {copy.taluka}
                 </label>
-                <input
-                  type="text"
-                  value={form.state}
-                  onChange={(e) => setForm({ ...form, state: e.target.value })}
-                  placeholder={copy.statePlaceholder}
+                <select
+                  value={form.taluka}
+                  onChange={(e) => setForm({ ...form, taluka: e.target.value, village: "" })}
+                  disabled={!form.district}
                   className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
-                />
+                >
+                  <option value="">{copy.talukaPlaceholder}</option>
+                  {talukaOptions.map((taluka) => (
+                    <option key={taluka} value={taluka}>
+                      {taluka}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
+                  {copy.village}
+                </label>
+                <select
+                  value={form.village}
+                  onChange={(e) => setForm({ ...form, village: e.target.value })}
+                  disabled={!form.taluka}
+                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                >
+                  <option value="">{copy.villagePlaceholder}</option>
+                  {villageOptions.map((village) => (
+                    <option key={village} value={village}>
+                      {village}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
@@ -302,16 +342,16 @@ const ProfileSetup = () => {
                   {crops.map((crop, i) => (
                     <button
                       key={crop}
-                      onClick={() => setForm({ ...form, crop_type: crop })}
+                      onClick={() => setForm({ ...form, crop_type: cropValues[i] })}
                       className={`py-3 px-4 rounded-xl text-sm font-semibold border-2 transition-all touch-manipulation flex items-center gap-2 ${
-                        form.crop_type === crop
+                        form.crop_type === cropValues[i]
                           ? "bg-primary text-primary-foreground border-primary shadow-soft"
                           : "bg-background text-foreground border-border hover:border-primary/30"
                       }`}
                     >
                       <span>{cropIconsList[i]}</span>
                       {crop}
-                      {form.crop_type === crop && <Check className="w-4 h-4 ml-auto" />}
+                      {form.crop_type === cropValues[i] && <Check className="w-4 h-4 ml-auto" />}
                     </button>
                   ))}
                 </div>
@@ -356,7 +396,7 @@ const ProfileSetup = () => {
           ) : (
             <button
               onClick={handleSave}
-              disabled={loading || !form.name.trim()}
+              disabled={loading || !canGoNext()}
               className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-3.5 text-base font-semibold active:scale-[0.97] transition-transform touch-manipulation disabled:opacity-40 shadow-md"
             >
               {loading ? (
@@ -369,6 +409,12 @@ const ProfileSetup = () => {
             </button>
           )}
         </div>
+
+        {!canGoNext() && step > 0 && (
+          <p className="text-center text-xs font-semibold text-muted-foreground">
+            {step === 1 ? copy.requiredLocation : copy.requiredFarm}
+          </p>
+        )}
 
         {error && (
           <p className="text-destructive text-sm font-semibold text-center">

@@ -4,6 +4,7 @@ import { NewsService } from "@/services/newsService";
 import { TipsService } from "@/services/tipsService";
 import { AlertsService } from "@/services/alertsService";
 import { useWeather } from "@/hooks/useWeather";
+import { getSavedSelectedLocation } from "@/services/gujaratLocationService";
 
 export const useDashboardData = (userId: string | undefined, selectedLanguage?: string) => {
   const newsLanguageFeedVersion = "language-first-v3";
@@ -19,7 +20,8 @@ export const useDashboardData = (userId: string | undefined, selectedLanguage?: 
     enabled: !!userId,
   });
 
-  const district = profile?.district || "Ahmedabad";
+  const savedLocation = getSavedSelectedLocation();
+  const district = profile?.district || savedLocation?.district || null;
   const language = selectedLanguage || profile?.preferred_language || "gu";
   const cropType = profile?.crop_type || undefined;
 
@@ -29,10 +31,12 @@ export const useDashboardData = (userId: string | undefined, selectedLanguage?: 
     isLoading: isWeatherLoading,
     error: weatherError,
   } = useWeather({
-    village: profile?.village,
-    taluka: profile?.taluka,
+    village: profile?.village || savedLocation?.village,
+    taluka: profile?.taluka || savedLocation?.taluka,
     district,
-    state: profile?.state || "Gujarat",
+    state: "Gujarat",
+    latitude: (profile as typeof profile & { latitude?: number | null })?.latitude || savedLocation?.latitude,
+    longitude: (profile as typeof profile & { longitude?: number | null })?.longitude || savedLocation?.longitude,
     cropType,
   });
 

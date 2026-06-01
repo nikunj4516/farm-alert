@@ -5,6 +5,8 @@ import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import logoWide from "@/assets/farmalert-logo-wide.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { hasActiveSubscription } from "@/services/subscriptionService";
+import { ProfileService } from "@/services/profileService";
 
 
 const getAuthErrorMessage = (message: string) => {
@@ -89,7 +91,21 @@ const LoginPage = () => {
       return;
     }
 
-    navigate("/subscription");
+    const { data: sessionData } = await supabase.auth.getSession();
+    const userId = sessionData.session?.user.id;
+    if (!userId) {
+      navigate("/subscription");
+      return;
+    }
+
+    const isSubscribed = await hasActiveSubscription(userId);
+    if (!isSubscribed) {
+      navigate("/subscription");
+      return;
+    }
+
+    const profile = await ProfileService.getProfile(userId);
+    navigate(ProfileService.isProfileComplete(profile) ? "/dashboard" : "/profile-setup", { replace: true });
   };
 
   return (

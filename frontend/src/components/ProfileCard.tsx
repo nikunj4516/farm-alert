@@ -2,6 +2,7 @@ import { ChangeEvent, useRef, useState } from "react";
 import {
   AlertCircle,
   Camera,
+  ImageUp,
   Languages,
   Loader2,
   LogOut,
@@ -24,7 +25,7 @@ type ProfileCardProps = {
   fallbackImageUrl?: string | null;
   onEdit: () => void;
   onLogout: () => void;
-  onImageUpload: (file: File) => Promise<void>;
+  onImageUpload: (file: File) => Promise<string | void>;
 };
 
 type ProfileExtra = Profile & {
@@ -133,9 +134,13 @@ const ProfileCard = ({
 }: ProfileCardProps) => {
   const { language } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState("");
   const copy = profileCopy[language];
-  const avatarUrl = readExtra(profile, ["profile_image_url", "profile_image", "avatar_url", "image_url"]) || fallbackImageUrl;
+  const savedAvatarUrl = readExtra(profile, ["profile_image_url", "profile_image", "avatar_url", "image_url"]) || fallbackImageUrl;
+  const avatarUrl = previewUrl || savedAvatarUrl;
   const displayName = profile?.name || copy.farmer;
   const preferredLanguage = (profile?.preferred_language || language) as Language;
   const taluka = readExtra(profile, ["taluka"]);
@@ -166,11 +171,20 @@ const ProfileCard = ({
 
     if (!file) return;
 
+    const localPreview = URL.createObjectURL(file);
+    setPreviewUrl(localPreview);
+    setUploadError("");
     setIsUploadingImage(true);
     try {
-      await onImageUpload(file);
+      const uploadedUrl = await onImageUpload(file);
+      if (uploadedUrl) setPreviewUrl(uploadedUrl);
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : copy.unavailable);
+      setPreviewUrl(null);
+      throw error;
     } finally {
       setIsUploadingImage(false);
+      window.setTimeout(() => URL.revokeObjectURL(localPreview), 1500);
     }
   };
 
@@ -209,7 +223,15 @@ const ProfileCard = ({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/png,image/jpeg,image/webp"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
                 className="hidden"
                 onChange={handleImageChange}
               />
@@ -230,6 +252,35 @@ const ProfileCard = ({
             </div>
             <h3 className="mt-3 text-xl font-bold text-foreground">{displayName}</h3>
             {isUploadingImage && <p className="mt-1 text-xs font-semibold text-primary">{copy.uploadingPhoto}</p>}
+            <div className="mt-2 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => cameraInputRef.current?.click()}
+                disabled={isUploadingImage}
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary disabled:opacity-60"
+              >
+                <Camera className="h-3.5 w-3.5" />
+                {language === "gu" ? "કેમેરા" : language === "hi" ? "कैमरा" : "Camera"}
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingImage}
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary disabled:opacity-60"
+              >
+                <ImageUp className="h-3.5 w-3.5" />
+                {language === "gu" ? "ગેલેરી" : language === "hi" ? "गैलरी" : "Gallery"}
+              </button>
+            </div>
+            {uploadError && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="mt-1 text-xs font-bold text-destructive underline"
+              >
+                {uploadError}
+              </button>
+            )}
             <p className="text-sm font-medium text-muted-foreground">
               {[profile?.village, taluka, profile?.district, profile?.state || copy.gujarat].filter(Boolean).join(", ") ||
                 copy.notAdded}

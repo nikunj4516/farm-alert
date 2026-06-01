@@ -1,11 +1,27 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/types/database.types";
+import { getSavedSelectedLocation } from "@/services/gujaratLocationService";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
 
-const legacyProfileKeys = new Set(["name", "phone", "village", "taluka", "district", "state", "crop_type", "land_size"]);
+const legacyProfileKeys = new Set([
+  "name",
+  "phone",
+  "village",
+  "taluka",
+  "district",
+  "state",
+  "crop_type",
+  "land_size",
+  "preferred_language",
+  "profile_image_url",
+  "profile_completed",
+  "onboarding_completed",
+  "latitude",
+  "longitude",
+]);
 const profileImageBuckets = ["Profile", "profile storge", "profile-storage", "profile-images"];
 
 const getErrorMessage = (error: unknown) => {
@@ -29,9 +45,16 @@ const isMissingProfileColumnError = (error: unknown) => {
 const toLegacyProfilePayload = (profile: ProfileUpdate) =>
   Object.fromEntries(Object.entries(profile).filter(([key]) => legacyProfileKeys.has(key))) as ProfileUpdate;
 
+const toMinimalProfilePayload = (profile: ProfileUpdate | Record<string, unknown>) =>
+  Object.fromEntries(
+    Object.entries(profile).filter(([key]) =>
+      ["name", "phone", "village", "taluka", "district", "crop_type", "land_size"].includes(key)
+    )
+  ) as ProfileUpdate;
+
 const getMissingColumnName = (error: unknown) => {
   const message = getErrorMessage(error);
-  return message.match(/'([^']+)'\s+column/)?.[1];
+  return message.match(/'([^']+)'\s+column/)?.[1] || message.match(/Could not find the '([^']+)' column/)?.[1];
 };
 
 const withoutColumn = (profile: ProfileUpdate, columnName: string) => {
@@ -47,7 +70,70 @@ const getImageExtension = (file: File) => {
   return "jpg";
 };
 
+const compressProfileImage = async (file: File): Promise<File> =>
+  new Promise((resolve) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const canvas = document.createElement("canvas");
+      const maxSize = 720;
+      const sourceSize = Math.min(image.width, image.height);
+      const sourceX = Math.max(0, Math.round((image.width - sourceSize) / 2));
+      const sourceY = Math.max(0, Math.round((image.height - sourceSize) / 2));
+      const outputSize = Math.min(maxSize, sourceSize);
+      canvas.width = Math.max(1, outputSize);
+      canvas.height = Math.max(1, outputSize);
+      const context = canvas.getContext("2d");
+
+      if (!context) {
+        resolve(file);
+        return;
+      }
+
+      context.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            resolve(file);
+            return;
+          }
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+        },
+        "image/jpeg",
+        0.82
+      );
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(file);
+    };
+
+    image.src = objectUrl;
+  });
+
 export class ProfileService {
+  static isProfileComplete(profile?: Partial<Profile> | null) {
+    if (!profile) return false;
+    const extra = profile as Partial<Profile> & { profile_completed?: boolean | null; onboarding_completed?: boolean | null };
+    const savedLocation = typeof window !== "undefined" ? getSavedSelectedLocation() : null;
+    const hasSavedHierarchy = Boolean(
+      (profile.district || savedLocation?.district) &&
+      (profile.taluka || savedLocation?.taluka) &&
+      (profile.village || savedLocation?.village)
+    );
+    const hasLocalCompletion = typeof window !== "undefined" && localStorage.getItem("farmalert_profile_completed") === "true";
+
+    return Boolean(
+      extra.profile_completed ||
+      extra.onboarding_completed ||
+      (hasLocalCompletion && profile.name && hasSavedHierarchy && (profile.crop_type || profile.land_size)) ||
+      (profile.name && hasSavedHierarchy && (profile.crop_type || profile.land_size))
+    );
+  }
+
   /**
    * Fetches the user's profile and preferences
    */
@@ -73,7 +159,7 @@ export class ProfileService {
     let payload = updates;
     let lastError: unknown = null;
 
-    for (let attempt = 0; attempt < 6; attempt += 1) {
+    for (let attempt = 0; attempt < 20; attempt += 1) {
       const { data, error } = await supabase
         .from("profiles")
         .update(payload)
@@ -107,7 +193,7 @@ export class ProfileService {
   /**
    * Create or update the user's profile using user_id as the stable key.
    */
-  static async upsertProfile(userId: string, profile: ProfileUpdate): Promise<Profile> {
+  static async upsertProfile(userId: string, profile: ProfileUpdate | Record<string, unknown>): Promise<Profile> {
     const saveProfile = async (payload: ProfileUpdate) =>
       supabase
         .from("profiles")
@@ -121,10 +207,10 @@ export class ProfileService {
         .select()
         .single();
 
-    let payload = profile;
+    let payload = profile as ProfileUpdate;
     let lastError: unknown = null;
 
-    for (let attempt = 0; attempt < 6; attempt += 1) {
+    for (let attempt = 0; attempt < 20; attempt += 1) {
       const { data, error } = await saveProfile(payload);
 
       if (!error) return data;
@@ -143,6 +229,22 @@ export class ProfileService {
     }
 
     console.error("Error saving profile:", lastError);
+    if (isMissingProfileColumnError(lastError)) {
+      let minimalPayload = toMinimalProfilePayload(profile as Record<string, unknown>);
+
+      for (let attempt = 0; attempt < 10 && Object.keys(minimalPayload).length > 0; attempt += 1) {
+        const { data, error } = await saveProfile(minimalPayload);
+        if (!error) return data;
+
+        lastError = error;
+        if (!isMissingProfileColumnError(error)) break;
+
+        const missingColumn = getMissingColumnName(error);
+        if (!missingColumn) break;
+        minimalPayload = withoutColumn(minimalPayload, missingColumn);
+      }
+    }
+
     throw new Error(getErrorMessage(lastError));
   }
 
@@ -155,19 +257,22 @@ export class ProfileService {
       throw new Error("Please choose an image file.");
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      throw new Error("Profile image must be smaller than 2 MB.");
+    if (file.size > 8 * 1024 * 1024) {
+      throw new Error("Profile image must be smaller than 8 MB.");
     }
 
-    const extension = getImageExtension(file);
-    const filePath = `${userId}/profile-${Date.now()}.${extension}`;
+    const compressedFile = await compressProfileImage(file);
+    const extension = getImageExtension(compressedFile);
+    const version = Date.now();
+    const uniqueId = crypto.randomUUID?.() || `${version}-${Math.random().toString(36).slice(2)}`;
+    const filePath = `${userId}/profile-${version}-${uniqueId}.${extension}`;
     let uploadedBucket = profileImageBuckets[0];
     let uploadError: unknown = null;
 
     for (const bucket of profileImageBuckets) {
-      const { error } = await supabase.storage.from(bucket).upload(filePath, file, {
+      const { error } = await supabase.storage.from(bucket).upload(filePath, compressedFile, {
         cacheControl: "3600",
-        contentType: file.type || `image/${extension}`,
+        contentType: compressedFile.type || `image/${extension}`,
         upsert: true,
       });
 
@@ -194,7 +299,7 @@ export class ProfileService {
     }
 
     const { data } = supabase.storage.from(uploadedBucket).getPublicUrl(filePath);
-    const imageUrl = data.publicUrl;
+    const imageUrl = `${data.publicUrl}?v=${version}`;
 
     try {
       await this.updateProfile(userId, { profile_image_url: imageUrl } as ProfileUpdate);

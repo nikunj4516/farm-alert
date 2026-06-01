@@ -21,6 +21,10 @@ export interface Database {
           state: string | null
           preferred_language: string | null
           profile_image_url: string | null
+          latitude: number | null
+          longitude: number | null
+          profile_completed: boolean
+          onboarding_completed: boolean
           farming_type: string | null
           crop_name: string | null
           crop_type: string | null
@@ -39,6 +43,10 @@ export interface Database {
           state?: string | null
           preferred_language?: string | null
           profile_image_url?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          profile_completed?: boolean
+          onboarding_completed?: boolean
           farming_type?: string | null
           crop_name?: string | null
           crop_type?: string | null
@@ -55,6 +63,10 @@ export interface Database {
           state?: string | null
           preferred_language?: string | null
           profile_image_url?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          profile_completed?: boolean
+          onboarding_completed?: boolean
           farming_type?: string | null
           crop_name?: string | null
           crop_type?: string | null

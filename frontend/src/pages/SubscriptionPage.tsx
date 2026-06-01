@@ -7,6 +7,7 @@ import VoiceCommandButton from "@/components/VoiceCommandButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { ProfileService } from "@/services/profileService";
 import logo from "@/assets/farmalert-logo.png";
 
 const SubscriptionPage = () => {
@@ -131,9 +132,15 @@ const SubscriptionPage = () => {
       return;
     }
 
-    localStorage.setItem("farmalert_onboarded", "true");
     localStorage.setItem("farmalert_subscribed", "true");
-    navigate("/dashboard");
+    localStorage.setItem("farmalert_subscription_active", "true");
+    const profile = await ProfileService.getProfile(user.id);
+    if (ProfileService.isProfileComplete(profile)) {
+      localStorage.setItem("farmalert_profile_completed", "true");
+      navigate("/dashboard", { state: { activeTab: "profile" } });
+    } else {
+      navigate("/profile-setup", { replace: true });
+    }
   };
 
   const benefits = [

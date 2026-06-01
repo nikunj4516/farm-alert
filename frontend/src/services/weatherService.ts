@@ -6,6 +6,7 @@ import { EmergencyAlertEngine, type EmergencyAlertPayload } from "@/services/eme
 import { RecommendationEngine, type FarmingRecommendation } from "@/services/recommendationEngine";
 import { SmartCropAlertService } from "@/services/smartCropAlertService";
 import { WeatherDangerEngine, type WeatherDangerAssessment } from "@/services/weatherDangerEngine";
+import { buildLocationDisplay, validateGujaratLocation } from "@/services/gujaratLocationService";
 
 type WeatherCacheRow = Database["public"]["Tables"]["weather_cache"]["Row"];
 type WeatherCacheInsert = Database["public"]["Tables"]["weather_cache"]["Insert"];
@@ -19,6 +20,8 @@ export interface WeatherLocationInput {
   district?: string | null;
   state?: string | null;
   cropType?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface WeatherForecastDay {
@@ -117,7 +120,7 @@ const GUJARAT_VILLAGE_TALUKA_HINTS: Record<string, string> = {
   "rampura|panchmahal": "jambughoda",
 };
 
-const DEFAULT_LOCATION: WeatherLocationInput = { district: "Ahmedabad", state: "Gujarat" };
+const DEFAULT_LOCATION: WeatherLocationInput = { state: "Gujarat" };
 const CACHE_DURATION_MS = 30 * 60 * 1000;
 const GOOGLE_WEATHER_BASE_URL = "https://weather.googleapis.com/v1";
 
@@ -210,14 +213,16 @@ const normalizeLocationInput = (input?: WeatherLocationInput | string | null): W
   return {
     village: input?.village?.trim() || null,
     taluka: input?.taluka?.trim() || null,
-    district: input?.district?.trim() || DEFAULT_LOCATION.district,
+    district: input?.district?.trim() || null,
     state: input?.state?.trim() || DEFAULT_LOCATION.state,
     cropType: input?.cropType?.trim() || null,
+    latitude: input?.latitude || null,
+    longitude: input?.longitude || null,
   };
 };
 
 const locationQuery = (input: WeatherLocationInput) =>
-  [input.taluka, input.district, input.state, "India"].filter(Boolean).join(", ");
+  [input.village, input.taluka, input.district, input.state, "India"].filter(Boolean).join(", ");
 
 const normalizePlace = (value?: string | null) =>
   value
@@ -233,6 +238,8 @@ const includesPlace = (value?: string | null, expected?: string | null) => {
 
 const uniqueCandidates = (input: WeatherLocationInput) => {
   const candidates = [
+    [input.village, input.taluka, input.district, input.state].filter(Boolean).join(" "),
+    [input.village, input.taluka, input.state].filter(Boolean).join(" "),
     [input.taluka, input.district, input.state].filter(Boolean).join(" "),
     [input.taluka, input.state].filter(Boolean).join(" "),
     [input.district, input.state].filter(Boolean).join(" "),
@@ -246,6 +253,28 @@ const uniqueCandidates = (input: WeatherLocationInput) => {
 
 const resolveKnownGujaratLocation = (input: WeatherLocationInput): ResolvedLocation | null => {
   if (normalizePlace(input.state) !== "gujarat") return null;
+
+  if (input.latitude && input.longitude) {
+    const validated = validateGujaratLocation(input);
+    return {
+      location: buildLocationDisplay(validated),
+      latitude: input.latitude,
+      longitude: input.longitude,
+      district: validated.district || input.district || "Gujarat",
+      taluka: validated.taluka || input.taluka || null,
+    };
+  }
+
+  const validated = validateGujaratLocation(input);
+  if (validated.latitude && validated.longitude && (validated.taluka || validated.district)) {
+    return {
+      location: buildLocationDisplay(validated),
+      latitude: validated.latitude,
+      longitude: validated.longitude,
+      district: validated.district || "Gujarat",
+      taluka: validated.taluka,
+    };
+  }
 
   const villageDistrictKey = `${normalizePlace(input.village)}|${normalizePlace(input.district)}`;
   const inferredTaluka = GUJARAT_VILLAGE_TALUKA_HINTS[villageDistrictKey];
@@ -327,15 +356,12 @@ const cacheMatchesInput = (row: WeatherCacheRecord | null, input: WeatherLocatio
 };
 
 const resolveLocation = async (input: WeatherLocationInput): Promise<ResolvedLocation> => {
-  const knownLocation = resolveKnownGujaratLocation(input);
-  if (knownLocation) return knownLocation;
-
   const candidates = uniqueCandidates(input);
   const expectedState = normalizePlace(input.state);
   const expectedDistrict = normalizePlace(input.district);
   const expectedTaluka = normalizePlace(input.taluka);
 
-  for (const candidate of candidates.length ? candidates : ["Ahmedabad"]) {
+  for (const candidate of candidates) {
     const params = new URLSearchParams({
       name: candidate,
       count: "100",
@@ -381,11 +407,14 @@ const resolveLocation = async (input: WeatherLocationInput): Promise<ResolvedLoc
         location: Array.from(new Set(parts)).join(", "),
         latitude: Number(match.latitude),
         longitude: Number(match.longitude),
-        district: input.district || match.admin2 || match.name || "Ahmedabad",
+        district: input.district || match.admin2 || match.name || "Gujarat",
         taluka: input.taluka || match.name || null,
       };
     }
   }
+
+  const knownLocation = resolveKnownGujaratLocation(input);
+  if (knownLocation) return knownLocation;
 
   throw new Error(`Could not resolve ${locationQuery(input)}.`);
 };
@@ -635,13 +664,13 @@ export class WeatherService {
     const input = normalizeLocationInput(locationInput);
     let cachedWeather: WeatherCacheRecord | null = null;
 
-    const cacheDistrict = input.district || DEFAULT_LOCATION.district;
+  const cacheDistrict = input.district || "Gujarat";
 
     try {
       const { data } = await supabase
         .from("weather_cache")
         .select("*")
-        .ilike("district", cacheDistrict || "Ahmedabad")
+        .ilike("district", cacheDistrict)
         .order("fetched_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -691,6 +720,6 @@ export class WeatherService {
   }
 
   static async getWeatherForDistrict(districtInput?: string | null): Promise<WeatherReport> {
-    return this.getWeatherForLocation({ district: districtInput || DEFAULT_LOCATION.district, state: DEFAULT_LOCATION.state });
+    return this.getWeatherForLocation({ district: districtInput || null, state: DEFAULT_LOCATION.state });
   }
 }
