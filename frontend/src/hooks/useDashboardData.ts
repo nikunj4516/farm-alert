@@ -31,7 +31,7 @@ export const useDashboardData = (userId: string | undefined, selectedLanguage?: 
     isLoading: isWeatherLoading,
     error: weatherError,
   } = useWeather({
-    village: profile?.village || savedLocation?.village,
+    village: null,
     taluka: profile?.taluka || savedLocation?.taluka,
     district,
     state: "Gujarat",

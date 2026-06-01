@@ -23,6 +23,199 @@ export interface ValidatedGujaratLocation {
 const LOCATION_STORAGE_KEY = "farmalert_profile_location";
 const villageHierarchyByDistrict = villageHierarchy as Record<string, Record<string, string[]>>;
 
+const placeLabels: Record<string, { gu: string; hi: string }> = {
+  Gujarat: { gu: "ગુજરાત", hi: "गुजरात" },
+  Jambughoda: { gu: "જાંબુઘોડા", hi: "जांबुघोड़ा" },
+  Rampura: { gu: "રામપુરા", hi: "रामपुरा" },
+  Bhanpura: { gu: "ભાણપુરા", hi: "भानपुरा" },
+  Narukot: { gu: "નારુકોટ", hi: "नारूकोट" },
+  Halol: { gu: "હાલોલ", hi: "हालोल" },
+  Ravaliya: { gu: "રવાળિયા", hi: "रवलिया" },
+  Vavdi: { gu: "વાવડી", hi: "वावड़ी" },
+  Baska: { gu: "બાસ્કા", hi: "बास्का" },
+  Kalol: { gu: "કલોલ", hi: "कलोल" },
+  Arad: { gu: "અરાડ", hi: "अराड" },
+  Delol: { gu: "દેલોલ", hi: "देलोल" },
+  Alindra: { gu: "અલીન્દ્રા", hi: "अलिंद्रा" },
+  Godhra: { gu: "ગોધરા", hi: "गोधरा" },
+  Vadodara: { gu: "વડોદરા", hi: "वडोदरा" },
+  Dabhoi: { gu: "ડભોઇ", hi: "डभोई" },
+  Desar: { gu: "ડેસર", hi: "डेसर" },
+  Karjan: { gu: "કરજણ", hi: "करजन" },
+  Padra: { gu: "પાદરા", hi: "पादरा" },
+  Savli: { gu: "સાવલી", hi: "सावली" },
+  Shinor: { gu: "શિનોર", hi: "शिनोर" },
+  Vaghodia: { gu: "વાઘોડિયા", hi: "वाघोडिया" },
+  Bajwa: { gu: "બાજવા", hi: "बाजवा" },
+  Harni: { gu: "હરણી", hi: "हरनी" },
+  Sevasi: { gu: "સેવાસી", hi: "सेवासी" },
+  Tarsali: { gu: "તરસાલી", hi: "तरसाली" },
+  Kayavarohan: { gu: "કાયાવરોહણ", hi: "कायावरोहण" },
+  Thuvavi: { gu: "થુવાવી", hi: "थुवावी" },
+  Anand: { gu: "આણંદ", hi: "आणंद" },
+  Anklav: { gu: "આંકલાવ", hi: "आंकलाव" },
+  Borsad: { gu: "બોરસદ", hi: "बोरसद" },
+  Vasad: { gu: "વાસદ", hi: "वासद" },
+  Petlad: { gu: "પેટલાદ", hi: "पेटलाद" },
+  Sojitra: { gu: "સોજીત્રા", hi: "सोजित्रा" },
+  Tarapur: { gu: "તારાપુર", hi: "तारापुर" },
+  Umreth: { gu: "ઉમરેઠ", hi: "उमरेठ" },
+  Karamsad: { gu: "કરમસદ", hi: "करमसद" },
+  Mogri: { gu: "મોગરી", hi: "मोगरी" },
+  "Vallabh Vidyanagar": { gu: "વલ્લભ વિદ્યાનગર", hi: "वल्लभ विद्यानगर" },
+  "Chhota Udepur": { gu: "છોટા ઉદેપુર", hi: "छोटा उदेपुर" },
+  Bodeli: { gu: "બોડેલી", hi: "बोडेली" },
+  Kavant: { gu: "કવાંટ", hi: "कवांट" },
+  Nasvadi: { gu: "નસવાડી", hi: "नसवाड़ी" },
+  Sankheda: { gu: "સંખેડા", hi: "संखेड़ा" },
+  "Jetpur Pavi": { gu: "જેતપુર પાવી", hi: "जेतपुर पावी" },
+  Raski: { gu: "રાસ્કી", hi: "रास्की" },
+  Ahmedabad: { gu: "અમદાવાદ", hi: "अहमदाबाद" },
+  "Ahmedabad City": { gu: "અમદાવાદ શહેર", hi: "अहमदाबाद शहर" },
+  Daskroi: { gu: "દસ્ક્રોઇ", hi: "दस्क्रोई" },
+  Dhandhuka: { gu: "ધંધુકા", hi: "धंधुका" },
+  Bavla: { gu: "બાવળા", hi: "बावला" },
+  Viramgam: { gu: "વિરમગામ", hi: "वीरमगाम" },
+  Sanand: { gu: "સાણંદ", hi: "सानंद" },
+  Dholka: { gu: "ધોળકા", hi: "धोलका" },
+  Mandal: { gu: "મંડલ", hi: "मंडल" },
+  "Detroj-Rampura": { gu: "દેત્રોજ-રામપુરા", hi: "देत्रोज-रामपुरा" },
+  Surat: { gu: "સુરત", hi: "सूरत" },
+  Bardoli: { gu: "બારડોલી", hi: "बारडोली" },
+  Choryasi: { gu: "ચોર્યાસી", hi: "चौर्यासी" },
+  Kamrej: { gu: "કામરેજ", hi: "कामरेज" },
+  Mahuva: { gu: "મહુવા", hi: "महुवा" },
+  Mandvi: { gu: "માંડવી", hi: "मांडवी" },
+  Mangrol: { gu: "માંગરોળ", hi: "मांगरोल" },
+  Olpad: { gu: "ઓલપાડ", hi: "ओलपाड" },
+  Palsana: { gu: "પલસાણા", hi: "पलसाना" },
+  "Surat City": { gu: "સુરત શહેર", hi: "सूरत शहर" },
+  Umarpada: { gu: "ઉમરપાડા", hi: "उमरपाड़ा" },
+  Rajkot: { gu: "રાજકોટ", hi: "राजकोट" },
+  Gondal: { gu: "ગોંડલ", hi: "गोंडल" },
+  Dhoraji: { gu: "ધોરાજી", hi: "धोराजी" },
+  Jamkandorna: { gu: "જામકંડોરણા", hi: "जामकंडोरणा" },
+  Jasdan: { gu: "જસદણ", hi: "जसदण" },
+  Jetpur: { gu: "જેતપુર", hi: "जेतपुर" },
+  "Kotda Sangani": { gu: "કોટડા સાંગાણી", hi: "कोटडा सांगानी" },
+  Lodhika: { gu: "લોધિકા", hi: "लोधिका" },
+  Paddhari: { gu: "પડધરી", hi: "पडधरी" },
+  Upleta: { gu: "ઉપલેટા", hi: "उपलेटा" },
+  Vinchhiya: { gu: "વિંછિયા", hi: "विंछिया" },
+  Mehsana: { gu: "મહેસાણા", hi: "मेहसाणा" },
+  Becharaji: { gu: "બેચરાજી", hi: "बेचराजी" },
+  Jotana: { gu: "જોટાણા", hi: "जोटाणा" },
+  Kadi: { gu: "કડી", hi: "कडी" },
+  Kheralu: { gu: "ખેરાલુ", hi: "खेरालु" },
+  Satlasana: { gu: "સતલાસણા", hi: "सतलासणा" },
+  Unjha: { gu: "ઊંઝા", hi: "ऊंझा" },
+  Vadnagar: { gu: "વડનગર", hi: "वडनगर" },
+  Vijapur: { gu: "વિજાપુર", hi: "विजापुर" },
+  Visnagar: { gu: "વિસનગર", hi: "विसनगर" },
+  Balasinor: { gu: "બાલાસિનોર", hi: "बालासिनोर" },
+  Kadana: { gu: "કડાણા", hi: "कडाना" },
+  Khanpur: { gu: "ખાનપુર", hi: "खानपुर" },
+  Lunawada: { gu: "લુણાવાડા", hi: "लुनावाडा" },
+  Santrampur: { gu: "સંતરામપુર", hi: "संतरामपुर" },
+  Virpur: { gu: "વીરપુર", hi: "वीरपुर" },
+};
+
+const gujaratiSyllables: Array<[RegExp, string]> = [
+  [/chh/gi, "છ"],
+  [/kh/gi, "ખ"],
+  [/gh/gi, "ઘ"],
+  [/dh/gi, "ધ"],
+  [/bh/gi, "ભ"],
+  [/ph/gi, "ફ"],
+  [/th/gi, "થ"],
+  [/sh/gi, "શ"],
+  [/aa/gi, "ા"],
+  [/ee/gi, "ી"],
+  [/oo/gi, "ૂ"],
+  [/ai/gi, "ૈ"],
+  [/au/gi, "ૌ"],
+  [/a/gi, "ા"],
+  [/b/gi, "બ"],
+  [/c/gi, "ક"],
+  [/d/gi, "દ"],
+  [/e/gi, "ે"],
+  [/f/gi, "ફ"],
+  [/g/gi, "ગ"],
+  [/h/gi, "હ"],
+  [/i/gi, "િ"],
+  [/j/gi, "જ"],
+  [/k/gi, "ક"],
+  [/l/gi, "લ"],
+  [/m/gi, "મ"],
+  [/n/gi, "ન"],
+  [/o/gi, "ો"],
+  [/p/gi, "પ"],
+  [/q/gi, "ક"],
+  [/r/gi, "ર"],
+  [/s/gi, "સ"],
+  [/t/gi, "ત"],
+  [/u/gi, "ુ"],
+  [/v/gi, "વ"],
+  [/w/gi, "વ"],
+  [/x/gi, "ક્સ"],
+  [/y/gi, "ય"],
+  [/z/gi, "ઝ"],
+];
+
+const hindiSyllables: Array<[RegExp, string]> = [
+  [/chh/gi, "छ"],
+  [/kh/gi, "ख"],
+  [/gh/gi, "घ"],
+  [/dh/gi, "ध"],
+  [/bh/gi, "भ"],
+  [/ph/gi, "फ"],
+  [/th/gi, "थ"],
+  [/sh/gi, "श"],
+  [/aa/gi, "ा"],
+  [/ee/gi, "ी"],
+  [/oo/gi, "ू"],
+  [/ai/gi, "ै"],
+  [/au/gi, "ौ"],
+  [/a/gi, "ा"],
+  [/b/gi, "ब"],
+  [/c/gi, "क"],
+  [/d/gi, "द"],
+  [/e/gi, "े"],
+  [/f/gi, "फ"],
+  [/g/gi, "ग"],
+  [/h/gi, "ह"],
+  [/i/gi, "ि"],
+  [/j/gi, "ज"],
+  [/k/gi, "क"],
+  [/l/gi, "ल"],
+  [/m/gi, "म"],
+  [/n/gi, "न"],
+  [/o/gi, "ो"],
+  [/p/gi, "प"],
+  [/q/gi, "क"],
+  [/r/gi, "र"],
+  [/s/gi, "स"],
+  [/t/gi, "त"],
+  [/u/gi, "ु"],
+  [/v/gi, "व"],
+  [/w/gi, "व"],
+  [/x/gi, "क्स"],
+  [/y/gi, "य"],
+  [/z/gi, "ज"],
+];
+
+const transliterateFallback = (value: string, language: Language) => {
+  if (language === "en") return value;
+  const rules = language === "gu" ? gujaratiSyllables : hindiSyllables;
+  return value
+    .split(/(\s+|-)/)
+    .map((part) => {
+      if (/^\s+$|^-$/u.test(part)) return part;
+      return rules.reduce((text, [pattern, replacement]) => text.replace(pattern, replacement), part);
+    })
+    .join("");
+};
+
 export const GUJARAT_DISTRICTS: GujaratDistrict[] = [
   { name: "Ahmedabad", gu: "અમદાવાદ", hi: "अहमदाबाद", center: { latitude: 23.0225, longitude: 72.5714 }, talukas: ["Ahmedabad City", "Daskroi", "Dholka", "Dhandhuka", "Bavla", "Viramgam", "Sanand", "Mandal", "Detroj-Rampura"], villages: ["Sanand", "Bavla", "Dholka", "Viramgam"] },
   { name: "Amreli", gu: "અમરેલી", hi: "अमरेली", center: { latitude: 21.6032, longitude: 71.2221 }, talukas: ["Amreli", "Babra", "Bagasara", "Dhari", "Jafrabad", "Khambha", "Kunkavav Vadia", "Lathi", "Lilia", "Rajula", "Savarkundla"] },
@@ -69,6 +262,17 @@ export const getDistrictLabel = (district: GujaratDistrict | string, language: L
   const record = typeof district === "string" ? findDistrict(district) : district;
   if (!record) return typeof district === "string" ? district : "";
   return language === "gu" ? record.gu : language === "hi" ? record.hi : record.name;
+};
+
+export const getLocationLabel = (value?: string | null, language: Language = "en") => {
+  if (!value) return "";
+  if (language === "en") return value;
+
+  const district = findDistrict(value);
+  if (district) return getDistrictLabel(district, language);
+
+  const label = placeLabels[value];
+  return language === "gu" ? label?.gu || transliterateFallback(value, language) : label?.hi || transliterateFallback(value, language);
 };
 
 export const findDistrict = (value?: string | null) => {

@@ -98,14 +98,14 @@ const LoginPage = () => {
       return;
     }
 
-    const isSubscribed = await hasActiveSubscription(userId);
-    if (!isSubscribed) {
-      navigate("/subscription");
+    const profile = await ProfileService.getProfile(userId);
+    if (!ProfileService.isProfileComplete(profile)) {
+      navigate("/profile-setup", { replace: true });
       return;
     }
 
-    const profile = await ProfileService.getProfile(userId);
-    navigate(ProfileService.isProfileComplete(profile) ? "/dashboard" : "/profile-setup", { replace: true });
+    const isSubscribed = await hasActiveSubscription(userId);
+    navigate(isSubscribed ? "/dashboard" : "/subscription", { replace: true });
   };
 
   return (

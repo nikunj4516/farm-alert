@@ -133,9 +133,9 @@ const translations = {
     en: "Your Name *",
   },
   profile_name_placeholder: {
-    gu: "દા.ત. રમેશભાઈ પટેલ",
-    hi: "जैसे राजेश कुमार",
-    en: "e.g. Ramesh Patel",
+    gu: "દા.ત. નવીનભાઈ બારિયા",
+    hi: "जैसे नवीनभाई बारिया",
+    en: "e.g. NavinBhai Bariya",
   },
   profile_village: {
     gu: "ગામ",
@@ -191,6 +191,31 @@ const translations = {
     gu: "પાછળ",
     hi: "पीछे",
     en: "Back",
+  },
+  profile_photo_updated: {
+    gu: "પ્રોફાઇલ ફોટો અપડેટ થયો",
+    hi: "प्रोफ़ाइल फोटो अपडेट हो गई",
+    en: "Profile photo updated",
+  },
+  profile_photo_updated_desc: {
+    gu: "તમારો નવો પ્રોફાઇલ ફોટો સેવ થઈ ગયો છે.",
+    hi: "आपकी नई प्रोफ़ाइल फोटो सेव हो गई है।",
+    en: "Your new profile image has been saved.",
+  },
+  profile_photo_failed: {
+    gu: "ફોટો અપડેટ થઈ શક્યો નથી",
+    hi: "फोटो अपडेट नहीं हो सकी",
+    en: "Could not update photo",
+  },
+  language_save_failed: {
+    gu: "ભાષા સેવ થઈ શકી નથી",
+    hi: "भाषा सेव नहीं हो सकी",
+    en: "Could not save language",
+  },
+  retry_later: {
+    gu: "કૃપા કરીને ફરી પ્રયાસ કરો.",
+    hi: "कृपया फिर प्रयास करें।",
+    en: "Please try again.",
   },
   crops: {
     gu: ["ઘઉં", "ડાંગર", "કપાસ", "મગફળી", "શેરડી", "શાકભાજી", "અન્ય"],

@@ -1,5 +1,6 @@
 import { WeatherReport } from "@/services/weatherService";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getLocationLabel } from "@/services/gujaratLocationService";
 
 interface WeatherCardProps {
   weather: WeatherReport;
@@ -16,10 +17,17 @@ const conditionIcon = (condition?: string | null) => {
 };
 
 const WeatherCard = ({ weather }: WeatherCardProps) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const condition = weather.weather_condition;
   const conditionLabel = condition ? t(`weather.conditions.${condition}`) : t("home.weatherUpdate");
   const providerLabel = t(`weather.intelligence.providers.${weather.provider || "weather"}`);
+  const locationLabel = (weather.location || weather.district || "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part) => part && part.toLowerCase() !== "india")
+    .map((part) => getLocationLabel(part, language))
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-emerald-700 p-5 text-primary-foreground shadow-elevated">
@@ -44,7 +52,7 @@ const WeatherCard = ({ weather }: WeatherCardProps) => {
       </div>
 
       <p className="mt-4 text-sm font-medium text-primary-foreground/85">
-        📍 {weather.location || weather.district}
+        📍 {locationLabel}
       </p>
 
       <div className="mt-4 grid grid-cols-3 gap-2">

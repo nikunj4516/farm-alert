@@ -1,21 +1,88 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, RotateCcw, ShieldAlert } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import VoiceCommandButton from "@/components/VoiceCommandButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileService } from "@/services/profileService";
+import { SUBSCRIPTION_CHECKED_AT_KEY, consumeSubscriptionRequiredMessage, hasActiveSubscription } from "@/services/subscriptionService";
 import logo from "@/assets/farmalert-logo.png";
 
 const SubscriptionPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const [selectedPlan, setSelectedPlan] = useState<"daily" | "monthly">("daily");
   const [error, setError] = useState("");
+  const [showRequiredNotice, setShowRequiredNotice] = useState(false);
+  const [checkingRestore, setCheckingRestore] = useState(false);
+
+  const copy = {
+    en: {
+      required: "Active subscription required to continue.",
+      retry: "Retry Subscription",
+      restore: "Restore Subscription",
+      restoreFailed: "No active subscription found. Please subscribe to continue.",
+    },
+    hi: {
+      required: "आगे बढ़ने के लिए सक्रिय सब्सक्रिप्शन ज़रूरी है।",
+      retry: "फिर से सब्सक्राइब करें",
+      restore: "सब्सक्रिप्शन रीस्टोर करें",
+      restoreFailed: "सक्रिय सब्सक्रिप्शन नहीं मिला। जारी रखने के लिए सब्सक्राइब करें।",
+    },
+    gu: {
+      required: "આગળ વધવા માટે સક્રિય સબ્સ્ક્રિપ્શન જરૂરી છે.",
+      retry: "ફરી સબ્સ્ક્રાઇબ કરો",
+      restore: "સબ્સ્ક્રિપ્શન રિસ્ટોર કરો",
+      restoreFailed: "સક્રિય સબ્સ્ક્રિપ્શન મળ્યું નથી. આગળ વધવા માટે સબ્સ્ક્રાઇબ કરો.",
+    },
+  }[language];
+
+  useEffect(() => {
+    setShowRequiredNotice(consumeSubscriptionRequiredMessage());
+  }, []);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    if (!user) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const guardProfileThenSubscription = async () => {
+      const profile = await ProfileService.getProfile(user.id);
+      if (!ProfileService.isProfileComplete(profile)) {
+        navigate("/profile-setup", { replace: true });
+        return;
+      }
+
+      const isSubscribed = await hasActiveSubscription(user.id);
+      if (isSubscribed) {
+        navigate("/dashboard", { state: { activeTab: "weather" }, replace: true });
+      }
+    };
+
+    void guardProfileThenSubscription();
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const keepOnSubscription = () => {
+      if (localStorage.getItem("farmalert_subscription_active") !== "true") {
+        window.history.pushState(null, "", "/subscription");
+        setShowRequiredNotice(true);
+      }
+    };
+
+    window.history.pushState(null, "", "/subscription");
+    window.addEventListener("popstate", keepOnSubscription);
+    return () => window.removeEventListener("popstate", keepOnSubscription);
+  }, []);
 
   const handleVoiceCommand = (transcript: string) => {
     const command = transcript.toLowerCase();
@@ -129,17 +196,43 @@ const SubscriptionPage = () => {
 
     if (upsertError) {
       setError(upsertError.message);
+      setShowRequiredNotice(true);
       return;
     }
 
     localStorage.setItem("farmalert_subscribed", "true");
     localStorage.setItem("farmalert_subscription_active", "true");
+    localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
+    await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>).catch(() => null);
     const profile = await ProfileService.getProfile(user.id);
     if (ProfileService.isProfileComplete(profile)) {
       localStorage.setItem("farmalert_profile_completed", "true");
-      navigate("/dashboard", { state: { activeTab: "profile" } });
+      navigate("/dashboard", { state: { activeTab: "weather" }, replace: true });
     } else {
       navigate("/profile-setup", { replace: true });
+    }
+  };
+
+  const handleRestoreSubscription = async () => {
+    setError("");
+    setCheckingRestore(true);
+    try {
+      if (!user) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      const isSubscribed = await hasActiveSubscription(user.id);
+      if (isSubscribed) {
+        localStorage.setItem("farmalert_subscription_active", "true");
+        navigate("/dashboard", { state: { activeTab: "weather" }, replace: true });
+        return;
+      }
+
+      setShowRequiredNotice(true);
+      setError(copy.restoreFailed);
+    } finally {
+      setCheckingRestore(false);
     }
   };
 
@@ -188,6 +281,38 @@ const SubscriptionPage = () => {
       </div>
 
       <div className="px-5 space-y-5 flex-1 overflow-y-auto">
+        {/* Header */}
+        {showRequiredNotice && (
+          <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-amber-950 shadow-card">
+            <div className="flex items-start gap-3">
+              <div className="rounded-xl bg-amber-200 p-2">
+                <ShieldAlert className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-black leading-relaxed">{copy.required}</p>
+                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={handleSubscribe}
+                    className="rounded-xl bg-primary px-3 py-2.5 text-sm font-black text-primary-foreground active:scale-95"
+                  >
+                    {copy.retry}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRestoreSubscription}
+                    disabled={checkingRestore}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-400 bg-white px-3 py-2.5 text-sm font-black text-amber-950 active:scale-95 disabled:opacity-60"
+                  >
+                    <RotateCcw className={`h-4 w-4 ${checkingRestore ? "animate-spin" : ""}`} />
+                    {copy.restore}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

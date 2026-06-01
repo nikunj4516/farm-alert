@@ -121,8 +121,7 @@ export class ProfileService {
     const savedLocation = typeof window !== "undefined" ? getSavedSelectedLocation() : null;
     const hasSavedHierarchy = Boolean(
       (profile.district || savedLocation?.district) &&
-      (profile.taluka || savedLocation?.taluka) &&
-      (profile.village || savedLocation?.village)
+      (profile.taluka || savedLocation?.taluka)
     );
     const hasLocalCompletion = typeof window !== "undefined" && localStorage.getItem("farmalert_profile_completed") === "true";
 

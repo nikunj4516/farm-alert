@@ -17,6 +17,7 @@ import {
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import { Language, languageNames, useLanguage } from "@/contexts/LanguageContext";
 import { Profile } from "@/services/profileService";
+import { getDistrictLabel, getLocationLabel } from "@/services/gujaratLocationService";
 
 type ProfileCardProps = {
   profile?: Profile | null;
@@ -50,7 +51,6 @@ const profileCopy = {
     loading: "Loading your profile",
     unavailable: "We could not load profile details right now.",
     fullName: "Full Name",
-    village: "Village",
     taluka: "Taluka",
     district: "District",
     state: "State",
@@ -62,6 +62,10 @@ const profileCopy = {
     farmer: "FarmAlert Farmer",
     gujarat: "Gujarat",
     mixedFarming: "Mixed farming",
+    acreFarm: "{value} acre farm",
+    camera: "Camera",
+    gallery: "Gallery",
+    languageNames: { gu: "Gujarati", hi: "Hindi", en: "English" },
   },
   hi: {
     title: "किसान प्रोफ़ाइल",
@@ -73,7 +77,6 @@ const profileCopy = {
     loading: "प्रोफ़ाइल लोड हो रही है",
     unavailable: "अभी प्रोफ़ाइल जानकारी लोड नहीं हो सकी।",
     fullName: "पूरा नाम",
-    village: "गाँव",
     taluka: "तालुका",
     district: "जिला",
     state: "राज्य",
@@ -85,6 +88,10 @@ const profileCopy = {
     farmer: "FarmAlert किसान",
     gujarat: "गुजरात",
     mixedFarming: "मिश्रित खेती",
+    acreFarm: "{value} एकड़ खेत",
+    camera: "कैमरा",
+    gallery: "गैलरी",
+    languageNames: { gu: "गुजराती", hi: "हिन्दी", en: "अंग्रेज़ी" },
   },
   gu: {
     title: "ખેડૂત પ્રોફાઇલ",
@@ -96,7 +103,6 @@ const profileCopy = {
     loading: "પ્રોફાઇલ લોડ થઈ રહી છે",
     unavailable: "હાલ પ્રોફાઇલ માહિતી લોડ થઈ શકી નથી.",
     fullName: "પૂરું નામ",
-    village: "ગામ",
     taluka: "તાલુકો",
     district: "જિલ્લો",
     state: "રાજ્ય",
@@ -108,6 +114,10 @@ const profileCopy = {
     farmer: "FarmAlert ખેડૂત",
     gujarat: "ગુજરાત",
     mixedFarming: "મિશ્ર ખેતી",
+    acreFarm: "{value} એકર ખેતર",
+    camera: "કેમેરા",
+    gallery: "ગેલેરી",
+    languageNames: { gu: "ગુજરાતી", hi: "હિન્દી", en: "અંગ્રેજી" },
   },
 } as const;
 
@@ -132,7 +142,7 @@ const ProfileCard = ({
   onLogout,
   onImageUpload,
 }: ProfileCardProps) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -144,20 +154,23 @@ const ProfileCard = ({
   const displayName = profile?.name || copy.farmer;
   const preferredLanguage = (profile?.preferred_language || language) as Language;
   const taluka = readExtra(profile, ["taluka"]);
-  const cropName = readExtra(profile, ["crop_name"]) || profile?.crop_type || copy.notAdded;
+  const talukaLabel = taluka ? getLocationLabel(taluka, language) : "";
+  const districtLabel = profile?.district ? getDistrictLabel(profile.district, language) : "";
+  const rawCropName = readExtra(profile, ["crop_name"]) || profile?.crop_type;
+  const translatedCropName = rawCropName ? t(`weather.intelligence.crops.${rawCropName}`) : "";
+  const cropName = translatedCropName && !translatedCropName.includes(".") ? translatedCropName : rawCropName || copy.notAdded;
   const farmingType =
     readExtra(profile, ["farming_type", "farm_type"]) ||
-    (profile?.land_size ? `${profile.land_size} acre farm` : copy.mixedFarming);
+    (profile?.land_size ? copy.acreFarm.replace("{value}", String(profile.land_size)) : copy.mixedFarming);
 
   const fields = [
     { label: copy.fullName, value: displayName, icon: User },
-    { label: copy.taluka, value: taluka || copy.notAdded, icon: MapPin },
-    { label: copy.district, value: profile?.district || copy.notAdded, icon: MapPin },
-    { label: copy.state, value: profile?.state || copy.gujarat, icon: MapPin },
-    { label: copy.village, value: profile?.village || copy.notAdded, icon: MapPin },
+    { label: copy.taluka, value: talukaLabel || copy.notAdded, icon: MapPin },
+    { label: copy.district, value: districtLabel || copy.notAdded, icon: MapPin },
+    { label: copy.state, value: getLocationLabel("Gujarat", language), icon: MapPin },
     {
       label: copy.language,
-      value: languageNames[preferredLanguage] || preferredLanguage || copy.notAdded,
+      value: copy.languageNames[preferredLanguage] || languageNames[preferredLanguage] || preferredLanguage || copy.notAdded,
       icon: Languages,
     },
     { label: copy.farmingType, value: farmingType, icon: Tractor },
@@ -260,7 +273,7 @@ const ProfileCard = ({
                 className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary disabled:opacity-60"
               >
                 <Camera className="h-3.5 w-3.5" />
-                {language === "gu" ? "કેમેરા" : language === "hi" ? "कैमरा" : "Camera"}
+                {copy.camera}
               </button>
               <button
                 type="button"
@@ -269,7 +282,7 @@ const ProfileCard = ({
                 className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary disabled:opacity-60"
               >
                 <ImageUp className="h-3.5 w-3.5" />
-                {language === "gu" ? "ગેલેરી" : language === "hi" ? "गैलरी" : "Gallery"}
+                {copy.gallery}
               </button>
             </div>
             {uploadError && (
@@ -282,7 +295,7 @@ const ProfileCard = ({
               </button>
             )}
             <p className="text-sm font-medium text-muted-foreground">
-              {[profile?.village, taluka, profile?.district, profile?.state || copy.gujarat].filter(Boolean).join(", ") ||
+              {[talukaLabel, districtLabel, getLocationLabel("Gujarat", language)].filter(Boolean).join(", ") ||
                 copy.notAdded}
             </p>
           </div>

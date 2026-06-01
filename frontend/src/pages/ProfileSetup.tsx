@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat, Bean, Cloud, Sprout, Trees, Carrot, Package } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
@@ -9,11 +9,13 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
 import { ProfileService } from "@/services/profileService";
+import { hasActiveSubscription } from "@/services/subscriptionService";
 import {
   GUJARAT_DISTRICTS,
   getTalukasForDistrict,
-  getVillagesForTaluka,
   getSavedSelectedLocation,
+  getDistrictLabel,
+  getLocationLabel,
   saveSelectedLocation,
   validateGujaratLocation,
 } from "@/services/gujaratLocationService";
@@ -21,45 +23,46 @@ import {
 const STEPS = 3;
 const locationCopy = {
   en: {
-    village: "Village",
-    villagePlaceholder: "e.g. Rampura",
     taluka: "Taluka",
     talukaPlaceholder: "e.g. Jambughoda",
     district: "District",
     districtPlaceholder: "e.g. Panchmahal",
     state: "State",
     statePlaceholder: "e.g. Gujarat",
-    requiredLocation: "Select district, taluka, and village.",
+    requiredLocation: "Select district and taluka.",
     requiredFarm: "Select crop and enter farm size.",
+    loadFailed: "Unable to load profile.",
+    saveFailed: "Unable to save profile. Please try again.",
   },
   hi: {
-    village: "गाँव",
-    villagePlaceholder: "जैसे रामपुरा",
     taluka: "तालुका",
     talukaPlaceholder: "जैसे जांबुघोड़ा",
     district: "जिला",
     districtPlaceholder: "जैसे पंचमहल",
     state: "राज्य",
     statePlaceholder: "जैसे गुजरात",
-    requiredLocation: "जिला, तालुका और गाँव चुनें.",
+    requiredLocation: "जिला और तालुका चुनें.",
     requiredFarm: "फसल चुनें और खेत का आकार दर्ज करें.",
+    loadFailed: "प्रोफ़ाइल लोड नहीं हो सकी।",
+    saveFailed: "प्रोफ़ाइल सेव नहीं हो सकी। कृपया फिर प्रयास करें।",
   },
   gu: {
-    village: "ગામ",
-    villagePlaceholder: "દા.ત. રામપુરા",
     taluka: "તાલુકો",
     talukaPlaceholder: "દા.ત. જાંબુઘોડા",
     district: "જિલ્લો",
     districtPlaceholder: "દા.ત. પંચમહાલ",
     state: "રાજ્ય",
     statePlaceholder: "દા.ત. ગુજરાત",
-    requiredLocation: "જિલ્લો, તાલુકો અને ગામ પસંદ કરો.",
+    requiredLocation: "જિલ્લો અને તાલુકો પસંદ કરો.",
     requiredFarm: "પાક પસંદ કરો અને જમીનનું ક્ષેત્રફળ લખો.",
+    loadFailed: "પ્રોફાઇલ લોડ થઈ શકી નથી.",
+    saveFailed: "પ્રોફાઇલ સેવ થઈ શકી નથી. કૃપા કરીને ફરી પ્રયાસ કરો.",
   },
 } as const;
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
+  const routeLocation = useLocation();
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { language, t, tArray } = useLanguage();
@@ -68,6 +71,9 @@ const ProfileSetup = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState(0);
+  const [isEditingProfile, setIsEditingProfile] = useState(
+    () => (routeLocation.state as { mode?: string } | null)?.mode === "edit"
+  );
   const [form, setForm] = useState({
     name: "",
     village: "",
@@ -91,10 +97,13 @@ const ProfileSetup = () => {
         const savedProfile = await ProfileService.getProfile(user.id);
         if (!isMounted) return;
         const savedLocation = getSavedSelectedLocation();
+        if (ProfileService.isProfileComplete(savedProfile)) {
+          setIsEditingProfile(true);
+        }
 
         setForm({
           name: savedProfile?.name || "",
-          village: savedProfile?.village || savedLocation?.village || "",
+          village: "",
           taluka: (savedProfile as typeof savedProfile & { taluka?: string | null } | null)?.taluka || savedLocation?.taluka || "",
           district: savedProfile?.district || savedLocation?.district || "",
           state: "Gujarat",
@@ -103,7 +112,7 @@ const ProfileSetup = () => {
         });
       } catch (error) {
         if (isMounted) {
-          setError(error instanceof Error ? error.message : "Unable to load profile");
+          setError(copy.loadFailed);
         }
       } finally {
         if (isMounted) {
@@ -122,7 +131,6 @@ const ProfileSetup = () => {
   const crops = tArray("crops");
   const cropValues = ["Wheat", "Rice", "Cotton", "Groundnut", "Sugarcane", "Vegetables", "Other"];
   const talukaOptions = getTalukasForDistrict(form.district);
-  const villageOptions = getVillagesForTaluka(form.district, form.taluka);
   const cropIconsList = [
     <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sheaf%20of%20Rice.png" alt="wheat" className="w-5 h-5 drop-shadow-sm" key="wheat" />,
     <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Seedling.png" alt="sprout" className="w-5 h-5 drop-shadow-sm" key="sprout" />,
@@ -152,13 +160,13 @@ const ProfileSetup = () => {
 
     try {
       const landSize = Number.parseFloat(form.land_size);
-      const validatedLocation = validateGujaratLocation(form);
+      const validatedLocation = validateGujaratLocation({ ...form, village: null });
       localStorage.setItem("farmalert_profile_completed", "true");
       localStorage.setItem("farmalert_onboarding_completed", "true");
       saveSelectedLocation(validatedLocation);
       await ProfileService.upsertProfile(user.id, {
         name: form.name.trim().substring(0, 100),
-        village: validatedLocation.village,
+        village: null,
         taluka: validatedLocation.taluka,
         district: validatedLocation.district,
         latitude: validatedLocation.latitude,
@@ -174,9 +182,18 @@ const ProfileSetup = () => {
         title: t("profile_save"),
         description: t("profile_subtitle"),
       });
-      navigate("/dashboard", { state: { activeTab: "profile" } });
+      if (isEditingProfile) {
+        navigate("/dashboard", { state: { activeTab: "profile" }, replace: true });
+        return;
+      }
+
+      const isSubscribed = await hasActiveSubscription(user.id);
+      navigate(isSubscribed ? "/dashboard" : "/subscription", {
+        state: isSubscribed ? { activeTab: "weather" } : { reason: "profile_completed" },
+        replace: true,
+      });
     } catch (error) {
-      setError(ProfileService.getErrorMessage(error));
+      setError(ProfileService.getErrorMessage(error).includes("profiles") ? copy.saveFailed : ProfileService.getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -195,7 +212,7 @@ const ProfileSetup = () => {
 
   const canGoNext = () => {
     if (step === 0) return form.name.trim().length > 0;
-    if (step === 1) return Boolean(form.district && form.taluka && form.village.trim());
+    if (step === 1) return Boolean(form.district && form.taluka);
     return Boolean(form.crop_type && Number.parseFloat(form.land_size) > 0);
   };
 
@@ -269,7 +286,7 @@ const ProfileSetup = () => {
                   {copy.state}
                 </label>
                 <div className="flex w-full items-center justify-between rounded-xl border-2 border-primary/15 bg-primary/5 px-4 py-3.5 text-base font-bold text-foreground">
-                  <span>{language === "gu" ? "ગુજરાત" : language === "hi" ? "गुजरात" : "Gujarat"}</span>
+                  <span>{getLocationLabel("Gujarat", language)}</span>
                   <Check className="h-5 w-5 text-primary" aria-hidden="true" />
                 </div>
               </div>
@@ -286,7 +303,7 @@ const ProfileSetup = () => {
                   <option value="">{copy.districtPlaceholder}</option>
                   {GUJARAT_DISTRICTS.map((district) => (
                     <option key={district.name} value={district.name}>
-                      {district.name}
+                      {getDistrictLabel(district, language)}
                     </option>
                   ))}
                 </select>
@@ -305,26 +322,7 @@ const ProfileSetup = () => {
                   <option value="">{copy.talukaPlaceholder}</option>
                   {talukaOptions.map((taluka) => (
                     <option key={taluka} value={taluka}>
-                      {taluka}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
-                  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Round%20Pushpin.png" alt="location" className="w-5 h-5 drop-shadow-sm" />
-                  {copy.village}
-                </label>
-                <select
-                  value={form.village}
-                  onChange={(e) => setForm({ ...form, village: e.target.value })}
-                  disabled={!form.taluka}
-                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
-                >
-                  <option value="">{copy.villagePlaceholder}</option>
-                  {villageOptions.map((village) => (
-                    <option key={village} value={village}>
-                      {village}
+                      {getLocationLabel(taluka, language)}
                     </option>
                   ))}
                 </select>
@@ -422,12 +420,14 @@ const ProfileSetup = () => {
           </p>
         )}
 
-        <button
-          onClick={() => { navigate("/subscription"); }}
-          className="w-full text-center text-sm text-muted-foreground font-semibold py-2 touch-manipulation"
-        >
-          {t("profile_skip")}
-        </button>
+        {isEditingProfile && (
+          <button
+            onClick={() => { navigate("/dashboard", { state: { activeTab: "profile" }, replace: true }); }}
+            className="w-full text-center text-sm text-muted-foreground font-semibold py-2 touch-manipulation"
+          >
+            {t("profile_back")}
+          </button>
+        )}
       </div>
     </div>
   );

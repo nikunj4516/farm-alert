@@ -14,12 +14,12 @@ import logo from "@/assets/farmalert-fa.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { hasActiveSubscription } from "@/services/subscriptionService";
+import { hasActiveSubscription, hasFreshLocalSubscription, markSubscriptionRequired } from "@/services/subscriptionService";
 import { ProfileService } from "@/services/profileService";
 import type { WeatherReport } from "@/services/weatherService";
 import type { VoiceCommandResult } from "@/services/voiceCommandEngine";
 import { toast } from "@/components/ui/use-toast";
-import { getSavedSelectedLocation } from "@/services/gujaratLocationService";
+import { getDistrictLabel, getLocationLabel, getSavedSelectedLocation } from "@/services/gujaratLocationService";
 
 const getWeatherAlertLevel = (weather?: WeatherReport | null) => {
   if (!weather) return "green" as const;
@@ -125,21 +125,6 @@ const Index = () => {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    if (loading || !user) {
-      return;
-    }
-
-    const routeUnsubscribedUser = async () => {
-      const isSubscribed = await hasActiveSubscription(user.id);
-      if (!isSubscribed) {
-        navigate("/subscription", { replace: true });
-      }
-    };
-
-    void routeUnsubscribedUser();
-  }, [user, loading, navigate]);
-
-  useEffect(() => {
     if (loading || !user || isProfileLoading) return;
 
     if (!ProfileService.isProfileComplete(profile)) {
@@ -149,6 +134,20 @@ const Index = () => {
 
     localStorage.setItem("farmalert_profile_completed", "true");
     localStorage.setItem("farmalert_onboarding_completed", "true");
+
+    const guardSubscription = async () => {
+      if (hasFreshLocalSubscription()) {
+        return;
+      }
+
+      const isSubscribed = await hasActiveSubscription(user.id);
+      if (!isSubscribed) {
+        markSubscriptionRequired();
+        navigate("/subscription", { replace: true });
+      }
+    };
+
+    void guardSubscription();
   }, [profile, isProfileLoading, user, loading, navigate]);
 
   const helplineNumber = "1800-180-1551";
@@ -157,11 +156,14 @@ const Index = () => {
   const profileWithSavedLocation = profile
     ? {
         ...profile,
-        village: profile.village || savedLocation?.village || null,
+        village: null,
         taluka: profile.taluka || savedLocation?.taluka || null,
         district: profile.district || savedLocation?.district || null,
       }
     : profile;
+  const headerLocation = profileWithSavedLocation?.district
+    ? `${getDistrictLabel(profileWithSavedLocation.district, language)}, ${getLocationLabel("Gujarat", language)}`
+    : t("location");
 
   const handleVoiceCommand = (command: VoiceCommandResult) => {
     switch (command.action) {
@@ -193,13 +195,13 @@ const Index = () => {
       const imageUrl = await ProfileService.uploadProfileImage(user.id, file);
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       toast({
-        title: "Profile photo updated",
-        description: "Your new profile image has been saved.",
+        title: t("profile_photo_updated"),
+        description: t("profile_photo_updated_desc"),
       });
       return imageUrl;
     } catch (error) {
       toast({
-        title: "Could not update photo",
+        title: t("profile_photo_failed"),
         description: ProfileService.getErrorMessage(error),
         variant: "destructive",
       });
@@ -231,7 +233,7 @@ const Index = () => {
               <div className="flex items-center gap-1">
                 <span className="text-sm leading-none" aria-hidden="true">📍</span>
                 <span className="text-xs text-primary-foreground/70 font-medium">
-                  {profileWithSavedLocation?.district ? `${profileWithSavedLocation.district}, Gujarat` : t("location")}
+                  {headerLocation}
                 </span>
               </div>
             </div>
@@ -241,7 +243,7 @@ const Index = () => {
               <button
                 type="button"
                 onClick={() => setShowLangMenu(!showLangMenu)}
-                aria-label="Change language"
+                aria-label={t("choose_language")}
                 className="relative w-10 h-10 bg-primary-foreground/15 rounded-xl active:scale-90 transition-transform touch-manipulation flex items-center justify-center"
               >
                 <span className="text-xl leading-none" aria-hidden="true">🌐</span>
@@ -266,8 +268,8 @@ const Index = () => {
                             }
                           } catch (error) {
                             toast({
-                              title: "Could not save language",
-                              description: error instanceof Error ? error.message : "Please try again.",
+                              title: t("language_save_failed"),
+                              description: error instanceof Error ? error.message : t("retry_later"),
                               variant: "destructive",
                             });
                           }
@@ -360,7 +362,7 @@ const Index = () => {
             isLoading={isProfileLoading}
             error={errors.profileError}
             fallbackImageUrl={user.user_metadata?.profile_image_url || user.user_metadata?.avatar_url}
-            onEdit={() => navigate("/profile-setup")}
+            onEdit={() => navigate("/profile-setup", { state: { mode: "edit" } })}
             onLogout={handleLogout}
             onImageUpload={handleProfileImageUpload}
           />

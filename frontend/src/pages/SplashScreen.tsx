@@ -6,6 +6,7 @@ import logo from "@/assets/farmalert-logo.png";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { hasActiveSubscription } from "@/services/subscriptionService";
+import { ProfileService } from "@/services/profileService";
 
 const indiaFlagUrl = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1ee-1f1f3.svg";
 
@@ -21,19 +22,37 @@ const SplashScreen = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (loading || !user) {
+    const languageSelected = localStorage.getItem("farmalert_language_selected") === "true";
+
+    if (loading) {
       return;
     }
 
-    const routeSubscribedUser = async () => {
+    if (!languageSelected) {
+      return;
+    }
+
+    if (!user) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const routeUser = async () => {
+      const profile = await ProfileService.getProfile(user.id);
+      if (!ProfileService.isProfileComplete(profile)) {
+        navigate("/profile-setup", { replace: true });
+        return;
+      }
+
       const isSubscribed = await hasActiveSubscription(user.id);
       navigate(isSubscribed ? "/dashboard" : "/subscription", { replace: true });
     };
 
-    void routeSubscribedUser();
+    void routeUser();
   }, [user, loading, navigate]);
 
   const handleContinue = () => {
+    localStorage.setItem("farmalert_language_selected", "true");
     navigate("/login");
   };
 
