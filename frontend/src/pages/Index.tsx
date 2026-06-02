@@ -185,6 +185,7 @@ const Index = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem("farmalert_onboarded");
+    localStorage.removeItem("farmalert_language_selected");
     navigate("/");
   };
 
@@ -247,7 +248,7 @@ const Index = () => {
                 className="relative w-10 h-10 bg-primary-foreground/15 rounded-xl active:scale-90 transition-transform touch-manipulation flex items-center justify-center"
               >
                 <span className="text-xl leading-none" aria-hidden="true">🌐</span>
-                <span className="absolute -bottom-1 -right-1 min-w-5 h-5 rounded-full bg-primary-foreground text-primary border border-primary/20 px-1 flex items-center justify-center text-[10px] font-bold leading-none">
+                <span className="absolute -bottom-1 -right-1 min-w-5 h-5 rounded-full bg-primary-foreground text-primary border border-primary/20 px-1 flex items-center justify-center text-[10px]">
                   {languageBadges[language]}
                 </span>
               </button>
