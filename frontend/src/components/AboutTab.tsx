@@ -66,11 +66,13 @@ const AboutTab = () => {
             {t("about_explore")}
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <button 
+          <Link
+            to="/profile-setup"
+            state={{ mode: "edit" }}
             className="w-full flex items-center justify-center gap-2 bg-card hover:bg-muted text-foreground border border-border py-3.5 px-6 rounded-xl font-semibold shadow-sm transition-all active:scale-[0.98]"
           >
             {t("about_join")}
-          </button>
+          </Link>
         </div>
       </motion.section>
 

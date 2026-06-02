@@ -83,8 +83,9 @@ const AboutPage = () => {
               Explore Services
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link 
-              to="/dashboard"
+            <Link
+              to="/profile-setup"
+              state={{ mode: "edit" }}
               className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-[#111827] border border-gray-200 py-3.5 px-6 rounded-2xl font-semibold shadow-sm transition-all active:scale-[0.98]"
             >
               Join Farmers Network
