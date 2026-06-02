@@ -185,6 +185,7 @@ const Index = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem("farmalert_onboarded");
+    localStorage.removeItem("farmalert_language_selected");
     navigate("/");
   };
 
