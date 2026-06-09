@@ -11,8 +11,12 @@ const emojiIcon = (emoji: string, label: string, size = "text-2xl") => (
   </span>
 );
 
-const AboutTab = () => {
-  const { t } = useLanguage();
+interface AboutTabProps {
+  onOpenSupport?: () => void;
+}
+
+const AboutTab = ({ onOpenSupport }: AboutTabProps) => {
+  const { t, language } = useLanguage();
 
   const features = [
     { icon: emojiIcon("🌤️", "weather"), title: t("feature_weather") },
@@ -219,6 +223,32 @@ const AboutTab = () => {
             </div>
           </div>
         </div>
+      </motion.section>
+
+      {/* Help, Feedback & Complaints Support Section */}
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+        variants={fadeInUp}
+        className="bg-gradient-to-br from-primary/5 via-primary/10 to-card rounded-2xl p-6 sm:p-8 border border-primary/10 shadow-sm text-center space-y-4"
+      >
+        <h2 className="text-lg font-bold text-foreground flex items-center justify-center gap-2">
+          {emojiIcon("💬", "support-chat")}
+          <span>{language === "gu" ? "મદદ, પ્રતિભાવ અને ફરિયાદ કેન્દ્ર" : language === "hi" ? "सहायता, फीडबैक और शिकायत केंद्र" : "Help, Feedback & Complaints"}</span>
+        </h2>
+        <p className="text-muted-foreground text-sm leading-relaxed max-w-md mx-auto">
+          {language === "gu" 
+            ? "તમારી પાસે કોઈ પ્રશ્ન, સૂચન કે કોઈ ફરિયાદ છે? અમને જણાવો, અમે તમારી મદદ કરવા માટે હંમેશા તત્પર છીએ." 
+            : "Have questions, suggestions, or a complaint? Let us know, we are always here to help you."}
+        </p>
+        <button
+          onClick={onOpenSupport}
+          className="mx-auto flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-xl font-bold shadow-md transition-all active:scale-[0.98] text-sm"
+        >
+          <span>Open Support Center</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </motion.section>
 
       {/* Footer Section */}

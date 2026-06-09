@@ -8,20 +8,25 @@ import { parseVoiceCommand, type VoiceCommandResult } from "@/services/voiceComm
 import { isVoiceRecognitionSupported, VoiceRecognitionService, type VoiceRecognitionState } from "@/services/voiceRecognitionService";
 import VoiceStatusIndicator from "./VoiceStatusIndicator";
 import VoiceWaveAnimation from "./VoiceWaveAnimation";
-
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
+import { getSavedSubscriptionTier } from "@/services/subscriptionService";
+ 
 interface VoiceAssistantButtonProps {
   language: Language;
   className?: string;
   onCommand: (command: VoiceCommandResult) => void;
+  isPremium?: boolean;
 }
-
-const VoiceAssistantButton = ({ language, className, onCommand }: VoiceAssistantButtonProps) => {
+ 
+const VoiceAssistantButton = ({ language, className, onCommand, isPremium = false }: VoiceAssistantButtonProps) => {
+  const navigate = useNavigate();
   const service = useMemo(() => new VoiceRecognitionService(), []);
   const timeoutRef = useRef<number | null>(null);
   const [voiceState, setVoiceState] = useState<VoiceRecognitionState>("idle");
   const [transcript, setTranscript] = useState("");
   const [detectedLanguage, setDetectedLanguage] = useState<Language>(language);
-
+ 
   const clearStatusLater = (delay = 1900) => {
     if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     timeoutRef.current = window.setTimeout(() => {
@@ -29,14 +34,24 @@ const VoiceAssistantButton = ({ language, className, onCommand }: VoiceAssistant
       setTranscript("");
     }, 2600);
   };
-
+ 
   const handleStop = () => {
     service.stop();
     stopSpeaking();
     setVoiceState("idle");
   };
-
+ 
   const handleStart = () => {
+    const tier = getSavedSubscriptionTier();
+    if (tier !== "pro") {
+      toast({
+        title: "🔒 Pro Feature",
+        description: "Voice AI Assistant is a Pro feature. Please upgrade to unlock.",
+      });
+      navigate("/subscription");
+      return;
+    }
+
     if (!isVoiceRecognitionSupported()) {
       setDetectedLanguage(language);
       setTranscript(getVoiceText("unsupportedShort", language));

@@ -104,8 +104,7 @@ const LoginPage = () => {
       return;
     }
 
-    const isSubscribed = await hasActiveSubscription(userId);
-    navigate(isSubscribed ? "/dashboard" : "/subscription", { replace: true });
+    navigate("/dashboard", { replace: true });
   };
 
   return (

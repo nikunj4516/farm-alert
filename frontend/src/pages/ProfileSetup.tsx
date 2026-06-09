@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat, Bean, Cloud, Sprout, Trees, Carrot, Package } from "lucide-react";
+import { Loader2, Check, ArrowRight, ArrowLeft, User, MapPin, Wheat, Bean, Cloud, Sprout, Trees, Carrot, Package, Phone } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import farmerAvatar from "@/assets/farmer-1.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +13,7 @@ import { hasActiveSubscription } from "@/services/subscriptionService";
 import {
   GUJARAT_DISTRICTS,
   getTalukasForDistrict,
+  getVillagesForTaluka,
   getSavedSelectedLocation,
   getDistrictLabel,
   getLocationLabel,
@@ -76,12 +77,14 @@ const ProfileSetup = () => {
   );
   const [form, setForm] = useState({
     name: "",
+    phone: "",
     village: "",
     taluka: "",
     district: "",
     state: "Gujarat",
     crop_type: "",
     land_size: "",
+    profile_image_url: "",
   });
 
   useEffect(() => {
@@ -103,12 +106,14 @@ const ProfileSetup = () => {
 
         setForm({
           name: savedProfile?.name || "",
-          village: "",
+          phone: savedProfile?.phone || "",
+          village: savedProfile?.village || savedLocation?.village || "",
           taluka: (savedProfile as typeof savedProfile & { taluka?: string | null } | null)?.taluka || savedLocation?.taluka || "",
           district: savedProfile?.district || savedLocation?.district || "",
           state: "Gujarat",
           crop_type: savedProfile?.crop_type || "",
           land_size: savedProfile?.land_size ? String(savedProfile.land_size) : "",
+          profile_image_url: savedProfile?.profile_image_url || "",
         });
       } catch (error) {
         if (isMounted) {
@@ -160,13 +165,14 @@ const ProfileSetup = () => {
 
     try {
       const landSize = Number.parseFloat(form.land_size);
-      const validatedLocation = validateGujaratLocation({ ...form, village: null });
+      const validatedLocation = validateGujaratLocation({ ...form });
       localStorage.setItem("farmalert_profile_completed", "true");
       localStorage.setItem("farmalert_onboarding_completed", "true");
       saveSelectedLocation(validatedLocation);
       await ProfileService.upsertProfile(user.id, {
         name: form.name.trim().substring(0, 100),
-        village: null,
+        phone: form.phone.trim().substring(0, 20),
+        village: validatedLocation.village,
         taluka: validatedLocation.taluka,
         district: validatedLocation.district,
         latitude: validatedLocation.latitude,
@@ -187,11 +193,7 @@ const ProfileSetup = () => {
         return;
       }
 
-      const isSubscribed = await hasActiveSubscription(user.id);
-      navigate(isSubscribed ? "/dashboard" : "/subscription", {
-        state: isSubscribed ? { activeTab: "weather" } : { reason: "profile_completed" },
-        replace: true,
-      });
+      navigate("/dashboard", { state: { activeTab: "weather" }, replace: true });
     } catch (error) {
       setError(ProfileService.getErrorMessage(error).includes("profiles") ? copy.saveFailed : ProfileService.getErrorMessage(error));
     } finally {
@@ -217,13 +219,18 @@ const ProfileSetup = () => {
   };
 
   const progress = ((step + 1) / STEPS) * 100;
+  const avatarUrl = form.profile_image_url || (user?.id ? localStorage.getItem(`farmalert_profile_image_url_${user.id}`) : null);
 
   return (
     <div className="min-h-screen bg-background px-4 py-6">
       <div className="max-w-[400px] mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <FarmerEmojiImage className="mx-auto h-16 w-16" />
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="farmer" className="mx-auto h-16 w-16 rounded-full object-cover border-2 border-primary/20 shadow-sm" />
+          ) : (
+            <FarmerEmojiImage className="mx-auto h-16 w-16" />
+          )}
           <h1 className="text-2xl font-bold text-foreground">
             {t("profile_title")}
           </h1>
@@ -272,6 +279,19 @@ const ProfileSetup = () => {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder={t("profile_name_placeholder")}
+                  className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+                  <Phone className="w-5 h-5 text-primary" />
+                  {language === "gu" ? "મોબાઇલ નંબર" : language === "hi" ? "मोबाइल नंबर" : "Phone Number"}
+                </label>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder={language === "gu" ? "૧૦ અંકનો ફોન નંબર..." : "10-digit phone number..."}
                   className="w-full text-base text-foreground py-3.5 px-4 border-2 border-border rounded-xl bg-background outline-none focus:border-primary transition-colors"
                 />
               </div>

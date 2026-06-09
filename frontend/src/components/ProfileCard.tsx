@@ -13,12 +13,22 @@ import {
   Tractor,
   User,
   Wheat,
+  Lock,
+  MessageSquare,
+  Smartphone,
+  Bell,
+  Sparkles,
 } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import { Language, languageNames, useLanguage } from "@/contexts/LanguageContext";
 import { Profile } from "@/services/profileService";
 import { getDistrictLabel, getLocationLabel } from "@/services/gujaratLocationService";
-
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { getSavedSubscriptionTier } from "@/services/subscriptionService";
+import SupportCenterModal from "./SupportCenterModal";
+ 
 type ProfileCardProps = {
   profile?: Profile | null;
   isLoading?: boolean;
@@ -27,6 +37,7 @@ type ProfileCardProps = {
   onEdit: () => void;
   onLogout: () => void;
   onImageUpload: (file: File) => Promise<string | void>;
+  isPremium?: boolean;
 };
 
 type ProfileExtra = Profile & {
@@ -141,15 +152,70 @@ const ProfileCard = ({
   onEdit,
   onLogout,
   onImageUpload,
+  isPremium = false,
 }: ProfileCardProps) => {
+  const navigate = useNavigate();
   const { language, t } = useLanguage();
+  const [whatsappEnabled, setWhatsappEnabled] = useState(() => localStorage.getItem("farmalert_whatsapp_alerts") === "true");
+  const [smsEnabled, setSmsEnabled] = useState(() => localStorage.getItem("farmalert_sms_alerts") === "true");
+  const [pushEnabled, setPushEnabled] = useState(() => localStorage.getItem("farmalert_push_alerts") !== "false");
+
+  const [showSupportModal, setShowSupportModal] = useState(false);
+
+  const tier = getSavedSubscriptionTier();
+
+  const handleWhatsappToggle = (checked: boolean) => {
+    if (tier === "free") {
+      toast({
+        title: "🔒 Premium Feature",
+        description: "WhatsApp alerts require a Premium or Pro subscription.",
+      });
+      navigate("/subscription");
+      return;
+    }
+    setWhatsappEnabled(checked);
+    localStorage.setItem("farmalert_whatsapp_alerts", String(checked));
+    toast({
+      title: checked ? "WhatsApp Alerts Enabled" : "WhatsApp Alerts Disabled",
+      description: checked ? "You will receive weather warnings on WhatsApp." : "WhatsApp warnings disabled.",
+    });
+  };
+
+  const handleSmsToggle = (checked: boolean) => {
+    if (tier !== "pro") {
+      toast({
+        title: "🔒 Pro Feature",
+        description: "SMS Emergency alerts require a Pro subscription.",
+      });
+      navigate("/subscription");
+      return;
+    }
+    setSmsEnabled(checked);
+    localStorage.setItem("farmalert_sms_alerts", String(checked));
+    toast({
+      title: checked ? "SMS Alerts Enabled" : "SMS Alerts Disabled",
+      description: checked ? "You will receive critical updates via SMS." : "SMS updates disabled.",
+    });
+  };
+
+  const handlePushToggle = (checked: boolean) => {
+    setPushEnabled(checked);
+    localStorage.setItem("farmalert_push_alerts", String(checked));
+    toast({
+      title: checked ? "Push Notifications Enabled" : "Push Notifications Disabled",
+      description: checked ? "You will receive live notification alerts." : "Notification alerts disabled.",
+    });
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState("");
   const copy = profileCopy[language];
-  const savedAvatarUrl = readExtra(profile, ["profile_image_url", "profile_image", "avatar_url", "image_url"]) || fallbackImageUrl;
+  const savedAvatarUrl = 
+    readExtra(profile, ["profile_image_url", "profile_image", "avatar_url", "image_url"]) || 
+    (profile?.user_id ? localStorage.getItem(`farmalert_profile_image_url_${profile.user_id}`) : null) || 
+    fallbackImageUrl;
   const avatarUrl = previewUrl || savedAvatarUrl;
   const displayName = profile?.name || copy.farmer;
   const preferredLanguage = (profile?.preferred_language || language) as Language;
@@ -330,6 +396,121 @@ const ProfileCard = ({
               );
             })}
           </div>
+
+          {/* Smart Alert & Notification Settings */}
+          <div className="mt-6 border-t border-border pt-6 space-y-4">
+            <h4 className="text-sm font-extrabold uppercase tracking-wide text-foreground flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              {language === "gu" ? "ચેતવણી અને સૂચના સેટિંગ્સ" : language === "hi" ? "अलर्ट और नोटिफिकेशन सेटिंग्स" : "Alert & Notification Settings"}
+            </h4>
+            
+            <div className="space-y-3">
+              {/* WhatsApp Alerts */}
+              <div className="flex items-center justify-between p-4 bg-background/50 border border-border rounded-2xl hover:border-primary/20 transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                    <MessageSquare className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-black text-foreground">
+                        {language === "gu" ? "વોટ્સએપ ચેતવણીઓ" : language === "hi" ? "व्हाट्सएप अलर्ट" : "WhatsApp Alerts"}
+                      </p>
+                      {tier === "free" && (
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-400/20 px-2 py-0.5 text-[9px] font-bold text-amber-600 border border-amber-400/25">
+                          <Lock className="w-2.5 h-2.5" />
+                          <span>Premium</span>
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground font-semibold mt-0.5">
+                      {language === "gu" ? "વોટ્સએપ પર હવામાન ચેતવણીઓ મેળવો" : language === "hi" ? "व्हाट्सएप पर मौसम अलर्ट प्राप्त करें" : "Get weather warnings on WhatsApp"}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={whatsappEnabled}
+                  onCheckedChange={handleWhatsappToggle}
+                  className="data-[state=checked]:bg-green-500"
+                />
+              </div>
+
+              {/* SMS Alerts */}
+              <div className="flex items-center justify-between p-4 bg-background/50 border border-border rounded-2xl hover:border-primary/20 transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-black text-foreground">
+                        {language === "gu" ? "SMS ચેતવણીઓ" : language === "hi" ? "एसएमएस अलर्ट" : "SMS Alerts"}
+                      </p>
+                      {tier !== "pro" && (
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-400/20 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-400/25">
+                          <Lock className="w-2.5 h-2.5" />
+                          <span>Pro</span>
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground font-semibold mt-0.5">
+                      {language === "gu" ? "મોબાઈલ પર કટોકટીના સંદેશાઓ મેળવો" : language === "hi" ? "मोबाइल पर आपातकालीन संदेश प्राप्त करें" : "Get critical SMS warning alerts"}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={smsEnabled}
+                  onCheckedChange={handleSmsToggle}
+                />
+              </div>
+
+              {/* Push Notifications */}
+              <div className="flex items-center justify-between p-4 bg-background/50 border border-border rounded-2xl hover:border-primary/20 transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                    <Bell className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-foreground">
+                      {language === "gu" ? "પુશ સૂચનાઓ" : language === "hi" ? "पुश नोटिफिकेशन" : "Push Notifications"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground font-semibold mt-0.5">
+                      {language === "gu" ? "મોબાઈલ પર લાઈવ નોટિફિકેશન ચેતવણીઓ મેળવો" : language === "hi" ? "मोबाइल पर लाइव नोटिफिकेशन प्राप्त करें" : "Receive real-time app alert notifications"}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={pushEnabled}
+                  onCheckedChange={handlePushToggle}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Support & Complaint Center Trigger */}
+          <div className="mt-6 border-t border-border pt-6">
+            <button
+              onClick={() => setShowSupportModal(true)}
+              className="w-full flex items-center justify-between p-4 bg-primary/5 border border-primary/10 rounded-2xl hover:border-primary/30 transition-all text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                  <Sparkles className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <p className="text-sm font-black text-foreground">
+                    {language === "gu" ? "મદદ, પ્રતિભાવ અને ફરિયાદ કેન્દ્ર" : language === "hi" ? "सहायता, फीडबैक और शिकायत केंद्र" : "Help, Feedback & Complaints"}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground font-semibold mt-0.5">
+                    {language === "gu" ? "તમારો પ્રતિભાવ આપો અથવા ફરિયાદ નોંધાવો" : language === "hi" ? "फीडबैक दें या कोई शिकायत दर्ज करें" : "Share feedback or file complaints"}
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs font-black text-primary hover:underline">
+                Open
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -351,6 +532,16 @@ const ProfileCard = ({
           {copy.logout}
         </button>
       </div>
+      {profile?.user_id && (
+        <SupportCenterModal
+          isOpen={showSupportModal}
+          onOpenChange={setShowSupportModal}
+          userId={profile.user_id}
+          userName={profile.name || "Farmer"}
+          userPhone={profile.phone || ""}
+          userVillage={profile.village || ""}
+        />
+      )}
     </section>
   );
 };

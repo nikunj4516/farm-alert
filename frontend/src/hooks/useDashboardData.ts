@@ -25,18 +25,20 @@ export const useDashboardData = (userId: string | undefined, selectedLanguage?: 
   const language = selectedLanguage || profile?.preferred_language || "gu";
   const cropType = profile?.crop_type || undefined;
 
-  // 2. Fetch Weather based on district
+  const isPremiumOrPro = typeof window !== "undefined" && localStorage.getItem("farmalert_subscription_active") === "true";
+
+  // 2. Fetch Weather based on village (Premium/Pro) or district (Free)
   const {
     data: weather,
     isLoading: isWeatherLoading,
     error: weatherError,
   } = useWeather({
-    village: null,
-    taluka: profile?.taluka || savedLocation?.taluka,
+    village: isPremiumOrPro ? (profile?.village || savedLocation?.village || null) : null,
+    taluka: isPremiumOrPro ? (profile?.taluka || savedLocation?.taluka || null) : null,
     district,
     state: "Gujarat",
-    latitude: (profile as typeof profile & { latitude?: number | null })?.latitude || savedLocation?.latitude,
-    longitude: (profile as typeof profile & { longitude?: number | null })?.longitude || savedLocation?.longitude,
+    latitude: isPremiumOrPro ? ((profile as any)?.latitude || savedLocation?.latitude || null) : null,
+    longitude: isPremiumOrPro ? ((profile as any)?.longitude || savedLocation?.longitude || null) : null,
     cropType,
   });
 

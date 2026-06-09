@@ -8,13 +8,15 @@ import BottomNav, { type Tab } from "@/components/BottomNav";
 import AboutTab from "@/components/AboutTab";
 import ProfileCard from "@/components/ProfileCard";
 import FarmerWeatherDashboard from "@/components/weather/FarmerWeatherDashboard";
-import { LogOut, Loader2, Phone } from "lucide-react";
+import AiDiseaseScanner from "@/components/scanner/AiDiseaseScanner";
+import { LogOut, Loader2, Phone, LifeBuoy } from "lucide-react";
 import { useLanguage, Language, languageNames } from "@/contexts/LanguageContext";
 import logo from "@/assets/farmalert-fa.png";
+import SupportCenterModal from "@/components/SupportCenterModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { hasActiveSubscription, hasFreshLocalSubscription, markSubscriptionRequired } from "@/services/subscriptionService";
+import { getSavedSubscriptionTier, getActiveSubscriptionTier, markSubscriptionRequired } from "@/services/subscriptionService";
 import { ProfileService } from "@/services/profileService";
 import type { WeatherReport } from "@/services/weatherService";
 import type { VoiceCommandResult } from "@/services/voiceCommandEngine";
@@ -105,6 +107,9 @@ const Index = () => {
   const { language, setLanguage, t, tArray } = useLanguage();
   const { user, loading } = useAuth();
   const [showLangMenu, setShowLangMenu] = useState(false);
+  const [tier, setTier] = useState<"free" | "premium" | "pro">(() => getSavedSubscriptionTier());
+  const isPremium = tier !== "free";
+  const [showSupportModal, setShowSupportModal] = useState(false);
 
   const {
     profile,
@@ -135,20 +140,76 @@ const Index = () => {
     localStorage.setItem("farmalert_profile_completed", "true");
     localStorage.setItem("farmalert_onboarding_completed", "true");
 
-    const guardSubscription = async () => {
-      if (hasFreshLocalSubscription()) {
-        return;
-      }
-
-      const isSubscribed = await hasActiveSubscription(user.id);
-      if (!isSubscribed) {
-        markSubscriptionRequired();
-        navigate("/subscription", { replace: true });
-      }
+    const checkPremium = async () => {
+      const activeTier = await getActiveSubscriptionTier(user.id);
+      setTier(activeTier);
     };
 
-    void guardSubscription();
+    void checkPremium();
   }, [profile, isProfileLoading, user, loading, navigate]);
+
+  // Simulated Proactive Alert Engine
+  useEffect(() => {
+    if (!weather || isWeatherLoading) return;
+    
+    const whatsappAlertsActive = localStorage.getItem("farmalert_whatsapp_alerts") === "true";
+    const smsAlertsActive = localStorage.getItem("farmalert_sms_alerts") === "true";
+    
+    const hasWhatsappAccess = tier !== "free" && whatsappAlertsActive;
+    const hasSmsAccess = tier === "pro" && smsAlertsActive;
+
+    const criticalAlerts = weather.agricultureAlerts.filter(a => a.severity === "red" || a.severity === "orange");
+    if (criticalAlerts.length === 0) return;
+
+    criticalAlerts.forEach((alert, index) => {
+      const locationName = weather.location?.split(",")?.[0]?.trim() || weather.district || "Vasad";
+      const cropName = profileWithSavedLocation?.crop_type || "crop";
+      
+      const messageText = alert.message.replace("{crop}", cropName).replace("{value}", alert.metricValue || "");
+      const recommendationText = alert.recommendation;
+
+      if (hasWhatsappAccess) {
+        window.setTimeout(() => {
+          toast({
+            title: `💬 [WhatsApp Alert] FarmAlert - ${locationName}`,
+            description: `⚠️ ${alert.type.toUpperCase()}: ${messageText}\nRecommendation: ${recommendationText}\nRisk Level: High`,
+            duration: 8000,
+          });
+        }, (index + 1) * 3000);
+      }
+
+      if (hasSmsAccess && alert.severity === "red") {
+        window.setTimeout(() => {
+          toast({
+            title: `🚨 [SMS Emergency Warning]`,
+            description: `⚠️ ${alert.type.toUpperCase()}: Storm/Flood Risk at ${locationName}! Avoid fields.`,
+            variant: "destructive",
+            duration: 9000,
+          });
+        }, (index + 1) * 4500);
+      }
+    });
+  }, [weather, isWeatherLoading]);
+
+  // Admin notification listener
+  useEffect(() => {
+    const handleNewComplaint = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const notif = customEvent.detail;
+      
+      toast({
+        title: "🚨 [Admin Notification]",
+        description: `New complaint received from ${notif.farmer_name} under category "${notif.message.split('"')[1] || ''}"!`,
+        variant: "destructive",
+        duration: 5000,
+      });
+    };
+    
+    window.addEventListener("farmalert_new_complaint", handleNewComplaint);
+    return () => {
+      window.removeEventListener("farmalert_new_complaint", handleNewComplaint);
+    };
+  }, []);
 
   const helplineNumber = "1800-180-1551";
   const helplineText = t("helpline").replace(/^📞\s*/, "");
@@ -156,13 +217,18 @@ const Index = () => {
   const profileWithSavedLocation = profile
     ? {
         ...profile,
-        village: null,
+        village: profile.village || savedLocation?.village || null,
         taluka: profile.taluka || savedLocation?.taluka || null,
         district: profile.district || savedLocation?.district || null,
       }
     : profile;
+  
+  const displayVil = isPremium && profileWithSavedLocation?.village ? `${getLocationLabel(profileWithSavedLocation.village, language)}, ` : "";
+  const displayTal = isPremium && profileWithSavedLocation?.taluka ? `${getLocationLabel(profileWithSavedLocation.taluka, language)}, ` : "";
+  const displayDis = profileWithSavedLocation?.district ? `${getDistrictLabel(profileWithSavedLocation.district, language)}` : "";
+  
   const headerLocation = profileWithSavedLocation?.district
-    ? `${getDistrictLabel(profileWithSavedLocation.district, language)}, ${getLocationLabel("Gujarat", language)}`
+    ? `${displayVil}${displayTal}${displayDis}`
     : t("location");
 
   const handleVoiceCommand = (command: VoiceCommandResult) => {
@@ -291,8 +357,16 @@ const Index = () => {
             <VoiceAssistantButton
               language={language}
               onCommand={handleVoiceCommand}
+              isPremium={isPremium}
               className="rounded-xl bg-primary-foreground/15 text-primary-foreground"
             />
+            <button
+              onClick={() => setShowSupportModal(true)}
+              title="Help & Support Center"
+              className="bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation flex items-center justify-center text-primary-foreground"
+            >
+              <LifeBuoy className="w-5 h-5 animate-spin-slow" />
+            </button>
             <button
               onClick={handleLogout}
               className="bg-primary-foreground/15 rounded-xl p-2.5 active:scale-90 transition-transform touch-manipulation"
@@ -302,16 +376,17 @@ const Index = () => {
           </div>
         </div>
       </header>
-
+ 
       <main className="max-w-[600px] mx-auto px-4 py-5 space-y-5">
         {activeTab === "weather" && (
           <>
             <FarmerWeatherDashboard
               weather={weather}
-            cropType={profileWithSavedLocation?.crop_type || profileWithSavedLocation?.crop_name}
+              cropType={profileWithSavedLocation?.crop_type || profileWithSavedLocation?.crop_name}
               isLoading={isWeatherLoading}
+              isPremium={isPremium}
             />
-
+ 
             <section className="overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-white to-emerald-50 shadow-elevated">
               <div className="bg-amber-400 px-4 py-2">
                 <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-amber-950">
@@ -333,14 +408,14 @@ const Index = () => {
                     </p>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <a
-                        href={`tel:${helplineNumber.replace(/-/g, "")}`}
+                         href={`tel:${helplineNumber.replace(/-/g, "")}`}
                         aria-label={`${t("helpline_call_now")} ${helplineText}`}
                         className="rounded-xl bg-primary px-4 py-2.5 text-base font-black text-primary-foreground shadow-sm active:scale-95 transition-transform touch-manipulation"
                       >
                         {helplineNumber}
                       </a>
                       <a
-                        href={`tel:${helplineNumber.replace(/-/g, "")}`}
+                         href={`tel:${helplineNumber.replace(/-/g, "")}`}
                         aria-label={`${t("helpline_call_now")} ${helplineText}`}
                         className="rounded-xl border border-primary/25 bg-white px-4 py-2.5 text-sm font-black text-primary shadow-sm active:scale-95 transition-transform touch-manipulation"
                       >
@@ -353,10 +428,11 @@ const Index = () => {
             </section>
           </>
         )}
-
+ 
         {activeTab === "tips" && <FarmingTips tipsData={tips} />}
         {activeTab === "news" && <AgriNews newsData={news} isLoading={isNewsLoading} />}
-        {activeTab === "about" && <AboutTab />}
+        {activeTab === "about" && <AboutTab onOpenSupport={() => setShowSupportModal(true)} />}
+        {activeTab === "scanner" && <AiDiseaseScanner isPremium={isPremium} />}
         {activeTab === "profile" && (
           <ProfileCard
             profile={profileWithSavedLocation}
@@ -366,12 +442,31 @@ const Index = () => {
             onEdit={() => navigate("/profile-setup", { state: { mode: "edit" } })}
             onLogout={handleLogout}
             onImageUpload={handleProfileImageUpload}
+            isPremium={isPremium}
+          />
+        )}
+
+        {user?.id && (
+          <SupportCenterModal
+            isOpen={showSupportModal}
+            onOpenChange={setShowSupportModal}
+            userId={user.id}
+            userName={profileWithSavedLocation?.name || "Farmer"}
+            userPhone={profileWithSavedLocation?.phone || ""}
+            userVillage={profileWithSavedLocation?.village || ""}
           />
         )}
 
       </main>
 
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNav 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+        profileImageUrl={
+          profileWithSavedLocation?.profile_image_url || 
+          (user?.id ? localStorage.getItem(`farmalert_profile_image_url_${user.id}`) : null)
+        } 
+      />
     </div>
   );
 };

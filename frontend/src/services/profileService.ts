@@ -148,6 +148,31 @@ export class ProfileService {
       throw error;
     }
 
+    if (data) {
+      let imageUrl = data.profile_image_url;
+
+      // 1. Local Storage Fallback
+      if (!imageUrl && typeof window !== "undefined") {
+        imageUrl = localStorage.getItem(`farmalert_profile_image_url_${userId}`);
+      }
+
+      // 2. Auth Metadata Fallback
+      if (!imageUrl) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && user.id === userId) {
+            imageUrl = user.user_metadata?.avatar_url || user.user_metadata?.profile_image_url || null;
+          }
+        } catch (authErr) {
+          console.warn("Could not fetch user metadata for profile image fallback:", authErr);
+        }
+      }
+
+      if (imageUrl && !data.profile_image_url) {
+        data.profile_image_url = imageUrl;
+      }
+    }
+
     return data;
   }
 
@@ -157,6 +182,11 @@ export class ProfileService {
   static async updateProfile(userId: string, updates: ProfileUpdate): Promise<Profile> {
     let payload = updates;
     let lastError: unknown = null;
+
+    // Cache profile image url in localStorage if specified
+    if (updates.profile_image_url && typeof window !== "undefined") {
+      localStorage.setItem(`farmalert_profile_image_url_${userId}`, updates.profile_image_url);
+    }
 
     for (let attempt = 0; attempt < 20; attempt += 1) {
       const { data, error } = await supabase
@@ -208,6 +238,11 @@ export class ProfileService {
 
     let payload = profile as ProfileUpdate;
     let lastError: unknown = null;
+
+    // Cache profile image url in localStorage if specified
+    if (payload.profile_image_url && typeof window !== "undefined") {
+      localStorage.setItem(`farmalert_profile_image_url_${userId}`, payload.profile_image_url);
+    }
 
     for (let attempt = 0; attempt < 20; attempt += 1) {
       const { data, error } = await saveProfile(payload);
@@ -299,6 +334,11 @@ export class ProfileService {
 
     const { data } = supabase.storage.from(uploadedBucket).getPublicUrl(filePath);
     const imageUrl = `${data.publicUrl}?v=${version}`;
+
+    // Store in localStorage cache immediately
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`farmalert_profile_image_url_${userId}`, imageUrl);
+    }
 
     try {
       await this.updateProfile(userId, { profile_image_url: imageUrl } as ProfileUpdate);

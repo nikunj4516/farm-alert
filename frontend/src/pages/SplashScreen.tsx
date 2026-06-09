@@ -44,8 +44,7 @@ const SplashScreen = () => {
         return;
       }
 
-      const isSubscribed = await hasActiveSubscription(user.id);
-      navigate(isSubscribed ? "/dashboard" : "/subscription", { replace: true });
+      navigate("/dashboard", { replace: true });
     };
 
     void routeUser();

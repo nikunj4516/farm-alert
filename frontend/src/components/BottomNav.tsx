@@ -2,22 +2,24 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import farmerAvatar from "@/assets/farmer-1.png";
 
-type Tab = "weather" | "tips" | "news" | "about" | "profile";
+type Tab = "weather" | "tips" | "news" | "scanner" | "about" | "profile";
 
 interface BottomNavProps {
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
+  profileImageUrl?: string | null;
 }
 
-const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
-  const { t } = useLanguage();
+const BottomNav = ({ activeTab, onTabChange, profileImageUrl }: BottomNavProps) => {
+  const { t, language } = useLanguage();
 
   const tabs = [
     { id: "weather" as Tab, label: t("nav_weather"), icon: <span className="text-3xl leading-none" aria-hidden="true">🌤️</span> },
     { id: "tips" as Tab, label: t("nav_tips"), icon: <span className="text-3xl leading-none" aria-hidden="true">💡</span> },
     { id: "news" as Tab, label: t("nav_news"), icon: <span className="text-3xl leading-none" aria-hidden="true">📰</span> },
+    { id: "scanner" as Tab, label: language === "gu" ? "સ્કેનર" : language === "hi" ? "स्कैनर" : "Scanner", icon: <span className="text-3xl leading-none" aria-hidden="true">📷</span> },
     { id: "about" as Tab, label: t("nav_about"), icon: <span className="text-3xl leading-none" aria-hidden="true">🏢</span> },
-    { id: "profile" as Tab, label: t("nav_profile"), icon: <img src={farmerAvatar} alt="profile" className="w-7 h-7 drop-shadow-md rounded-full object-cover" /> },
+    { id: "profile" as Tab, label: t("nav_profile"), icon: <img src={profileImageUrl || farmerAvatar} alt="profile" className="w-7 h-7 drop-shadow-md rounded-full object-cover" /> },
   ];
 
   return (

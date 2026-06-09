@@ -16,9 +16,10 @@ interface FarmerWeatherDashboardProps {
   weather?: WeatherReport | null;
   cropType?: string | null;
   isLoading?: boolean;
+  isPremium?: boolean;
 }
 
-const FarmerWeatherDashboard = ({ weather, cropType, isLoading }: FarmerWeatherDashboardProps) => {
+const FarmerWeatherDashboard = ({ weather, cropType, isLoading, isPremium = false }: FarmerWeatherDashboardProps) => {
   const { t } = useLanguage();
 
   if (isLoading) return <WeatherSkeleton />;
@@ -36,16 +37,14 @@ const FarmerWeatherDashboard = ({ weather, cropType, isLoading }: FarmerWeatherD
     <div className="space-y-5">
       <EmergencyVoiceAlert weather={weather} />
       <EmergencyWarningCard weather={weather} cropType={cropType} />
-      <WeatherCard weather={weather} />
-      <SmartWeatherAlerts alerts={weather.agricultureAlerts} cropType={cropType} />
+      <WeatherCard weather={weather} isPremium={isPremium} />
+      <SmartWeatherAlerts alerts={weather.agricultureAlerts} cropType={cropType} isPremium={isPremium} />
       <CropRiskCard cropType={cropType} alerts={weather.agricultureAlerts} riskProfile={weather.cropRiskProfile} />
       <div className="grid gap-4 sm:grid-cols-2">
         <RainPredictionCard weather={weather} />
         <HeatwaveAlertCard weather={weather} cropType={cropType} />
       </div>
       <WeatherInsights weather={weather} cropType={cropType} />
-      <FarmingRecommendations alerts={weather.agricultureAlerts} cropType={cropType} recommendations={weather.recommendations} />
-      <ForecastCard weather={weather} />
     </div>
   );
 };

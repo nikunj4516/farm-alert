@@ -1,5 +1,6 @@
 import type { Language } from "@/contexts/LanguageContext";
 import villageHierarchy from "@/data/gujaratVillageHierarchy.json";
+import { getVillageCoordinates } from "@/data/gujaratVillageCoordinates";
 
 export interface GujaratDistrict {
   name: string;
@@ -22,6 +23,38 @@ export interface ValidatedGujaratLocation {
 
 const LOCATION_STORAGE_KEY = "farmalert_profile_location";
 const villageHierarchyByDistrict = villageHierarchy as Record<string, Record<string, string[]>>;
+
+export const GUJARAT_TALUKA_COORDINATES: Record<string, { name: string; district: string; latitude: number; longitude: number }> = {
+  jambughoda: { name: "Jambughoda", district: "Panchmahal", latitude: 22.3667, longitude: 73.7333 },
+  godhra: { name: "Godhra", district: "Panchmahal", latitude: 22.7755, longitude: 73.6149 },
+  halol: { name: "Halol", district: "Panchmahal", latitude: 22.5036, longitude: 73.4728 },
+  kalol: { name: "Kalol", district: "Panchmahal", latitude: 22.6077, longitude: 73.4633 },
+  balasinor: { name: "Balasinor", district: "Mahisagar", latitude: 22.9559, longitude: 73.3365 },
+  kadana: { name: "Kadana", district: "Mahisagar", latitude: 23.2824, longitude: 73.8442 },
+  khanpur: { name: "Khanpur", district: "Mahisagar", latitude: 23.2924, longitude: 73.6156 },
+  lunawada: { name: "Lunawada", district: "Mahisagar", latitude: 23.1284, longitude: 73.6105 },
+  santrampur: { name: "Santrampur", district: "Mahisagar", latitude: 23.1892, longitude: 73.8960 },
+  virpur: { name: "Virpur", district: "Mahisagar", latitude: 23.1862, longitude: 73.4798 },
+  anand: { name: "Anand", district: "Anand", latitude: 22.5645, longitude: 72.9289 },
+  borsad: { name: "Borsad", district: "Anand", latitude: 22.4079, longitude: 72.8982 },
+  petlad: { name: "Petlad", district: "Anand", latitude: 22.4768, longitude: 72.8006 },
+  umreth: { name: "Umreth", district: "Anand", latitude: 22.6988, longitude: 73.1156 },
+  vadodara: { name: "Vadodara", district: "Vadodara", latitude: 22.3072, longitude: 73.1812 },
+  dabhoi: { name: "Dabhoi", district: "Vadodara", latitude: 22.1836, longitude: 73.4336 },
+  desar: { name: "Desar", district: "Vadodara", latitude: 22.6814, longitude: 73.2477 },
+  karjan: { name: "Karjan", district: "Vadodara", latitude: 22.0536, longitude: 73.1230 },
+  padra: { name: "Padra", district: "Vadodara", latitude: 22.2380, longitude: 73.0840 },
+  savli: { name: "Savli", district: "Vadodara", latitude: 22.5608, longitude: 73.2214 },
+  vaghodia: { name: "Vaghodia", district: "Vadodara", latitude: 22.3055, longitude: 73.3977 },
+  ahmedabad: { name: "Ahmedabad", district: "Ahmedabad", latitude: 23.0225, longitude: 72.5714 },
+  sanand: { name: "Sanand", district: "Ahmedabad", latitude: 22.9920, longitude: 72.3810 },
+  dholka: { name: "Dholka", district: "Ahmedabad", latitude: 22.7273, longitude: 72.4413 },
+  surat: { name: "Surat", district: "Surat", latitude: 21.1702, longitude: 72.8311 },
+  bardoli: { name: "Bardoli", district: "Surat", latitude: 21.1220, longitude: 73.1115 },
+  rajkot: { name: "Rajkot", district: "Rajkot", latitude: 22.3039, longitude: 70.8022 },
+  gondal: { name: "Gondal", district: "Rajkot", latitude: 21.9619, longitude: 70.7927 },
+};
+
 
 const placeLabels: Record<string, { gu: string; hi: string }> = {
   Gujarat: { gu: "ગુજરાત", hi: "गुजरात" },
@@ -305,18 +338,56 @@ export const validateGujaratLocation = (input: {
   const talukaDistrict = findDistrictByTaluka(input.taluka);
   const district = findDistrict(input.district) || talukaDistrict;
   const taluka = findTaluka(district?.name, input.taluka) || null;
-  const center = district?.center || null;
+  
+  let village = input.village?.trim() || null;
+  if (!village && taluka && district) {
+    const villages = getVillagesForTaluka(district.name, taluka);
+    if (villages.length > 0) {
+      village = villages[0];
+    }
+  }
+
+  let latitude: number | null = null;
+  let longitude: number | null = null;
+  let confidence: ValidatedGujaratLocation["confidence"] = "fallback";
+
+  // Multi-level fallback: Village -> Taluka -> District
+  if (village && taluka && district) {
+    const coords = getVillageCoordinates(district.name, taluka, village);
+    if (coords) {
+      latitude = coords.latitude;
+      longitude = coords.longitude;
+      confidence = "manual"; // village level
+    }
+  }
+
+  if (latitude === null && taluka && district) {
+    const key = String(taluka).toLowerCase();
+    const talukaCoords = GUJARAT_TALUKA_COORDINATES[key];
+    if (talukaCoords) {
+      latitude = talukaCoords.latitude;
+      longitude = talukaCoords.longitude;
+      confidence = "taluka";
+    }
+  }
+
+  if (latitude === null && district) {
+    latitude = district.center.latitude;
+    longitude = district.center.longitude;
+    confidence = "district";
+  }
 
   return {
-    village: input.village?.trim() || null,
+    village,
     taluka,
     district: district?.name || null,
     state: "Gujarat",
-    latitude: center?.latitude || null,
-    longitude: center?.longitude || null,
-    confidence: taluka ? "taluka" : district ? "district" : "fallback",
+    latitude,
+    longitude,
+    confidence,
   };
 };
+
 
 export const getTalukasForDistrict = (districtName?: string | null) => findDistrict(districtName)?.talukas || [];
 

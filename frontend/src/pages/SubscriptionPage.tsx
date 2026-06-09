@@ -1,215 +1,189 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, ArrowRight, RotateCcw, ShieldAlert } from "lucide-react";
+import { Check, ArrowRight, RotateCcw, ShieldAlert, Sparkles, X } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
-import VoiceCommandButton from "@/components/VoiceCommandButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileService } from "@/services/profileService";
-import { SUBSCRIPTION_CHECKED_AT_KEY, consumeSubscriptionRequiredMessage, hasActiveSubscription } from "@/services/subscriptionService";
+import { SUBSCRIPTION_CHECKED_AT_KEY, consumeSubscriptionRequiredMessage, getSavedSubscriptionTier, getActiveSubscriptionTier } from "@/services/subscriptionService";
 import logo from "@/assets/farmalert-logo.png";
 
 const SubscriptionPage = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { t, language, setLanguage } = useLanguage();
-  const [selectedPlan, setSelectedPlan] = useState<"daily" | "monthly">("daily");
+  const { t, language } = useLanguage();
   const [error, setError] = useState("");
   const [showRequiredNotice, setShowRequiredNotice] = useState(false);
   const [checkingRestore, setCheckingRestore] = useState(false);
+  const [submittingTier, setSubmittingTier] = useState<"premium" | "pro" | null>(null);
+  const [currentTier, setCurrentTier] = useState<"free" | "premium" | "pro">("free");
 
   const copy = {
     en: {
-      required: "Active subscription required to continue.",
-      retry: "Retry Subscription",
+      required: "Subscription required to unlock advanced intelligence features.",
+      retry: "Subscribe Now",
       restore: "Restore Subscription",
       restoreFailed: "No active subscription found. Please subscribe to continue.",
-    },
-    hi: {
-      required: "आगे बढ़ने के लिए सक्रिय सब्सक्रिप्शन ज़रूरी है।",
-      retry: "फिर से सब्सक्राइब करें",
-      restore: "सब्सक्रिप्शन रीस्टोर करें",
-      restoreFailed: "सक्रिय सब्सक्रिप्शन नहीं मिला। जारी रखने के लिए सब्सक्राइब करें।",
+      title: "Choose Your Farming Plan",
+      subtitle: "Help your crops flourish and avoid severe losses with AI weather intelligence, crop scanners, and instant alerts.",
+      freePlan: "Free Plan",
+      freePrice: "₹0",
+      freeDesc: "District-level weather, basic agriculture news, farming tips, and standard notifications.",
+      premiumPlan: "Premium Plan",
+      premiumPrice: "₹59",
+      premiumPeriod: "/ month",
+      premiumDesc: "Village-level coordinate weather, advanced warnings, smart recommendations, and WhatsApp alerts.",
+      proPlan: "Pro Plan",
+      proPrice: "₹149",
+      proPeriod: "/ month",
+      proDesc: "Everything in Premium, AI crop disease scanner, pest detection, treatment tips, Voice AI assistant, and emergency SMS alerts.",
+      activePlan: "Active",
+      selectPlan: "Subscribe Plan",
+      trusted: "Trusted by 50,000+ farmers across Gujarat",
+      cancelAnytime: "Cancel anytime. Safe & secure payment.",
+      featureBreakdown: "Compare Plans",
+      features: [
+        { name: "Weather Accuracy", free: "District-Level", premium: "Village-Level", pro: "Village-Level" },
+        { name: "Farming Tips & News", free: "Standard", premium: "Ad-free", pro: "Ad-free" },
+        { name: "Weather Alerts", free: "Basic", premium: "Advanced", pro: "Advanced" },
+        { name: "AI recommendations", free: "❌", premium: "✔️", pro: "✔️" },
+        { name: "WhatsApp Alerts", free: "❌", premium: "✔️", pro: "✔️" },
+        { name: "AI Disease Scanner", free: "❌", premium: "❌", pro: "✔️ (Camera Scan)" },
+        { name: "Voice AI Assistant", free: "❌", premium: "❌", pro: "✔️ (Multilingual)" },
+        { name: "SMS Emergency Alerts", free: "❌", premium: "❌", pro: "✔️" }
+      ],
+      backToDashboard: "Continue on Free Plan",
     },
     gu: {
-      required: "આગળ વધવા માટે સક્રિય સબ્સ્ક્રિપ્શન જરૂરી છે.",
-      retry: "ફરી સબ્સ્ક્રાઇબ કરો",
+      required: "ખેતી સલાહ અને સ્કેનર સુવિધાઓ મેળવવા માટે સબ્સ્ક્રિપ્શન જરૂરી છે.",
+      retry: "હમણાં સબ્સ્ક્રાઇબ કરો",
       restore: "સબ્સ્ક્રિપ્શન રિસ્ટોર કરો",
-      restoreFailed: "સક્રિય સબ્સ્ક્રિપ્શન મળ્યું નથી. આગળ વધવા માટે સબ્સ્ક્રાઇબ કરો.",
+      restoreFailed: "કોઈ સક્રિય સબ્સ્ક્રિપ્શન મળ્યું નથી. ચાલુ રાખવા માટે સબ્સ્ક્રાઇબ કરો.",
+      title: "તમારી ખેતી માટે પ્લાન પસંદ કરો",
+      subtitle: "AI હવામાન સલાહ, પાક રોગ સ્કેનર અને સીધા એલર્ટ દ્વારા તમારા પાકને નુકસાનથી બચાવો.",
+      freePlan: "ફ્રી પ્લાન",
+      freePrice: "₹૦",
+      freeDesc: "જિલ્લા કક્ષાની હવામાન આગાહી, કૃષિ સમાચાર, ખેતી પદ્ધતિઓ અને સાદા નોટિફિકેશન.",
+      premiumPlan: "પ્રીમિયમ પ્લાન",
+      premiumPrice: "₹૫૯",
+      premiumPeriod: "/ મહિને",
+      premiumDesc: "ગામ સ્તરની ચોક્કસ હવામાન આગાહી, ખાસ કૃષિ એલર્ટ, સ્માર્ટ ભલામણો અને વોટ્સએપ ચેતવણીઓ.",
+      proPlan: "પ્રો પ્લાન",
+      proPrice: "₹૧૪૯",
+      proPeriod: "/ મહિને",
+      proDesc: "પ્રીમિયમ પ્લાનનું બધું જ, AI પાક રોગ સ્કેનર, દવા ઉપચાર માહિતી, વોઇસ AI અને કટોકટીના SMS એલર્ટ.",
+      activePlan: "સક્રિય",
+      selectPlan: "પ્લાન પસંદ કરો",
+      trusted: "ગુજરાતના ૫૦,૦૦૦+ ખેડૂતોનો વિશ્વાસ",
+      cancelAnytime: "ગમે ત્યારે રદ કરો. સુરક્ષિત પેમેન્ટ.",
+      featureBreakdown: "પ્લાનની સરખામણી",
+      features: [
+        { name: "હવામાન ચોકસાઈ", free: "જિલ્લા સ્તરે", premium: "ગામ સ્તરે", pro: "ગામ સ્તરે" },
+        { name: "ખેતી સમાચાર અને માહિતી", free: "સામાન્ય", premium: "જાહેરાત વગર", pro: "જાહેરાત વગર" },
+        { name: "હવામાન ચેતવણીઓ", free: "સામાન્ય", premium: "ખાસ સ્માર્ટ", pro: "ખાસ સ્માર્ટ" },
+        { name: "AI કૃષિ ભલામણો", free: "❌", premium: "✔️", pro: "✔️" },
+        { name: "વોટ્સએપ ચેતવણીઓ", free: "❌", premium: "✔️", pro: "✔️" },
+        { name: "AI પાક રોગ સ્કેનર", free: "❌", premium: "❌", pro: "✔️ (કેમેરા સ્કેન)" },
+        { name: "વોઇસ AI આસિસ્ટન્ટ", free: "❌", premium: "❌", pro: "✔️ (અવાજ કમાન્ડ)" },
+        { name: "SMS કટોકટી ચેતવણીઓ", free: "❌", premium: "❌", pro: "✔️" }
+      ],
+      backToDashboard: "ફ્રી પ્લાન ચાલુ રાખો",
     },
-  }[language];
+    hi: {
+      required: "कृषि मौसम अंतर्दृष्टि और रोग स्कैनर के लिए सब्सक्रिप्शन आवश्यक है.",
+      retry: "अभी सब्सक्राइब करें",
+      restore: "सब्सक्रिप्शन रीस्टोर करें",
+      restoreFailed: "कोई सक्रिय सब्सक्रिप्शन नहीं मिला। जारी रखने के लिए सब्सक्राइब करें.",
+      title: "अपनी खेती के लिए प्लान चुनें",
+      subtitle: "AI मौसम सलाह, फसल रोग स्कैनर और तत्काल अलर्ट के साथ अपनी फसलों को भारी नुकसान से बचाएं।",
+      freePlan: "फ्री प्लान",
+      freePrice: "₹0",
+      freeDesc: "जिला स्तर का मौसम पूर्वानुमान, कृषि समाचार, खेती टिप्स और बुनियादी सूचनाएं.",
+      premiumPlan: "प्रीमियम प्लान",
+      premiumPrice: "₹59",
+      premiumPeriod: "/ महीना",
+      premiumDesc: "गांव के सटीक स्थान स्तर पर मौसम, उन्नत चेतावनी, कृषि प्रबंधन सलाह और व्हाट्सएप अलर्ट.",
+      proPlan: "प्रो प्लान",
+      proPrice: "₹149",
+      proPeriod: "/ महीना",
+      proDesc: "प्रीमियम की सभी सुविधाएं, AI फसल रोग स्कैनर, कीट पहचान व उपचार सलाह, वॉयस AI और आपातकालीन एसएमएस अलर्ट.",
+      activePlan: "सक्रिय",
+      selectPlan: "प्लान चुनें",
+      trusted: "गुजरात के 50,000+ किसानों का भरोसा",
+      cancelAnytime: "कभी भी रद्द करें। सुरक्षित भुगतान.",
+      featureBreakdown: "प्लान की तुलना",
+      features: [
+        { name: "मौसम की सटीकता", free: "जिला स्तर", premium: "गांव स्तर", pro: "गांव स्तर" },
+        { name: "कृषि टिप्स और समाचार", free: "सामान्य", premium: "विज्ञापन मुक्त", pro: "विज्ञापन मुक्त" },
+        { name: "मौसम अलर्ट", free: "बुनियादी", premium: "उन्नत", pro: "उन्नत" },
+        { name: "AI कृषि सलाह", free: "❌", premium: "✔️", pro: "✔️" },
+        { name: "व्हाट्सएप अलर्ट", free: "❌", premium: "✔️", pro: "✔️" },
+        { name: "AI फसल रोग स्कैनर", free: "❌", premium: "❌", pro: "✔️ (कैमरा स्कैन)" },
+        { name: "वॉयस AI सहायक", free: "❌", premium: "❌", pro: "✔️ (वॉयस निर्देश)" },
+        { name: "एसएमएस आपातकालीन अलर्ट", free: "❌", premium: "❌", pro: "✔️" }
+      ],
+      backToDashboard: "फ्री प्लान जारी रखें",
+    }
+  }[language as "en" | "gu" | "hi"] || copyText.en;
 
   useEffect(() => {
     setShowRequiredNotice(consumeSubscriptionRequiredMessage());
+    setCurrentTier(getSavedSubscriptionTier());
   }, []);
 
   useEffect(() => {
-    if (loading) {
-      return;
-    }
-
+    if (loading) return;
     if (!user) {
       navigate("/login", { replace: true });
-      return;
     }
+  }, [user, loading, navigate]);
 
-    const guardProfileThenSubscription = async () => {
-      const profile = await ProfileService.getProfile(user.id);
-      if (!ProfileService.isProfileComplete(profile)) {
-        navigate("/profile-setup", { replace: true });
+  const handleSubscribe = async (tier: "premium" | "pro") => {
+    if (!user) return;
+    setError("");
+    setSubmittingTier(tier);
+
+    try {
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30); // 30-day validity
+
+      const planDbValue = tier === "pro" ? "daily" : "monthly";
+      const amountPaise = tier === "pro" ? 14900 : 5900;
+
+      const { error: upsertError } = await supabase
+        .from("subscriptions")
+        .upsert(
+          {
+            user_id: user.id,
+            plan: planDbValue,
+            status: "active",
+            amount_paise: amountPaise,
+            started_at: new Date().toISOString(),
+            expires_at: expiresAt.toISOString(),
+          },
+          { onConflict: "user_id" }
+        );
+
+      if (upsertError) {
+        setError(upsertError.message);
         return;
       }
 
-      const isSubscribed = await hasActiveSubscription(user.id);
-      if (isSubscribed) {
-        navigate("/dashboard", { state: { activeTab: "weather" }, replace: true });
-      }
-    };
-
-    void guardProfileThenSubscription();
-  }, [user, loading, navigate]);
-
-  useEffect(() => {
-    const keepOnSubscription = () => {
-      if (localStorage.getItem("farmalert_subscription_active") !== "true") {
-        window.history.pushState(null, "", "/subscription");
-        setShowRequiredNotice(true);
-      }
-    };
-
-    window.history.pushState(null, "", "/subscription");
-    window.addEventListener("popstate", keepOnSubscription);
-    return () => window.removeEventListener("popstate", keepOnSubscription);
-  }, []);
-
-  const handleVoiceCommand = (transcript: string) => {
-    const command = transcript.toLowerCase();
-
-    if (
-      command.includes("benefit") || 
-      command.includes("what you get") ||
-      command.includes("ફાયદા") ||
-      command.includes("લાભ") ||
-      command.includes("fayda") ||
-      command.includes("fayde") ||
-      command.includes("labh") ||
-      command.includes("फायदे") ||
-      command.includes("लाभ")
-    ) {
-      document.getElementById("subscription-benefits")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-
-    if (
-      command.includes("gujarati") ||
-      command.includes("ગુજરાતી") ||
-      command.includes("gujarat")
-    ) {
-      setLanguage("gu");
-      return;
-    }
-
-    if (
-      command.includes("hindi") ||
-      command.includes("हिंदी") ||
-      command.includes("हिन्दी")
-    ) {
-      setLanguage("hi");
-      return;
-    }
-
-    if (
-      command.includes("english") || 
-      command.includes("અંગ્રેજી") ||
-      command.includes("angreji") ||
-      command.includes("अंग्रेजी")
-    ) {
-      setLanguage("en");
-      return;
-    }
-
-    if (
-      command.includes("daily") ||
-      command.includes("દિવસ") ||
-      command.includes("दिन") ||
-      command.includes("divas") ||
-      command.includes("din") ||
-      command.includes("roj") ||
-      command.includes("roz") ||
-      command.includes("રોજ") ||
-      command.includes("रोज")
-    ) {
-      setSelectedPlan("daily");
-      return;
-    }
-
-    if (
-      command.includes("monthly") ||
-      command.includes("month") ||
-      command.includes("મહિનો") ||
-      command.includes("મહિને") ||
-      command.includes("महीना") ||
-      command.includes("mahina") ||
-      command.includes("mahino") ||
-      command.includes("masik") ||
-      command.includes("માસિક") ||
-      command.includes("मासिक")
-    ) {
-      setSelectedPlan("monthly");
-      return;
-    }
-
-    if (
-      command.includes("subscribe") ||
-      command.includes("સબ્સ્ક્રાઇબ") ||
-      command.includes("सब्सक्राइब") ||
-      command.includes("kharido") ||
-      command.includes("le lo") ||
-      command.includes("buy")
-    ) {
-      void handleSubscribe();
-    }
-  };
-
-  const handleSubscribe = async () => {
-    setError("");
-
-    if (!user) {
-      navigate("/login", { replace: true });
-      return;
-    }
-
-    const { error: upsertError } = await supabase
-      .from("subscriptions")
-      .upsert(
-        {
-          user_id: user.id,
-          plan: selectedPlan,
-          status: "active",
-          amount_paise: selectedPlan === "daily" ? 200 : 6000,
-          started_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      );
-
-    if (upsertError) {
-      setError(upsertError.message);
-      setShowRequiredNotice(true);
-      return;
-    }
-
-    localStorage.setItem("farmalert_subscribed", "true");
-    localStorage.setItem("farmalert_subscription_active", "true");
-    localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
-    await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>).catch(() => null);
-    const profile = await ProfileService.getProfile(user.id);
-    if (ProfileService.isProfileComplete(profile)) {
-      localStorage.setItem("farmalert_profile_completed", "true");
+      localStorage.setItem("farmalert_subscribed", "true");
+      localStorage.setItem("farmalert_subscription_active", "true");
+      localStorage.setItem("farmalert_subscription_tier", tier);
+      localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
+      
+      await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>).catch(() => null);
+      
+      setCurrentTier(tier);
       navigate("/dashboard", { state: { activeTab: "weather" }, replace: true });
-    } else {
-      navigate("/profile-setup", { replace: true });
+    } catch (err: any) {
+      setError(err.message || "Subscription failed");
+    } finally {
+      setSubmittingTier(null);
     }
   };
 
@@ -217,241 +191,209 @@ const SubscriptionPage = () => {
     setError("");
     setCheckingRestore(true);
     try {
-      if (!user) {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      const isSubscribed = await hasActiveSubscription(user.id);
-      if (isSubscribed) {
+      if (!user) return;
+      const tier = await getActiveSubscriptionTier(user.id);
+      if (tier !== "free") {
+        setCurrentTier(tier);
         localStorage.setItem("farmalert_subscription_active", "true");
+        localStorage.setItem("farmalert_subscription_tier", tier);
         navigate("/dashboard", { state: { activeTab: "weather" }, replace: true });
         return;
       }
-
-      setShowRequiredNotice(true);
       setError(copy.restoreFailed);
     } finally {
       setCheckingRestore(false);
     }
   };
 
-  const benefits = [
-    { icon: "🌧️", text: t("sub_benefit_1") },
-    { icon: "🌾", text: t("sub_benefit_2") },
-    { icon: "🐛", text: t("sub_benefit_3") },
-    { icon: "📍", text: t("sub_benefit_4") },
-    { icon: "📞", text: t("sub_benefit_5") },
-  ];
-
-  const testimonials = [
-    { name: t("sub_testimonial_1_name"), text: t("sub_testimonial_1_text"), icon: "🌾" },
-    { name: t("sub_testimonial_2_name"), text: t("sub_testimonial_2_text"), icon: "🌱" },
-  ];
-
-  const langToggle = (
-    <div className="flex gap-1 bg-secondary rounded-full p-1">
-      {(["gu", "hi", "en"] as const).map((l) => (
-        <button
-          key={l}
-          onClick={() => setLanguage(l)}
-          className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-            language === l
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground"
-          }`}
-        >
-          {l === "gu" ? "ગુજ" : l === "hi" ? "हिं" : "EN"}
-        </button>
-      ))}
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-28">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <img src={logo} alt="FarmAlert" className="h-8 w-8 rounded-lg" />
+    <div className="min-h-screen bg-slate-50 flex flex-col pb-10">
+      {/* Top Header */}
+      <div className="flex items-center justify-between px-5 pt-4 pb-4 border-b border-slate-200 bg-white shadow-sm">
         <div className="flex items-center gap-2">
-          {langToggle}
-          <VoiceCommandButton
-            onCommand={handleVoiceCommand}
-          />
+          <img src={logo} alt="FarmAlert" className="h-8 w-8 rounded-lg" />
+          <span className="text-lg font-black text-slate-800 tracking-tight">FarmAlert Premium</span>
         </div>
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="p-1.5 rounded-full hover:bg-slate-100 text-slate-500 transition-all active:scale-95"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
-      <div className="px-5 space-y-5 flex-1 overflow-y-auto">
-        {/* Header */}
+      <div className="px-5 space-y-6 flex-1 overflow-y-auto max-w-[480px] mx-auto py-5">
         {showRequiredNotice && (
-          <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-amber-950 shadow-card">
+          <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-amber-950 shadow-md">
             <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-amber-200 p-2">
-                <ShieldAlert className="h-5 w-5" aria-hidden="true" />
+              <div className="rounded-xl bg-amber-200 p-2 text-amber-600">
+                <ShieldAlert className="h-5 w-5 animate-bounce" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-black leading-relaxed">{copy.required}</p>
-                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <button
-                    type="button"
-                    onClick={handleSubscribe}
-                    className="rounded-xl bg-primary px-3 py-2.5 text-sm font-black text-primary-foreground active:scale-95"
-                  >
-                    {copy.retry}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleRestoreSubscription}
-                    disabled={checkingRestore}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-400 bg-white px-3 py-2.5 text-sm font-black text-amber-950 active:scale-95 disabled:opacity-60"
-                  >
-                    <RotateCcw className={`h-4 w-4 ${checkingRestore ? "animate-spin" : ""}`} />
-                    {copy.restore}
-                  </button>
-                </div>
+                <p className="text-xs font-black leading-relaxed">{copy.required}</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center pt-2"
-        >
-          <FarmerEmojiImage className="mx-auto mb-3 h-16 w-16" />
-          <h1 className="text-2xl font-extrabold text-foreground leading-tight">
-            {t("sub_header_title")}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-            {t("sub_header_subtitle")}
-          </p>
-        </motion.div>
+        {/* Title */}
+        <div className="text-center space-y-2">
+          <FarmerEmojiImage className="mx-auto h-16 w-16" />
+          <h1 className="text-2xl font-black text-slate-900 leading-tight">{copy.title}</h1>
+          <p className="text-xs text-slate-500 font-semibold leading-relaxed">{copy.subtitle}</p>
+        </div>
 
-        {/* Pricing Card */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.15 }}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-5 text-primary-foreground shadow-elevated"
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-10 translate-x-10" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-8 -translate-x-8" />
-
-          <motion.div
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="relative z-10"
-          >
-            <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-black">₹2</span>
-              <span className="text-xl font-semibold opacity-90">/ {t("sub_day")}</span>
-            </div>
-            <p className="text-sm opacity-80 mt-1">
-              {t("sub_just")} ₹60/{t("sub_month")}
-            </p>
-          </motion.div>
-
-          <div className="relative z-10 mt-4 bg-white/15 rounded-xl px-4 py-3">
-            <p className="text-sm font-medium italic leading-relaxed">
-              "{t("sub_emotional_line")}"
-            </p>
-          </div>
-
-          <div className="relative z-10 mt-3 flex items-center gap-2">
-            <Check className="w-4 h-4" />
-            <span className="text-sm font-semibold">{t("sub_best_value")}</span>
-          </div>
-        </motion.div>
-
-        {/* Benefits */}
-        <div id="subscription-benefits" className="space-y-3">
-          <h2 className="text-base font-bold text-foreground">
-            {t("sub_benefits_title")}
-          </h2>
-          <div className="space-y-2">
-            {benefits.map((b, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 + i * 0.08 }}
-                className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border shadow-card"
-              >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <span className="text-2xl leading-none" aria-hidden="true">{b.icon}</span>
-                </div>
-                <span className="text-sm font-medium text-foreground leading-snug">
-                  {b.text}
+        {/* Plan Tiers Cards */}
+        <div className="grid gap-5">
+          {/* Free Plan Card */}
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 relative shadow-sm hover:shadow-md transition-all">
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                  {copy.freePlan}
                 </span>
-              </motion.div>
-            ))}
+                <p className="text-3xl font-black text-slate-800 mt-2">{copy.freePrice}</p>
+              </div>
+              {currentTier === "free" && (
+                <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                  {copy.activePlan}
+                </span>
+              )}
+            </div>
+            <p className="text-xs font-semibold text-slate-500 mt-3 leading-relaxed">{copy.freeDesc}</p>
+          </div>
+
+          {/* Premium Plan Card */}
+          <div className={`rounded-3xl border-2 p-5 relative shadow-md overflow-hidden bg-gradient-to-br from-white via-white to-emerald-50/10 transition-all ${
+            currentTier === "premium" ? "border-emerald-500 bg-emerald-50/20" : "border-emerald-600/70"
+          }`}>
+            <div className="absolute top-0 right-0 bg-emerald-600 text-white text-[9px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
+              Best Value
+            </div>
+
+            <div>
+              <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md">
+                {copy.premiumPlan}
+              </span>
+              <div className="flex items-baseline mt-2">
+                <p className="text-3xl font-black text-slate-800">{copy.premiumPrice}</p>
+                <p className="text-xs font-bold text-slate-500 ml-1">{copy.premiumPeriod}</p>
+              </div>
+            </div>
+            
+            <p className="text-xs font-semibold text-slate-500 mt-3 leading-relaxed">{copy.premiumDesc}</p>
+
+            <button
+              onClick={() => handleSubscribe("premium")}
+              disabled={submittingTier !== null || currentTier === "premium"}
+              className={`w-full mt-4 h-11 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all ${
+                currentTier === "premium"
+                  ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-default shadow-none"
+                  : "bg-emerald-600 hover:bg-emerald-700 text-white"
+              }`}
+            >
+              {submittingTier === "premium" ? "Processing..." : currentTier === "premium" ? copy.activePlan : `${copy.selectPlan} (₹59)`}
+              {currentTier !== "premium" && <ArrowRight className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+
+          {/* Pro Plan Card */}
+          <div className={`rounded-3xl border-2 p-5 relative shadow-lg overflow-hidden bg-gradient-to-br from-white via-white to-blue-50/10 transition-all ${
+            currentTier === "pro" ? "border-blue-500 bg-blue-50/20" : "border-blue-600/70"
+          }`}>
+            <div className="absolute top-0 right-0 bg-blue-600 text-white text-[9px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
+              Most Popular
+            </div>
+
+            <div>
+              <span className="text-[10px] font-black uppercase text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md">
+                {copy.proPlan}
+              </span>
+              <div className="flex items-baseline mt-2">
+                <p className="text-3xl font-black text-slate-800">{copy.proPrice}</p>
+                <p className="text-xs font-bold text-slate-500 ml-1">{copy.proPeriod}</p>
+              </div>
+            </div>
+            
+            <p className="text-xs font-semibold text-slate-500 mt-3 leading-relaxed">{copy.proDesc}</p>
+
+            <button
+              onClick={() => handleSubscribe("pro")}
+              disabled={submittingTier !== null || currentTier === "pro"}
+              className={`w-full mt-4 h-11 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all ${
+                currentTier === "pro"
+                  ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-default shadow-none"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
+            >
+              {submittingTier === "pro" ? "Processing..." : currentTier === "pro" ? copy.activePlan : `${copy.selectPlan} (₹149)`}
+              {currentTier !== "pro" && <ArrowRight className="w-3.5 h-3.5" />}
+            </button>
           </div>
         </div>
 
-        {/* Trust Section */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 justify-center">
-            <span className="text-base leading-none" aria-hidden="true">🛡️</span>
-            <p className="text-sm font-semibold text-primary text-center">
-              {t("sub_trusted")}
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            {testimonials.map((tm, i) => (
-              <div
-                key={i}
-                className="bg-card border border-border rounded-xl p-3 shadow-card"
-              >
-                <p className="text-xs text-muted-foreground italic leading-relaxed">
-                  "{tm.text}"
-                </p>
-                <p className="text-xs font-semibold text-foreground mt-2">
-                  — {tm.name} <span className="ml-1" aria-hidden="true">{tm.icon}</span>
-                </p>
+        {/* Feature Comparison Table */}
+        <section className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
+          <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-emerald-600 animate-pulse" />
+            {copy.featureBreakdown}
+          </h3>
+          
+          <div className="overflow-hidden border border-slate-100 rounded-2xl divide-y divide-slate-100">
+            {/* Header row */}
+            <div className="grid grid-cols-12 p-3 text-[10px] font-black text-slate-400 bg-slate-50 gap-1">
+              <div className="col-span-4">Feature</div>
+              <div className="col-span-2 text-center">Free</div>
+              <div className="col-span-3 text-center text-emerald-700">Premium</div>
+              <div className="col-span-3 text-center text-blue-700">Pro</div>
+            </div>
+            {copy.features.map((f, i) => (
+              <div key={i} className="grid grid-cols-12 p-3 text-xs gap-1 hover:bg-slate-50/50 transition-all items-center">
+                <div className="col-span-4 font-bold text-slate-700 leading-tight">{f.name}</div>
+                <div className="col-span-2 text-center text-[10px] font-semibold text-slate-400">{f.free}</div>
+                <div className="col-span-3 text-center text-[10px] font-black text-emerald-600">{f.premium}</div>
+                <div className="col-span-3 text-center text-[10px] font-black text-blue-600">{f.pro}</div>
               </div>
             ))}
           </div>
+        </section>
 
-          <p className="text-center text-xs text-muted-foreground font-medium">
-            {t("sub_cancel_anytime")}
+        {/* Payment details */}
+        <div className="space-y-4 text-center">
+          <p className="text-[10px] font-bold text-emerald-700 flex items-center justify-center gap-1.5">
+            <span>🛡️</span> {copy.trusted}
           </p>
-        </div>
+          <p className="text-[10px] text-slate-400 font-semibold">{copy.cancelAnytime}</p>
 
-        {/* Payment Methods */}
-        <div className="flex items-center justify-center gap-3 py-2">
-          {["UPI", "Paytm", "PhonePe", "GPay"].map((p) => (
-            <div
-              key={p}
-              className="bg-card border border-border rounded-lg px-3 py-1.5 text-xs font-semibold text-muted-foreground shadow-card"
+          <div className="flex gap-2 justify-center py-2 opacity-80">
+            {["UPI", "GPay", "PhonePe", "Cards"].map(p => (
+              <span key={p} className="bg-slate-100 px-2.5 py-1 rounded-md text-[10px] font-bold text-slate-500 border border-slate-200">
+                {p}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-2 pt-2">
+            <button
+              onClick={handleRestoreSubscription}
+              disabled={checkingRestore}
+              className="text-xs text-emerald-600 font-black underline flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
-              {p}
-            </div>
-          ))}
+              <RotateCcw className={`w-3.5 h-3.5 ${checkingRestore ? "animate-spin" : ""}`} />
+              {copy.restore}
+            </button>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="text-xs text-slate-400 font-bold hover:text-slate-600 mt-2"
+            >
+              {copy.backToDashboard}
+            </button>
+          </div>
         </div>
 
         {error && (
-          <p className="text-center text-sm font-semibold text-destructive">
-            {error}
-          </p>
+          <p className="text-center text-xs font-black text-red-600 mt-2">{error}</p>
         )}
-      </div>
-
-      {/* Sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-5 py-4 space-y-2 z-50">
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={handleSubscribe}
-          className="w-full h-14 bg-primary text-primary-foreground rounded-xl text-base font-semibold flex items-center justify-center gap-2 shadow-md touch-manipulation transition-transform active:scale-[0.98]"
-        >
-          {t("sub_cta")}
-          <ArrowRight className="w-5 h-5" />
-        </motion.button>
-        <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-          <span className="text-xs leading-none" aria-hidden="true">🛡️</span>
-          <span>{t("sub_secure_payment")}</span>
-        </div>
       </div>
     </div>
   );
