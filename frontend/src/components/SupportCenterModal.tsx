@@ -16,6 +16,16 @@ interface SupportCenterModalProps {
   userVillage?: string;
 }
 
+const getErrorMessage = (err: unknown): string => {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object") {
+    if ("message" in err) return String((err as any).message);
+    if ("error" in err) return String((err as any).error);
+    if ("error_description" in err) return String((err as any).error_description);
+  }
+  return String(err);
+};
+
 const SupportCenterModal = ({
   isOpen,
   onOpenChange,
@@ -141,7 +151,7 @@ const SupportCenterModal = ({
     } catch (err) {
       toast({
         title: "Submission failed",
-        description: err instanceof Error ? err.message : "Error submitting feedback",
+        description: getErrorMessage(err) || "Error submitting feedback",
         variant: "destructive",
       });
     } finally {
@@ -190,7 +200,7 @@ const SupportCenterModal = ({
     } catch (err) {
       toast({
         title: "Registration failed",
-        description: err instanceof Error ? err.message : "Error registering complaint",
+        description: getErrorMessage(err) || "Error registering complaint",
         variant: "destructive",
       });
     } finally {

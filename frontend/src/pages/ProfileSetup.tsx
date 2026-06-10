@@ -61,6 +61,13 @@ const locationCopy = {
   },
 } as const;
 
+const isValidAvatarUrl = (url: any): url is string => {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim().toLowerCase();
+  if (trimmed === "" || trimmed === "null" || trimmed === "undefined") return false;
+  return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/");
+};
+
 const ProfileSetup = () => {
   const navigate = useNavigate();
   const routeLocation = useLocation();
@@ -231,11 +238,14 @@ const ProfileSetup = () => {
       <div className="max-w-[400px] mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          {avatarUrl && !avatarLoadError ? (
+          {isValidAvatarUrl(avatarUrl) && !avatarLoadError ? (
             <img 
               src={avatarUrl} 
               alt="farmer" 
-              onError={() => setAvatarLoadError(true)}
+              onError={(e) => {
+                setAvatarLoadError(true);
+                e.currentTarget.src = farmerAvatar;
+              }}
               className="mx-auto h-16 w-16 rounded-full object-cover border-2 border-primary/20 shadow-sm" 
             />
           ) : (

@@ -39,6 +39,17 @@ const isRelationMissingError = (error: any): boolean => {
   return msg.includes("does not exist") || msg.includes("not found") || error.code === "PGRST204" || error.status === 404;
 };
 
+const generateUUID = (): string => {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 export class ComplaintService {
   // Helper for localStorage complaints
   private static getLocalComplaints(): Complaint[] {
@@ -79,7 +90,7 @@ export class ComplaintService {
   static addAdminNotification(complaintId: string, farmerName: string, category: string) {
     const notifications = this.getAdminNotifications();
     const newNotif: AdminNotification = {
-      id: crypto.randomUUID?.() || Math.random().toString(36).substring(2, 9),
+      id: generateUUID(),
       message: `New complaint filed by ${farmerName} under category "${category}".`,
       complaint_id: complaintId,
       farmer_name: farmerName,
@@ -109,7 +120,7 @@ export class ComplaintService {
    * Submit a new complaint (attempts Supabase table, falls back to LocalStorage database)
    */
   static async submitComplaint(complaintData: Omit<Complaint, "id" | "status" | "created_at" | "updated_at">): Promise<Complaint> {
-    const id = crypto.randomUUID?.() || `comp-${Math.random().toString(36).substring(2, 11)}`;
+    const id = generateUUID();
     const now = new Date().toISOString();
     const newComplaint: Complaint = {
       ...complaintData,
@@ -245,7 +256,7 @@ export class ComplaintService {
    * Submit feedback
    */
   static async submitFeedback(feedbackData: Omit<Feedback, "id" | "created_at">): Promise<Feedback> {
-    const id = crypto.randomUUID?.() || `fb-${Math.random().toString(36).substring(2, 11)}`;
+    const id = generateUUID();
     const newFeedback: Feedback = {
       ...feedbackData,
       id,

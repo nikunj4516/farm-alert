@@ -298,7 +298,9 @@ export class ProfileService {
     const compressedFile = await compressProfileImage(file);
     const extension = getImageExtension(compressedFile);
     const version = Date.now();
-    const uniqueId = crypto.randomUUID?.() || `${version}-${Math.random().toString(36).slice(2)}`;
+    const uniqueId = (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") 
+      ? crypto.randomUUID() 
+      : `${version}-${Math.random().toString(36).slice(2)}`;
     const filePath = `${userId}/profile-${version}-${uniqueId}.${extension}`;
     let uploadedBucket = profileImageBuckets[0];
     let uploadError: unknown = null;

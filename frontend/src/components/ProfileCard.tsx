@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
+import farmerAvatar from "@/assets/farmer-1.png";
 import { Language, languageNames, useLanguage } from "@/contexts/LanguageContext";
 import { Profile } from "@/services/profileService";
 import { getDistrictLabel, getLocationLabel } from "@/services/gujaratLocationService";
@@ -28,6 +29,13 @@ import { toast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { getSavedSubscriptionTier } from "@/services/subscriptionService";
 import SupportCenterModal from "./SupportCenterModal";
+
+const isValidAvatarUrl = (url: any): url is string => {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim().toLowerCase();
+  if (trimmed === "" || trimmed === "null" || trimmed === "undefined") return false;
+  return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/");
+};
  
 type ProfileCardProps = {
   profile?: Profile | null;
@@ -300,11 +308,14 @@ const ProfileCard = ({
         <div className="-mt-12 px-5 pb-5">
           <div className="flex flex-col items-center text-center">
             <div className="relative h-24 w-24 rounded-full border-4 border-card bg-primary/10 shadow-elevated flex items-center justify-center overflow-hidden">
-              {avatarUrl && !avatarLoadError ? (
+              {isValidAvatarUrl(avatarUrl) && !avatarLoadError ? (
                 <img 
                   src={avatarUrl} 
                   alt={displayName} 
-                  onError={() => setAvatarLoadError(true)}
+                  onError={(e) => {
+                    setAvatarLoadError(true);
+                    e.currentTarget.src = farmerAvatar;
+                  }}
                   className="h-full w-full rounded-full object-cover" 
                 />
               ) : (
