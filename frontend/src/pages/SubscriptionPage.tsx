@@ -127,7 +127,7 @@ const SubscriptionPage = () => {
       ],
       backToDashboard: "फ्री प्लान जारी रखें",
     }
-  }[language as "en" | "gu" | "hi"] || copyText.en;
+  };
   const copy = copyText[language as "en" | "gu" | "hi"] || copyText.en;
 
   useEffect(() => {
