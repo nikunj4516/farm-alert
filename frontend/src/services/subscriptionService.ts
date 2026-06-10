@@ -24,7 +24,13 @@ export const getActiveSubscriptionTier = async (userId: string): Promise<"free" 
     .eq("status", "active")
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
+    console.warn("Subscription database query error, using local cache:", error);
+    const cachedTier = localStorage.getItem(SUBSCRIPTION_TIER_KEY) as "free" | "premium" | "pro";
+    return cachedTier || "free";
+  }
+
+  if (!data) {
     localStorage.removeItem(SUBSCRIPTION_ACTIVE_KEY);
     localStorage.setItem(SUBSCRIPTION_TIER_KEY, "free");
     localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
