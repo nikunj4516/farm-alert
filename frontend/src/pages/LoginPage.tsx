@@ -93,18 +93,9 @@ const LoginPage = () => {
 
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData.session?.user.id;
-    if (!userId) {
-      navigate("/subscription");
-      return;
-    }
-
-    const profile = await ProfileService.getProfile(userId);
-    if (!ProfileService.isProfileComplete(profile)) {
-      navigate("/profile-setup", { replace: true });
-      return;
-    }
-
-    navigate("/dashboard", { replace: true });
+    
+    // Direct navigation to subscription page after successful OTP verification
+    navigate("/subscription", { replace: true });
   };
 
   return (

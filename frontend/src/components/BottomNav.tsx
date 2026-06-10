@@ -19,7 +19,7 @@ const BottomNav = ({ activeTab, onTabChange, profileImageUrl }: BottomNavProps) 
     { id: "news" as Tab, label: t("nav_news"), icon: <span className="text-3xl leading-none" aria-hidden="true">📰</span> },
     { id: "scanner" as Tab, label: language === "gu" ? "સ્કેનર" : language === "hi" ? "स्कैनर" : "Scanner", icon: <span className="text-3xl leading-none" aria-hidden="true">📷</span> },
     { id: "about" as Tab, label: t("nav_about"), icon: <span className="text-3xl leading-none" aria-hidden="true">🏢</span> },
-    { id: "profile" as Tab, label: t("nav_profile"), icon: <img src={profileImageUrl || farmerAvatar} alt="profile" className="w-7 h-7 drop-shadow-md rounded-full object-cover" /> },
+    { id: "profile" as Tab, label: t("nav_profile"), icon: <img src={profileImageUrl || farmerAvatar} onError={(e) => { e.currentTarget.src = farmerAvatar; }} alt="profile" className="w-7 h-7 drop-shadow-md rounded-full object-cover" /> },
   ];
 
   return (

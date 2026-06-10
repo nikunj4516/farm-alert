@@ -141,16 +141,14 @@ export class ComplaintService {
       this.addAdminNotification(id, newComplaint.name, newComplaint.category);
       return data as Complaint;
     } catch (err) {
-      if (isRelationMissingError(err)) {
-        // Fallback to local storage database
-        const complaints = this.getLocalComplaints();
-        complaints.unshift(newComplaint);
-        this.saveLocalComplaints(complaints);
-        
-        this.addAdminNotification(id, newComplaint.name, newComplaint.category);
-        return newComplaint;
-      }
-      throw err;
+      console.warn("Supabase complaint submission failed, falling back to local storage:", err);
+      // Fallback to local storage database
+      const complaints = this.getLocalComplaints();
+      complaints.unshift(newComplaint);
+      this.saveLocalComplaints(complaints);
+      
+      this.addAdminNotification(id, newComplaint.name, newComplaint.category);
+      return newComplaint;
     }
   }
 
@@ -168,11 +166,9 @@ export class ComplaintService {
       if (error) throw error;
       return data as Complaint[];
     } catch (err) {
-      if (isRelationMissingError(err)) {
-        const complaints = this.getLocalComplaints();
-        return complaints.filter(c => c.user_id === userId);
-      }
-      throw err;
+      console.warn("Supabase getComplaints failed, falling back to local storage:", err);
+      const complaints = this.getLocalComplaints();
+      return complaints.filter(c => c.user_id === userId);
     }
   }
 
@@ -189,10 +185,8 @@ export class ComplaintService {
       if (error) throw error;
       return data as Complaint[];
     } catch (err) {
-      if (isRelationMissingError(err)) {
-        return this.getLocalComplaints();
-      }
-      throw err;
+      console.warn("Supabase getAllComplaints failed, falling back to local storage:", err);
+      return this.getLocalComplaints();
     }
   }
 
@@ -221,31 +215,29 @@ export class ComplaintService {
       if (error) throw error;
       return data as Complaint;
     } catch (err) {
-      if (isRelationMissingError(err)) {
-        const complaints = this.getLocalComplaints();
-        const index = complaints.findIndex(c => c.id === complaintId);
-        if (index === -1) {
-          throw new Error("Complaint not found in database.");
-        }
-        
-        const updatedComplaint: Complaint = {
-          ...complaints[index],
-          status,
-          admin_reply: adminReply,
-          updated_at: now
-        };
-        
-        complaints[index] = updatedComplaint;
-        this.saveLocalComplaints(complaints);
-        
-        // Trigger local notification event so farmer UI updates immediately if open
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("farmalert_complaint_updated", { detail: updatedComplaint }));
-        }
-
-        return updatedComplaint;
+      console.warn("Supabase updateComplaintStatus failed, falling back to local storage:", err);
+      const complaints = this.getLocalComplaints();
+      const index = complaints.findIndex(c => c.id === complaintId);
+      if (index === -1) {
+        throw new Error("Complaint not found in database.");
       }
-      throw err;
+      
+      const updatedComplaint: Complaint = {
+        ...complaints[index],
+        status,
+        admin_reply: adminReply,
+        updated_at: now
+      };
+      
+      complaints[index] = updatedComplaint;
+      this.saveLocalComplaints(complaints);
+      
+      // Trigger local notification event so farmer UI updates immediately if open
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("farmalert_complaint_updated", { detail: updatedComplaint }));
+      }
+
+      return updatedComplaint;
     }
   }
 
@@ -276,13 +268,11 @@ export class ComplaintService {
       if (error) throw error;
       return data as Feedback;
     } catch (err) {
-      if (isRelationMissingError(err)) {
-        const feedbacks = this.getLocalFeedbacks();
-        feedbacks.unshift(newFeedback);
-        this.saveLocalFeedbacks(feedbacks);
-        return newFeedback;
-      }
-      throw err;
+      console.warn("Supabase feedback submission failed, falling back to local storage:", err);
+      const feedbacks = this.getLocalFeedbacks();
+      feedbacks.unshift(newFeedback);
+      this.saveLocalFeedbacks(feedbacks);
+      return newFeedback;
     }
   }
 
@@ -299,10 +289,8 @@ export class ComplaintService {
       if (error) throw error;
       return data as Feedback[];
     } catch (err) {
-      if (isRelationMissingError(err)) {
-        return this.getLocalFeedbacks();
-      }
-      throw err;
+      console.warn("Supabase getAllFeedbacks failed, falling back to local storage:", err);
+      return this.getLocalFeedbacks();
     }
   }
 }

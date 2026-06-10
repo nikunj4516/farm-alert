@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState, useEffect } from "react";
 import {
   AlertCircle,
   Camera,
@@ -217,6 +217,12 @@ const ProfileCard = ({
     (profile?.user_id ? localStorage.getItem(`farmalert_profile_image_url_${profile.user_id}`) : null) || 
     fallbackImageUrl;
   const avatarUrl = previewUrl || savedAvatarUrl;
+  const [avatarLoadError, setAvatarLoadError] = useState(false);
+
+  useEffect(() => {
+    setAvatarLoadError(false);
+  }, [avatarUrl]);
+
   const displayName = profile?.name || copy.farmer;
   const preferredLanguage = (profile?.preferred_language || language) as Language;
   const taluka = readExtra(profile, ["taluka"]);
@@ -293,9 +299,14 @@ const ProfileCard = ({
 
         <div className="-mt-12 px-5 pb-5">
           <div className="flex flex-col items-center text-center">
-            <div className="relative h-24 w-24 rounded-full border-4 border-card bg-primary/10 shadow-elevated">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={displayName} className="h-full w-full rounded-full object-cover" />
+            <div className="relative h-24 w-24 rounded-full border-4 border-card bg-primary/10 shadow-elevated flex items-center justify-center overflow-hidden">
+              {avatarUrl && !avatarLoadError ? (
+                <img 
+                  src={avatarUrl} 
+                  alt={displayName} 
+                  onError={() => setAvatarLoadError(true)}
+                  className="h-full w-full rounded-full object-cover" 
+                />
               ) : (
                 <FarmerEmojiImage className="h-full w-full rounded-full" />
               )}
