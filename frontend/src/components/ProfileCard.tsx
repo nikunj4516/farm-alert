@@ -307,20 +307,22 @@ const ProfileCard = ({
 
         <div className="-mt-12 px-5 pb-5">
           <div className="flex flex-col items-center text-center">
-            <div className="relative h-24 w-24 rounded-full border-4 border-card bg-primary/10 shadow-elevated flex items-center justify-center overflow-hidden">
-              {isValidAvatarUrl(avatarUrl) && !avatarLoadError ? (
-                <img 
-                  src={avatarUrl} 
-                  alt={displayName} 
-                  onError={(e) => {
-                    setAvatarLoadError(true);
-                    e.currentTarget.src = farmerAvatar;
-                  }}
-                  className="h-full w-full rounded-full object-cover" 
-                />
-              ) : (
-                <FarmerEmojiImage className="h-full w-full rounded-full" />
-              )}
+            <div className="relative h-24 w-24">
+              <div className="h-full w-full rounded-full border-4 border-card bg-primary/10 shadow-elevated flex items-center justify-center overflow-hidden">
+                {isValidAvatarUrl(avatarUrl) && !avatarLoadError ? (
+                  <img 
+                    src={avatarUrl} 
+                    alt={displayName} 
+                    onError={(e) => {
+                      setAvatarLoadError(true);
+                      e.currentTarget.src = farmerAvatar;
+                    }}
+                    className="h-full w-full rounded-full object-cover" 
+                  />
+                ) : (
+                  <FarmerEmojiImage className="h-full w-full rounded-full" />
+                )}
+              </div>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -342,7 +344,7 @@ const ProfileCard = ({
                 disabled={isUploadingImage}
                 aria-label={copy.changePhoto}
                 title={copy.changePhoto}
-                className="absolute bottom-0 right-0 rounded-full border-2 border-card bg-primary p-1.5 text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-95 disabled:opacity-70"
+                className="absolute -bottom-1 -right-1 z-10 rounded-full border-2 border-card bg-primary p-2 text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-95 disabled:opacity-70 flex items-center justify-center"
               >
                 {isUploadingImage ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
