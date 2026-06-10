@@ -1,6 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Lock, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import UpgradeModal from "./UpgradeModal";
 
 interface PremiumLockOverlayProps {
   title?: string;
@@ -34,8 +35,8 @@ const copyText = {
 };
 
 export const PremiumLockOverlay = ({ title, description, compact = false, requiredTier = "premium" }: PremiumLockOverlayProps) => {
-  const navigate = useNavigate();
   const { language } = useLanguage();
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const copy = copyText[language] || copyText.en;
 
   const displayTitle = title || (requiredTier === "pro" ? copy.proTitle : copy.premiumTitle);
@@ -44,42 +45,56 @@ export const PremiumLockOverlay = ({ title, description, compact = false, requir
   const handleUpgradeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate("/subscription");
+    setShowUpgrade(true);
   };
 
   if (compact) {
     return (
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-2 z-10 rounded-2xl">
-        <button
-          onClick={handleUpgradeClick}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-black shadow-md hover:bg-primary/95 transition-all"
-        >
-          <Lock className="w-3.5 h-3.5" />
-          <span>{copy.cta}</span>
-        </button>
-      </div>
+      <>
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-2 z-10 rounded-2xl">
+          <button
+            onClick={handleUpgradeClick}
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-black shadow-md hover:bg-primary/95 transition-all"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>{copy.cta}</span>
+          </button>
+        </div>
+        <UpgradeModal 
+          isOpen={showUpgrade} 
+          onOpenChange={setShowUpgrade} 
+          requiredTier={requiredTier} 
+        />
+      </>
     );
   }
 
   return (
-    <div className="absolute inset-0 bg-background/70 backdrop-blur-[6px] flex flex-col items-center justify-center text-center p-5 z-10 rounded-2xl border border-primary/10">
-      <div className="w-12 h-12 rounded-2xl bg-primary/15 flex items-center justify-center mb-3 text-primary animate-pulse">
-        <Lock className="w-6 h-6" />
+    <>
+      <div className="absolute inset-0 bg-background/70 backdrop-blur-[6px] flex flex-col items-center justify-center text-center p-5 z-10 rounded-2xl border border-primary/10">
+        <div className="w-12 h-12 rounded-2xl bg-primary/15 flex items-center justify-center mb-3 text-primary animate-pulse">
+          <Lock className="w-6 h-6" />
+        </div>
+        <h3 className="text-base font-black text-foreground flex items-center justify-center gap-1.5">
+          {displayTitle}
+        </h3>
+        <p className="mt-1 text-xs text-muted-foreground font-semibold leading-relaxed max-w-[280px] mx-auto">
+          {displayDesc}
+        </p>
+        <button
+          onClick={handleUpgradeClick}
+          className="mt-4 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-emerald-700 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-black shadow-md active:scale-95 transition-transform"
+        >
+          <span>{copy.cta}</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
-      <h3 className="text-base font-black text-foreground flex items-center justify-center gap-1.5">
-        {displayTitle}
-      </h3>
-      <p className="mt-1 text-xs text-muted-foreground font-semibold leading-relaxed max-w-[280px] mx-auto">
-        {displayDesc}
-      </p>
-      <button
-        onClick={handleUpgradeClick}
-        className="mt-4 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-emerald-700 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-black shadow-md active:scale-95 transition-transform"
-      >
-        <span>{copy.cta}</span>
-        <ArrowRight className="w-4 h-4" />
-      </button>
-    </div>
+      <UpgradeModal 
+        isOpen={showUpgrade} 
+        onOpenChange={setShowUpgrade} 
+        requiredTier={requiredTier} 
+      />
+    </>
   );
 };
 

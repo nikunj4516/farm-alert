@@ -27,19 +27,19 @@ const SubscriptionPage = () => {
       retry: "Subscribe Now",
       restore: "Restore Subscription",
       restoreFailed: "No active subscription found. Please subscribe to continue.",
-      title: "Choose Your Farming Plan",
-      subtitle: "Help your crops flourish and avoid severe losses with AI weather intelligence, crop scanners, and instant alerts.",
+      title: "Choose Your Plan",
+      subtitle: "Protect Your Crops Before Damage Happens",
       freePlan: "Free Plan",
       freePrice: "₹0",
-      freeDesc: "District-level weather, basic agriculture news, farming tips, and standard notifications.",
+      freeDesc: "Weather Forecast, News, Tips, Basic Alerts",
       premiumPlan: "Premium Plan",
       premiumPrice: "₹59",
       premiumPeriod: "/ month",
-      premiumDesc: "Village-level coordinate weather, advanced warnings, smart recommendations, and WhatsApp alerts.",
+      premiumDesc: "Village-Level Weather, AI Weather Alerts, WhatsApp Notifications, Smart Recommendations",
       proPlan: "Pro Plan",
       proPrice: "₹149",
       proPeriod: "/ month",
-      proDesc: "Everything in Premium, AI crop disease scanner, pest detection, treatment tips, Voice AI assistant, and emergency SMS alerts.",
+      proDesc: "Everything in Premium, Disease Scanner, Voice AI Assistant, SMS Alerts",
       activePlan: "Active",
       selectPlan: "Subscribe Plan",
       trusted: "Trusted by 50,000+ farmers across Gujarat",
@@ -62,19 +62,19 @@ const SubscriptionPage = () => {
       retry: "હમણાં સબ્સ્ક્રાઇબ કરો",
       restore: "સબ્સ્ક્રિપ્શન રિસ્ટોર કરો",
       restoreFailed: "કોઈ સક્રિય સબ્સ્ક્રિપ્શન મળ્યું નથી. ચાલુ રાખવા માટે સબ્સ્ક્રાઇબ કરો.",
-      title: "તમારી ખેતી માટે પ્લાન પસંદ કરો",
-      subtitle: "AI હવામાન સલાહ, પાક રોગ સ્કેનર અને સીધા એલર્ટ દ્વારા તમારા પાકને નુકસાનથી બચાવો.",
+      title: "તમારો પ્લાન પસંદ કરો",
+      subtitle: "નુકસાન થાય તે પહેલાં તમારા પાકનું રક્ષણ કરો",
       freePlan: "ફ્રી પ્લાન",
       freePrice: "₹૦",
-      freeDesc: "જિલ્લા કક્ષાની હવામાન આગાહી, કૃષિ સમાચાર, ખેતી પદ્ધતિઓ અને સાદા નોટિફિકેશન.",
+      freeDesc: "હવામાન આગાહી, કૃષિ સમાચાર, ખેતી માહિતી, સામાન્ય ચેતવણીઓ",
       premiumPlan: "પ્રીમિયમ પ્લાન",
       premiumPrice: "₹૫૯",
       premiumPeriod: "/ મહિને",
-      premiumDesc: "ગામ સ્તરની ચોક્કસ હવામાન આગાહી, ખાસ કૃષિ એલર્ટ, સ્માર્ટ ભલામણો અને વોટ્સએપ ચેતવણીઓ.",
+      premiumDesc: "ગામ સ્તરનું હવામાન, AI હવામાન એલર્ટ, વોટ્સએપ નોટિફિકેશન, સ્માર્ટ ભલામણો",
       proPlan: "પ્રો પ્લાન",
       proPrice: "₹૧૪૯",
       proPeriod: "/ મહિને",
-      proDesc: "પ્રીમિયમ પ્લાનનું બધું જ, AI પાક રોગ સ્કેનર, દવા ઉપચાર માહિતી, વોઇસ AI અને કટોકટીના SMS એલર્ટ.",
+      proDesc: "પ્રીમિયમનું બધું જ, પાક રોગ સ્કેનર, વોઇસ AI આસિસ્ટન્ટ, SMS એલર્ટ",
       activePlan: "સક્રિય",
       selectPlan: "પ્લાન પસંદ કરો",
       trusted: "ગુજરાતના ૫૦,૦૦૦+ ખેડૂતોનો વિશ્વાસ",
@@ -97,19 +97,19 @@ const SubscriptionPage = () => {
       retry: "अभी सब्सक्राइब करें",
       restore: "सब्सक्रिप्शन रीस्टोर करें",
       restoreFailed: "कोई सक्रिय सब्सक्रिप्शन नहीं मिला। जारी रखने के लिए सब्सक्राइब करें.",
-      title: "अपनी खेती के लिए प्लान चुनें",
-      subtitle: "AI मौसम सलाह, फसल रोग स्कैनर और तत्काल अलर्ट के साथ अपनी फसलों को भारी नुकसान से बचाएं।",
+      title: "अपना प्लान चुनें",
+      subtitle: "नुकसान होने से पहले अपनी फसलों की रक्षा करें",
       freePlan: "फ्री प्लान",
       freePrice: "₹0",
-      freeDesc: "जिला स्तर का मौसम पूर्वानुमान, कृषि समाचार, खेती टिप्स और बुनियादी सूचनाएं.",
+      freeDesc: "मौसम पूर्वानुमान, समाचार, टिप्स, सामान्य अलर्ट",
       premiumPlan: "प्रीमियम प्लान",
       premiumPrice: "₹59",
       premiumPeriod: "/ महीना",
-      premiumDesc: "गांव के सटीक स्थान स्तर पर मौसम, उन्नत चेतावनी, कृषि प्रबंधन सलाह और व्हाट्सएप अलर्ट.",
+      premiumDesc: "गांव-स्तरीय मौसम, AI मौसम अलर्ट, व्हाट्सएप सूचनाएं, स्मार्ट सिफारिशें",
       proPlan: "प्रो प्लान",
       proPrice: "₹149",
       proPeriod: "/ महीना",
-      proDesc: "प्रीमियम की सभी सुविधाएं, AI फसल रोग स्कैनर, कीट पहचान व उपचार सलाह, वॉयस AI और आपातकालीन एसएमएस अलर्ट.",
+      proDesc: "प्रीमियम का सब कुछ, फसल रोग स्कैनर, वॉयस AI सहायक, एसएमएस अलर्ट",
       activePlan: "सक्रिय",
       selectPlan: "प्लान चुनें",
       trusted: "गुजरात के 50,000+ किसानों का भरोसा",
@@ -132,6 +132,16 @@ const SubscriptionPage = () => {
   useEffect(() => {
     setShowRequiredNotice(consumeSubscriptionRequiredMessage());
     setCurrentTier(getSavedSubscriptionTier());
+  }, []);
+
+  useEffect(() => {
+    const handleSubChange = () => {
+      setCurrentTier(getSavedSubscriptionTier());
+    };
+    window.addEventListener("farmalert_subscription_changed", handleSubChange);
+    return () => {
+      window.removeEventListener("farmalert_subscription_changed", handleSubChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -180,6 +190,7 @@ const SubscriptionPage = () => {
       await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>).catch(() => null);
       
       setCurrentTier(tier);
+      window.dispatchEvent(new Event("farmalert_subscription_changed"));
       navigate("/dashboard", { state: { activeTab: "weather" }, replace: true });
     } catch (err: any) {
       setError(err.message || "Subscription failed");
@@ -248,6 +259,8 @@ const SubscriptionPage = () => {
           description: `All ${tier} features are now unlocked.`,
         });
       }
+
+      window.dispatchEvent(new Event("farmalert_subscription_changed"));
     } catch (err: any) {
       // Local storage fallback
       if (tier === "free") {
@@ -335,7 +348,13 @@ const SubscriptionPage = () => {
               <ShieldAlert className="w-4 h-4 text-amber-600 animate-pulse" />
               <span>🔬 Developer Test Switcher</span>
             </div>
-            <span className="text-[9px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-black uppercase">
+            <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase border tracking-wider ${
+              currentTier === "pro" 
+                ? "bg-[#FEF3C7] text-[#D97706] border-[#FCD34D]"
+                : currentTier === "premium"
+                  ? "bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE]"
+                  : "bg-[#F3F4F6] text-[#374151] border-[#E5E7EB]"
+            }`}>
               Current: {currentTier}
             </span>
           </div>
@@ -347,7 +366,7 @@ const SubscriptionPage = () => {
               onClick={() => handleTestSwitch("free")}
               className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
                 currentTier === "free"
-                  ? "bg-slate-800 text-white border-slate-900 shadow-sm"
+                  ? "bg-slate-500 text-white border-slate-600 shadow-sm"
                   : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
               }`}
             >
@@ -357,21 +376,21 @@ const SubscriptionPage = () => {
               onClick={() => handleTestSwitch("premium")}
               className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
                 currentTier === "premium"
-                  ? "bg-emerald-600 text-white border-emerald-700 shadow-sm"
+                  ? "bg-blue-600 text-white border-blue-700 shadow-sm"
                   : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
               }`}
             >
-              PREMIUM (₹59)
+              PREMIUM
             </button>
             <button
               onClick={() => handleTestSwitch("pro")}
               className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
                 currentTier === "pro"
-                  ? "bg-blue-600 text-white border-blue-700 shadow-sm"
+                  ? "bg-amber-500 text-white border-amber-600 shadow-sm"
                   : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
               }`}
             >
-              PRO (₹149)
+              PRO Plan
             </button>
           </div>
         </div>

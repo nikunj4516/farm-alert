@@ -29,6 +29,8 @@ import { toast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { getSavedSubscriptionTier } from "@/services/subscriptionService";
 import SupportCenterModal from "./SupportCenterModal";
+import UpgradeModal from "@/components/ui/UpgradeModal";
+import { supabase } from "@/integrations/supabase/client";
 
 const isValidAvatarUrl = (url: any): url is string => {
   if (!url || typeof url !== "string") return false;
@@ -169,16 +171,97 @@ const ProfileCard = ({
   const [pushEnabled, setPushEnabled] = useState(() => localStorage.getItem("farmalert_push_alerts") !== "false");
 
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [requiredUpgradeTier, setRequiredUpgradeTier] = useState<"premium" | "pro">("premium");
+  const [tier, setTier] = useState<"free" | "premium" | "pro">(() => getSavedSubscriptionTier());
 
-  const tier = getSavedSubscriptionTier();
+  useEffect(() => {
+    const handleSubChange = () => {
+      setTier(getSavedSubscriptionTier());
+    };
+    window.addEventListener("farmalert_subscription_changed", handleSubChange);
+    return () => {
+      window.removeEventListener("farmalert_subscription_changed", handleSubChange);
+    };
+  }, []);
+
+  const handleProfileTestSwitch = async (newTier: "free" | "premium" | "pro") => {
+    if (!profile?.user_id) return;
+    
+    try {
+      if (newTier === "free") {
+        await supabase
+          .from("subscriptions")
+          .delete()
+          .eq("user_id", profile.user_id)
+          .catch(() => null);
+
+        localStorage.removeItem("farmalert_subscribed");
+        localStorage.removeItem("farmalert_subscription_active");
+        localStorage.setItem("farmalert_subscription_tier", "free");
+        localStorage.setItem("farmalert_subscription_checked_at", String(Date.now()));
+
+        await supabase
+          .from("profiles")
+          .update({ subscription_active: false })
+          .eq("user_id", profile.user_id)
+          .catch(() => null);
+
+        toast({
+          title: "Test Mode: Free Plan Activated",
+          description: "All premium/pro features are now locked.",
+        });
+      } else {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 30);
+        const planDbValue = newTier === "pro" ? "daily" : "monthly";
+        const amountPaise = newTier === "pro" ? 14900 : 5900;
+
+        await supabase
+          .from("subscriptions")
+          .upsert(
+            {
+              user_id: profile.user_id,
+              plan: planDbValue,
+              status: "active",
+              amount_paise: amountPaise,
+              started_at: new Date().toISOString(),
+              expires_at: expiresAt.toISOString(),
+            },
+            { onConflict: "user_id" }
+          );
+
+        localStorage.setItem("farmalert_subscribed", "true");
+        localStorage.setItem("farmalert_subscription_active", "true");
+        localStorage.setItem("farmalert_subscription_tier", newTier);
+        localStorage.setItem("farmalert_subscription_checked_at", String(Date.now()));
+
+        await supabase
+          .from("profiles")
+          .update({ subscription_active: true })
+          .eq("user_id", profile.user_id)
+          .catch(() => null);
+
+        toast({
+          title: `Test Mode: ${newTier.toUpperCase()} Plan Activated`,
+          description: `All ${newTier} features are now unlocked.`,
+        });
+      }
+
+      window.dispatchEvent(new Event("farmalert_subscription_changed"));
+    } catch (err: any) {
+      toast({
+        title: "Simulation Switch Failed",
+        description: err.message || "Error updating plan.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleWhatsappToggle = (checked: boolean) => {
     if (tier === "free") {
-      toast({
-        title: "🔒 Premium Feature",
-        description: "WhatsApp alerts require a Premium or Pro subscription.",
-      });
-      navigate("/subscription");
+      setRequiredUpgradeTier("premium");
+      setShowUpgrade(true);
       return;
     }
     setWhatsappEnabled(checked);
@@ -191,11 +274,8 @@ const ProfileCard = ({
 
   const handleSmsToggle = (checked: boolean) => {
     if (tier !== "pro") {
-      toast({
-        title: "🔒 Pro Feature",
-        description: "SMS Emergency alerts require a Pro subscription.",
-      });
-      navigate("/subscription");
+      setRequiredUpgradeTier("pro");
+      setShowUpgrade(true);
       return;
     }
     setSmsEnabled(checked);
@@ -421,6 +501,71 @@ const ProfileCard = ({
             })}
           </div>
 
+          {/* Active Subscription Tier Badge & Simulator Switcher */}
+          <div className="mt-6 border-t border-border pt-6 space-y-4 text-left">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-extrabold uppercase tracking-wide text-foreground flex items-center gap-2">
+                <span>💳</span>
+                {language === "gu" ? "સક્રિય સબ્સ્ક્રિપ્શન પ્લાન" : language === "hi" ? "सक्रिय सब्सक्रिप्शन प्लान" : "Active Subscription Plan"}
+              </h4>
+              <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border shadow-sm transition-all tracking-wider ${
+                tier === "pro" 
+                  ? "bg-[#FEF3C7] text-[#D97706] border-[#FCD34D]"
+                  : tier === "premium"
+                    ? "bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE]"
+                    : "bg-[#F3F4F6] text-[#374151] border-[#E5E7EB]"
+              }`}>
+                {tier === "pro" ? "PRO" : tier === "premium" ? "PREMIUM" : "FREE"}
+              </span>
+            </div>
+
+            {/* Test Switcher (Visible to Admins / Developers / Test Users) */}
+            <div className="bg-[#FFFBEB] border-2 border-dashed border-[#FDE68A] rounded-2xl p-4 space-y-2.5 shadow-sm">
+              <div className="flex items-center gap-1.5 text-[10px] font-black text-amber-800 uppercase tracking-wide">
+                <ShieldAlert className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                <span>🔬 Subscription Simulator (Test Mode)</span>
+              </div>
+              <p className="text-[10px] text-amber-700 font-semibold leading-normal">
+                Quickly toggle tiers to test locks (Scanner, Voice assistant, weather forecasts, notifications) in real-time.
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleProfileTestSwitch("free")}
+                  className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
+                    tier === "free"
+                      ? "bg-slate-800 text-white border-slate-900 shadow-sm"
+                      : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  FREE Plan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleProfileTestSwitch("premium")}
+                  className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
+                    tier === "premium"
+                      ? "bg-blue-600 text-white border-blue-700 shadow-sm"
+                      : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  PREMIUM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleProfileTestSwitch("pro")}
+                  className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
+                    tier === "pro"
+                      ? "bg-amber-500 text-white border-amber-600 shadow-sm"
+                      : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  PRO Plan
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Smart Alert & Notification Settings */}
           <div className="mt-6 border-t border-border pt-6 space-y-4">
             <h4 className="text-sm font-extrabold uppercase tracking-wide text-foreground flex items-center gap-2">
@@ -566,6 +711,11 @@ const ProfileCard = ({
           userVillage={profile.village || ""}
         />
       )}
+      <UpgradeModal 
+        isOpen={showUpgrade} 
+        onOpenChange={setShowUpgrade} 
+        requiredTier={requiredUpgradeTier} 
+      />
     </section>
   );
 };

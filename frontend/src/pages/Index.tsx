@@ -130,6 +130,16 @@ const Index = () => {
   }, [user, loading, navigate]);
 
   useEffect(() => {
+    const handleSubChange = () => {
+      setTier(getSavedSubscriptionTier());
+    };
+    window.addEventListener("farmalert_subscription_changed", handleSubChange);
+    return () => {
+      window.removeEventListener("farmalert_subscription_changed", handleSubChange);
+    };
+  }, []);
+
+  useEffect(() => {
     if (loading || !user || isProfileLoading) return;
 
     if (!ProfileService.isProfileComplete(profile)) {

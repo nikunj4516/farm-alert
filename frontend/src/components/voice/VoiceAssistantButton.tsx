@@ -11,6 +11,7 @@ import VoiceWaveAnimation from "./VoiceWaveAnimation";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { getSavedSubscriptionTier } from "@/services/subscriptionService";
+import UpgradeModal from "@/components/ui/UpgradeModal";
  
 interface VoiceAssistantButtonProps {
   language: Language;
@@ -25,6 +26,7 @@ const VoiceAssistantButton = ({ language, className, onCommand, isPremium = fals
   const timeoutRef = useRef<number | null>(null);
   const [voiceState, setVoiceState] = useState<VoiceRecognitionState>("idle");
   const [transcript, setTranscript] = useState("");
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [detectedLanguage, setDetectedLanguage] = useState<Language>(language);
  
   const clearStatusLater = (delay = 1900) => {
@@ -44,11 +46,7 @@ const VoiceAssistantButton = ({ language, className, onCommand, isPremium = fals
   const handleStart = () => {
     const tier = getSavedSubscriptionTier();
     if (tier !== "pro") {
-      toast({
-        title: "🔒 Pro Feature",
-        description: "Voice AI Assistant is a Pro feature. Please upgrade to unlock.",
-      });
-      navigate("/subscription");
+      setShowUpgrade(true);
       return;
     }
 
@@ -132,6 +130,11 @@ const VoiceAssistantButton = ({ language, className, onCommand, isPremium = fals
       {(voiceState !== "idle" || transcript) && (
         <VoiceStatusIndicator language={detectedLanguage} state={voiceState} transcript={transcript} />
       )}
+      <UpgradeModal 
+        isOpen={showUpgrade} 
+        onOpenChange={setShowUpgrade} 
+        requiredTier="pro" 
+      />
     </div>
   );
 };
