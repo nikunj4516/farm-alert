@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileService } from "@/services/profileService";
 import { SUBSCRIPTION_CHECKED_AT_KEY, consumeSubscriptionRequiredMessage, getSavedSubscriptionTier, getActiveSubscriptionTier } from "@/services/subscriptionService";
 import logo from "@/assets/farmalert-logo.png";
+import { toast } from "@/components/ui/use-toast";
 
 const SubscriptionPage = () => {
   const navigate = useNavigate();
@@ -187,6 +188,90 @@ const SubscriptionPage = () => {
     }
   };
 
+  const handleTestSwitch = async (tier: "free" | "premium" | "pro") => {
+    if (!user) return;
+    setError("");
+    setSubmittingTier(tier === "free" ? null : tier);
+
+    try {
+      if (tier === "free") {
+        // Deactivate subscription in Supabase
+        await supabase
+          .from("subscriptions")
+          .delete()
+          .eq("user_id", user.id)
+          .catch(() => null);
+
+        localStorage.removeItem("farmalert_subscribed");
+        localStorage.removeItem("farmalert_subscription_active");
+        localStorage.setItem("farmalert_subscription_tier", "free");
+        localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
+
+        await ProfileService.upsertProfile(user.id, { subscription_active: false } as Record<string, unknown>).catch(() => null);
+
+        setCurrentTier("free");
+        toast({
+          title: "Test Mode: Free Tier Activated",
+          description: "All premium/pro features are now locked.",
+        });
+      } else {
+        // Upgrade to Premium/Pro in Supabase
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 30);
+        const planDbValue = tier === "pro" ? "daily" : "monthly";
+        const amountPaise = tier === "pro" ? 14900 : 5900;
+
+        await supabase
+          .from("subscriptions")
+          .upsert(
+            {
+              user_id: user.id,
+              plan: planDbValue,
+              status: "active",
+              amount_paise: amountPaise,
+              started_at: new Date().toISOString(),
+              expires_at: expiresAt.toISOString(),
+            },
+            { onConflict: "user_id" }
+          );
+
+        localStorage.setItem("farmalert_subscribed", "true");
+        localStorage.setItem("farmalert_subscription_active", "true");
+        localStorage.setItem("farmalert_subscription_tier", tier);
+        localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
+
+        await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>).catch(() => null);
+
+        setCurrentTier(tier);
+        toast({
+          title: `Test Mode: ${tier.toUpperCase()} Tier Activated`,
+          description: `All ${tier} features are now unlocked.`,
+        });
+      }
+    } catch (err: any) {
+      // Local storage fallback
+      if (tier === "free") {
+        localStorage.removeItem("farmalert_subscribed");
+        localStorage.removeItem("farmalert_subscription_active");
+        localStorage.setItem("farmalert_subscription_tier", "free");
+        setCurrentTier("free");
+      } else {
+        localStorage.setItem("farmalert_subscribed", "true");
+        localStorage.setItem("farmalert_subscription_active", "true");
+        localStorage.setItem("farmalert_subscription_tier", tier);
+        setCurrentTier(tier);
+      }
+      localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
+      
+      toast({
+        title: `Test Mode: Local ${tier.toUpperCase()} Activated`,
+        description: `Running with local storage simulation.`,
+      });
+    } finally {
+      setSubmittingTier(null);
+    }
+  };
+
   const handleRestoreSubscription = async () => {
     setError("");
     setCheckingRestore(true);
@@ -241,6 +326,54 @@ const SubscriptionPage = () => {
           <FarmerEmojiImage className="mx-auto h-16 w-16" />
           <h1 className="text-2xl font-black text-slate-900 leading-tight">{copy.title}</h1>
           <p className="text-xs text-slate-500 font-semibold leading-relaxed">{copy.subtitle}</p>
+        </div>
+
+        {/* Developer Sandbox Test Mode Switcher */}
+        <div className="bg-amber-50 border-2 border-dashed border-amber-300 rounded-3xl p-5 space-y-3 shadow-sm text-left animate-in fade-in duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-amber-800 font-black text-xs uppercase tracking-wider">
+              <ShieldAlert className="w-4 h-4 text-amber-600 animate-pulse" />
+              <span>🔬 Developer Test Switcher</span>
+            </div>
+            <span className="text-[9px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-black uppercase">
+              Current: {currentTier}
+            </span>
+          </div>
+          <p className="text-[10px] text-amber-700 font-semibold leading-normal">
+            Since payment gateway integration is currently in sandbox/mock, use this dashboard to instantly toggle subscription tiers for locks, scanner, and alert testing.
+          </p>
+          <div className="grid grid-cols-3 gap-2 pt-1">
+            <button
+              onClick={() => handleTestSwitch("free")}
+              className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
+                currentTier === "free"
+                  ? "bg-slate-800 text-white border-slate-900 shadow-sm"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              FREE Plan
+            </button>
+            <button
+              onClick={() => handleTestSwitch("premium")}
+              className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
+                currentTier === "premium"
+                  ? "bg-emerald-600 text-white border-emerald-700 shadow-sm"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              PREMIUM (₹59)
+            </button>
+            <button
+              onClick={() => handleTestSwitch("pro")}
+              className={`py-2 px-1 text-center rounded-xl text-[10px] font-black transition-all active:scale-95 border ${
+                currentTier === "pro"
+                  ? "bg-blue-600 text-white border-blue-700 shadow-sm"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              PRO (₹149)
+            </button>
+          </div>
         </div>
 
         {/* Plan Tiers Cards */}

@@ -362,6 +362,111 @@ export interface Database {
           is_read?: boolean
         }
       }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          plan: string
+          status: string
+          amount_paise: number
+          started_at: string
+          expires_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan: string
+          status: string
+          amount_paise: number
+          started_at?: string
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan?: string
+          status?: string
+          amount_paise?: number
+          started_at?: string
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      complaints: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          phone: string
+          village: string
+          category: string
+          message: string
+          screenshot_url: string | null
+          status: string
+          admin_reply: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          phone: string
+          village: string
+          category: string
+          message: string
+          screenshot_url?: string | null
+          status?: string
+          admin_reply?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          phone?: string
+          village?: string
+          category?: string
+          message?: string
+          screenshot_url?: string | null
+          status?: string
+          admin_reply?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      feedbacks: {
+        Row: {
+          id: string
+          user_id: string
+          rating: number
+          favorite_feature: string
+          suggestions: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          rating: number
+          favorite_feature: string
+          suggestions: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          rating?: number
+          favorite_feature?: string
+          suggestions?: string
+          created_at?: string
+        }
+      }
     }
   }
 }
