@@ -6,7 +6,10 @@ export interface Complaint {
   name: string;
   phone: string;
   village: string;
+  taluka: string;
+  district: string;
   category: string;
+  subject: string;
   message: string;
   screenshot_url?: string | null;
   status: "Pending" | "In Review" | "Resolved" | "Rejected";
@@ -19,8 +22,8 @@ export interface Feedback {
   id: string;
   user_id: string;
   rating: number;
-  favorite_feature: string;
-  suggestions: string;
+  feedback_message: string;
+  language: string;
   created_at: string;
 }
 
@@ -32,12 +35,6 @@ export interface AdminNotification {
   created_at: string;
   read: boolean;
 }
-
-const isRelationMissingError = (error: any): boolean => {
-  if (!error) return false;
-  const msg = String(error.message || "").toLowerCase();
-  return msg.includes("does not exist") || msg.includes("not found") || error.code === "PGRST204" || error.status === 404;
-};
 
 const generateUUID = (): string => {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -139,7 +136,10 @@ export class ComplaintService {
           name: newComplaint.name,
           phone: newComplaint.phone,
           village: newComplaint.village,
+          taluka: newComplaint.taluka,
+          district: newComplaint.district,
           category: newComplaint.category,
+          subject: newComplaint.subject,
           message: newComplaint.message,
           screenshot_url: newComplaint.screenshot_url,
           status: newComplaint.status,
@@ -153,7 +153,6 @@ export class ComplaintService {
       return data as Complaint;
     } catch (err) {
       console.warn("Supabase complaint submission failed, falling back to local storage:", err);
-      // Fallback to local storage database
       const complaints = this.getLocalComplaints();
       complaints.unshift(newComplaint);
       this.saveLocalComplaints(complaints);
@@ -175,7 +174,7 @@ export class ComplaintService {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Complaint[];
+      return (data || []) as Complaint[];
     } catch (err) {
       console.warn("Supabase getComplaints failed, falling back to local storage:", err);
       const complaints = this.getLocalComplaints();
@@ -194,7 +193,7 @@ export class ComplaintService {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Complaint[];
+      return (data || []) as Complaint[];
     } catch (err) {
       console.warn("Supabase getAllComplaints failed, falling back to local storage:", err);
       return this.getLocalComplaints();
@@ -243,7 +242,6 @@ export class ComplaintService {
       complaints[index] = updatedComplaint;
       this.saveLocalComplaints(complaints);
       
-      // Trigger local notification event so farmer UI updates immediately if open
       if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent("farmalert_complaint_updated", { detail: updatedComplaint }));
       }
@@ -253,7 +251,7 @@ export class ComplaintService {
   }
 
   /**
-   * Submit feedback
+   * Submit feedback (to the new singular 'feedback' table)
    */
   static async submitFeedback(feedbackData: Omit<Feedback, "id" | "created_at">): Promise<Feedback> {
     const id = generateUUID();
@@ -265,13 +263,13 @@ export class ComplaintService {
 
     try {
       const { data, error } = await supabase
-        .from("feedbacks")
+        .from("feedback")
         .insert({
           id: newFeedback.id,
           user_id: newFeedback.user_id,
           rating: newFeedback.rating,
-          favorite_feature: newFeedback.favorite_feature,
-          suggestions: newFeedback.suggestions,
+          feedback_message: newFeedback.feedback_message,
+          language: newFeedback.language
         })
         .select()
         .single();
@@ -293,12 +291,12 @@ export class ComplaintService {
   static async getAllFeedbacks(): Promise<Feedback[]> {
     try {
       const { data, error } = await supabase
-        .from("feedbacks")
+        .from("feedback")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Feedback[];
+      return (data || []) as Feedback[];
     } catch (err) {
       console.warn("Supabase getAllFeedbacks failed, falling back to local storage:", err);
       return this.getLocalFeedbacks();

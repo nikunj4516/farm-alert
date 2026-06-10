@@ -3,6 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { getLocationLabel, getDistrictLabel } from "@/services/gujaratLocationService";
 import { Lock, ArrowRight, ShieldCheck, AlertTriangle, AlertOctagon, Sparkles } from "lucide-react";
 import PremiumLockOverlay from "@/components/ui/PremiumLockOverlay";
+import { PermissionService } from "@/services/permissionService";
 
 interface WeatherCardProps {
   weather: WeatherReport;
@@ -61,9 +62,10 @@ const copyText = {
   },
 };
 
-export const WeatherCard = ({ weather, isPremium = false }: WeatherCardProps) => {
+export const WeatherCard = ({ weather }: WeatherCardProps) => {
   const { language, t } = useLanguage();
   const copy = copyText[language] || copyText.en;
+  const hasPremiumAccess = PermissionService.hasPermission("Advanced Alerts");
 
   // Resolve Names
   const villageName = weather.location?.split(",")?.[0]?.trim() || weather.village || "";
@@ -118,7 +120,7 @@ export const WeatherCard = ({ weather, isPremium = false }: WeatherCardProps) =>
             <span>•</span>
             <span>{displayDistrict}</span>
             <span>•</span>
-            {isPremium ? (
+            {hasPremiumAccess ? (
               <span>{displayTaluka}</span>
             ) : (
               <span className="text-amber-400/80 font-black">{copy.talukaLocked}</span>
@@ -126,14 +128,14 @@ export const WeatherCard = ({ weather, isPremium = false }: WeatherCardProps) =>
           </div>
           <div className="flex items-baseline justify-between">
             <h2 className="text-2xl font-black tracking-tight text-white leading-tight">
-              {isPremium ? (
+              {hasPremiumAccess ? (
                 displayVillage || "Village Weather"
               ) : (
                 <span className="text-amber-400/95 font-extrabold">{copy.villageLocked}</span>
               )}
             </h2>
             <span className="text-[10px] font-black uppercase bg-white/10 px-2 py-0.5 rounded border border-white/5 text-slate-300">
-              {isPremium ? copy.villageLabel : copy.freeLabel}
+              {hasPremiumAccess ? copy.villageLabel : copy.freeLabel}
             </span>
           </div>
         </div>
@@ -182,7 +184,7 @@ export const WeatherCard = ({ weather, isPremium = false }: WeatherCardProps) =>
 
       {/* AI Recommendation Card (Directly Below) */}
       <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm min-h-[120px] flex flex-col justify-center">
-        {!isPremium ? (
+        {!hasPremiumAccess ? (
           <>
             <div className="space-y-2.5 opacity-20 blur-[1px] select-none">
               <div className="flex items-center gap-2 mb-1">

@@ -404,7 +404,10 @@ export interface Database {
           name: string
           phone: string
           village: string
+          taluka: string
+          district: string
           category: string
+          subject: string
           message: string
           screenshot_url: string | null
           status: string
@@ -418,7 +421,10 @@ export interface Database {
           name: string
           phone: string
           village: string
+          taluka: string
+          district: string
           category: string
+          subject: string
           message: string
           screenshot_url?: string | null
           status?: string
@@ -432,7 +438,10 @@ export interface Database {
           name?: string
           phone?: string
           village?: string
+          taluka?: string
+          district?: string
           category?: string
+          subject?: string
           message?: string
           screenshot_url?: string | null
           status?: string
@@ -441,29 +450,107 @@ export interface Database {
           updated_at?: string
         }
       }
-      feedbacks: {
+      feedback: {
         Row: {
           id: string
           user_id: string
           rating: number
-          favorite_feature: string
-          suggestions: string
+          feedback_message: string
+          language: string
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
           rating: number
-          favorite_feature: string
-          suggestions: string
+          feedback_message: string
+          language: string
           created_at?: string
         }
         Update: {
           id?: string
           user_id?: string
           rating?: number
-          favorite_feature?: string
-          suggestions?: string
+          feedback_message?: string
+          language?: string
+          created_at?: string
+        }
+      }
+      user_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          plan_type: string
+          subscription_status: string
+          started_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_type: string
+          subscription_status?: string
+          started_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_type?: string
+          subscription_status?: string
+          started_at?: string
+          updated_at?: string
+        }
+      }
+      plan_permissions: {
+        Row: {
+          id: string
+          plan_type: string
+          feature_name: string
+          is_enabled: boolean
+        }
+        Insert: {
+          id?: string
+          plan_type: string
+          feature_name: string
+          is_enabled?: boolean
+        }
+        Update: {
+          id?: string
+          plan_type?: string
+          feature_name?: string
+          is_enabled?: boolean
+        }
+      }
+      scan_history: {
+        Row: {
+          id: string
+          user_id: string
+          image_url: string
+          crop_name: string
+          disease_name: string
+          confidence_score: number
+          recommendation: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          image_url: string
+          crop_name: string
+          disease_name: string
+          confidence_score: number
+          recommendation: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          image_url?: string
+          crop_name?: string
+          disease_name?: string
+          confidence_score?: number
+          recommendation?: string
           created_at?: string
         }
       }

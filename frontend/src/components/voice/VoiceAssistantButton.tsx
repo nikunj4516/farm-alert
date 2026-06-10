@@ -10,8 +10,8 @@ import VoiceStatusIndicator from "./VoiceStatusIndicator";
 import VoiceWaveAnimation from "./VoiceWaveAnimation";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
-import { getSavedSubscriptionTier } from "@/services/subscriptionService";
 import UpgradeModal from "@/components/ui/UpgradeModal";
+import { PermissionService } from "@/services/permissionService";
  
 interface VoiceAssistantButtonProps {
   language: Language;
@@ -44,8 +44,8 @@ const VoiceAssistantButton = ({ language, className, onCommand, isPremium = fals
   };
  
   const handleStart = () => {
-    const tier = getSavedSubscriptionTier();
-    if (tier !== "pro") {
+    const hasVoiceAccess = PermissionService.hasPermission("Voice Assistant");
+    if (!hasVoiceAccess) {
       setShowUpgrade(true);
       return;
     }

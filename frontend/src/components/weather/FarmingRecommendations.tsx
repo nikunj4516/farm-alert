@@ -4,6 +4,7 @@ import { FarmingRecommendation } from "@/services/recommendationEngine";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Sparkles } from "lucide-react";
 import PremiumLockOverlay from "@/components/ui/PremiumLockOverlay";
+import { PermissionService } from "@/services/permissionService";
 
 interface FarmingRecommendationsProps {
   weather: WeatherReport;
@@ -12,8 +13,9 @@ interface FarmingRecommendationsProps {
   isPremium?: boolean;
 }
 
-const FarmingRecommendations = ({ weather, cropType, recommendations: generatedRecommendations, isPremium = false }: FarmingRecommendationsProps) => {
+const FarmingRecommendations = ({ weather, cropType, recommendations: generatedRecommendations }: FarmingRecommendationsProps) => {
   const { t, language } = useLanguage();
+  const isPremium = PermissionService.hasPermission("AI Recommendations");
   const crop = t(`weather.intelligence.crops.${getCropWeatherThreshold(cropType).cropName}`);
 
   // Core generated recommendations based on database rules

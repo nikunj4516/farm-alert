@@ -158,22 +158,14 @@ const SubscriptionPage = () => {
     setSubmittingTier(tier);
 
     try {
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 30); // 30-day validity
-
-      const planDbValue = tier === "pro" ? "daily" : "monthly";
-      const amountPaise = tier === "pro" ? 14900 : 5900;
-
       const { error: upsertError } = await supabase
-        .from("subscriptions")
+        .from("user_subscriptions")
         .upsert(
           {
             user_id: user.id,
-            plan: planDbValue,
-            status: "active",
-            amount_paise: amountPaise,
-            started_at: new Date().toISOString(),
-            expires_at: expiresAt.toISOString(),
+            plan_type: tier.toUpperCase(),
+            subscription_status: "active",
+            updated_at: new Date().toISOString()
           },
           { onConflict: "user_id" }
         );
@@ -188,7 +180,11 @@ const SubscriptionPage = () => {
       localStorage.setItem("farmalert_subscription_tier", tier);
       localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
       
-      await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>).catch(() => null);
+      try {
+        await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>);
+      } catch (profileErr) {
+        console.warn("Profile sync failed in handleSubscribe, continuing:", profileErr);
+      }
       
       setCurrentTier(tier);
       window.dispatchEvent(new Event("farmalert_subscription_changed"));
@@ -207,19 +203,30 @@ const SubscriptionPage = () => {
 
     try {
       if (tier === "free") {
-        // Deactivate subscription in Supabase
-        await supabase
-          .from("subscriptions")
-          .delete()
-          .eq("user_id", user.id)
-          .catch(() => null);
+        const { error: subError } = await supabase
+          .from("user_subscriptions")
+          .upsert(
+            {
+              user_id: user.id,
+              plan_type: "FREE",
+              subscription_status: "inactive",
+              updated_at: new Date().toISOString()
+            },
+            { onConflict: "user_id" }
+          );
+
+        if (subError) throw subError;
 
         localStorage.removeItem("farmalert_subscribed");
         localStorage.removeItem("farmalert_subscription_active");
         localStorage.setItem("farmalert_subscription_tier", "free");
         localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
 
-        await ProfileService.upsertProfile(user.id, { subscription_active: false } as Record<string, unknown>).catch(() => null);
+        try {
+          await ProfileService.upsertProfile(user.id, { subscription_active: false } as Record<string, unknown>);
+        } catch (profileErr) {
+          console.warn("Profile sync failed in handleTestSwitch, continuing:", profileErr);
+        }
 
         setCurrentTier("free");
         toast({
@@ -227,32 +234,30 @@ const SubscriptionPage = () => {
           description: "All premium/pro features are now locked.",
         });
       } else {
-        // Upgrade to Premium/Pro in Supabase
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 30);
-        const planDbValue = tier === "pro" ? "daily" : "monthly";
-        const amountPaise = tier === "pro" ? 14900 : 5900;
-
-        await supabase
-          .from("subscriptions")
+        const { error: subError } = await supabase
+          .from("user_subscriptions")
           .upsert(
             {
               user_id: user.id,
-              plan: planDbValue,
-              status: "active",
-              amount_paise: amountPaise,
-              started_at: new Date().toISOString(),
-              expires_at: expiresAt.toISOString(),
+              plan_type: tier.toUpperCase(),
+              subscription_status: "active",
+              updated_at: new Date().toISOString()
             },
             { onConflict: "user_id" }
           );
+
+        if (subError) throw subError;
 
         localStorage.setItem("farmalert_subscribed", "true");
         localStorage.setItem("farmalert_subscription_active", "true");
         localStorage.setItem("farmalert_subscription_tier", tier);
         localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
 
-        await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>).catch(() => null);
+        try {
+          await ProfileService.upsertProfile(user.id, { subscription_active: true } as Record<string, unknown>);
+        } catch (profileErr) {
+          console.warn("Profile sync failed in handleTestSwitch, continuing:", profileErr);
+        }
 
         setCurrentTier(tier);
         toast({
@@ -281,6 +286,7 @@ const SubscriptionPage = () => {
         title: `Test Mode: Local ${tier.toUpperCase()} Activated`,
         description: `Running with local storage simulation.`,
       });
+      window.dispatchEvent(new Event("farmalert_subscription_changed"));
     } finally {
       setSubmittingTier(null);
     }

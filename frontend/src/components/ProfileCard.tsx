@@ -32,6 +32,7 @@ import { getSavedSubscriptionTier } from "@/services/subscriptionService";
 import SupportCenterModal from "./SupportCenterModal";
 import UpgradeModal from "@/components/ui/UpgradeModal";
 import { supabase } from "@/integrations/supabase/client";
+import { PermissionService } from "@/services/permissionService";
 
 const isValidAvatarUrl = (url: any): url is string => {
   if (!url || typeof url !== "string") return false;
@@ -191,57 +192,62 @@ const ProfileCard = ({
     
     try {
       if (newTier === "free") {
-        await supabase
-          .from("subscriptions")
-          .delete()
-          .eq("user_id", profile.user_id)
-          .catch(() => null);
+        const { error: subError } = await supabase
+          .from("user_subscriptions")
+          .upsert(
+            {
+              user_id: profile.user_id,
+              plan_type: "FREE",
+              subscription_status: "inactive",
+              updated_at: new Date().toISOString()
+            },
+            { onConflict: "user_id" }
+          );
+
+        if (subError) throw subError;
 
         localStorage.removeItem("farmalert_subscribed");
         localStorage.removeItem("farmalert_subscription_active");
         localStorage.setItem("farmalert_subscription_tier", "free");
         localStorage.setItem("farmalert_subscription_checked_at", String(Date.now()));
 
-        await supabase
+        const { error: profileError } = await supabase
           .from("profiles")
           .update({ subscription_active: false })
-          .eq("user_id", profile.user_id)
-          .catch(() => null);
+          .eq("user_id", profile.user_id);
+
+        if (profileError) throw profileError;
 
         toast({
           title: "Test Mode: Free Plan Activated",
           description: "All premium/pro features are now locked.",
         });
       } else {
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 30);
-        const planDbValue = newTier === "pro" ? "daily" : "monthly";
-        const amountPaise = newTier === "pro" ? 14900 : 5900;
-
-        await supabase
-          .from("subscriptions")
+        const { error: subError } = await supabase
+          .from("user_subscriptions")
           .upsert(
             {
               user_id: profile.user_id,
-              plan: planDbValue,
-              status: "active",
-              amount_paise: amountPaise,
-              started_at: new Date().toISOString(),
-              expires_at: expiresAt.toISOString(),
+              plan_type: newTier.toUpperCase(),
+              subscription_status: "active",
+              updated_at: new Date().toISOString()
             },
             { onConflict: "user_id" }
           );
+
+        if (subError) throw subError;
 
         localStorage.setItem("farmalert_subscribed", "true");
         localStorage.setItem("farmalert_subscription_active", "true");
         localStorage.setItem("farmalert_subscription_tier", newTier);
         localStorage.setItem("farmalert_subscription_checked_at", String(Date.now()));
 
-        await supabase
+        const { error: profileError } = await supabase
           .from("profiles")
           .update({ subscription_active: true })
-          .eq("user_id", profile.user_id)
-          .catch(() => null);
+          .eq("user_id", profile.user_id);
+
+        if (profileError) throw profileError;
 
         toast({
           title: `Test Mode: ${newTier.toUpperCase()} Plan Activated`,
@@ -251,16 +257,29 @@ const ProfileCard = ({
 
       window.dispatchEvent(new Event("farmalert_subscription_changed"));
     } catch (err: any) {
+      // Offline fallback
+      if (newTier === "free") {
+        localStorage.removeItem("farmalert_subscribed");
+        localStorage.removeItem("farmalert_subscription_active");
+        localStorage.setItem("farmalert_subscription_tier", "free");
+      } else {
+        localStorage.setItem("farmalert_subscribed", "true");
+        localStorage.setItem("farmalert_subscription_active", "true");
+        localStorage.setItem("farmalert_subscription_tier", newTier);
+      }
+      localStorage.setItem("farmalert_subscription_checked_at", String(Date.now()));
+      window.dispatchEvent(new Event("farmalert_subscription_changed"));
+
       toast({
-        title: "Simulation Switch Failed",
-        description: err.message || "Error updating plan.",
-        variant: "destructive"
+        title: `Test Mode: Activated (Offline-mode)`,
+        description: `Plan set to ${newTier.toUpperCase()} locally.`,
       });
     }
   };
 
   const handleWhatsappToggle = (checked: boolean) => {
-    if (tier === "free") {
+    const hasWhatsappAccess = PermissionService.hasPermission("WhatsApp Alerts");
+    if (!hasWhatsappAccess) {
       setRequiredUpgradeTier("premium");
       setShowUpgrade(true);
       return;
@@ -274,7 +293,8 @@ const ProfileCard = ({
   };
 
   const handleSmsToggle = (checked: boolean) => {
-    if (tier !== "pro") {
+    const hasSmsAccess = PermissionService.hasPermission("SMS Alerts");
+    if (!hasSmsAccess) {
       setRequiredUpgradeTier("pro");
       setShowUpgrade(true);
       return;

@@ -4,6 +4,7 @@ import { getCropWeatherThreshold } from "@/services/agricultureWeatherRules";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Lock, Bell, AlertOctagon, ShieldAlert, CloudRain, Wind, Flame, Droplets, ShieldCheck, Bug } from "lucide-react";
 import PremiumLockOverlay from "@/components/ui/PremiumLockOverlay";
+import { PermissionService } from "@/services/permissionService";
 
 interface SmartWeatherAlertsProps {
   alerts: SmartAgricultureAlert[];
@@ -43,9 +44,10 @@ const alertIcon = (type: string) => {
 const formatTemplate = (template: string, values: Record<string, string>) =>
   Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), template);
 
-const SmartWeatherAlerts = ({ alerts, cropType, isPremium = false }: SmartWeatherAlertsProps) => {
+const SmartWeatherAlerts = ({ alerts, cropType }: SmartWeatherAlertsProps) => {
   const { t, language } = useLanguage();
   const [activeCategory, setActiveCategory] = useState("all");
+  const isPremium = PermissionService.hasPermission("Advanced Alerts");
   const threshold = getCropWeatherThreshold(cropType);
   const crop = t(`weather.intelligence.crops.${threshold.cropName}`);
 

@@ -18,16 +18,16 @@ export const getSavedSubscriptionTier = (): "free" | "premium" | "pro" => {
 
 export const getActiveSubscriptionTier = async (userId: string): Promise<"free" | "premium" | "pro"> => {
   const { data, error } = await supabase
-    .from("subscriptions")
-    .select("status, expires_at, plan")
+    .from("user_subscriptions")
+    .select("subscription_status, plan_type")
     .eq("user_id", userId)
-    .eq("status", "active")
+    .eq("subscription_status", "active")
     .maybeSingle();
 
   if (error) {
     console.warn("Subscription database query error, using local cache:", error);
     const cachedTier = localStorage.getItem(SUBSCRIPTION_TIER_KEY) as "free" | "premium" | "pro";
-    return cachedTier || "free";
+    return (cachedTier || "free").toLowerCase() as "free" | "premium" | "pro";
   }
 
   if (!data) {
@@ -37,19 +37,11 @@ export const getActiveSubscriptionTier = async (userId: string): Promise<"free" 
     return "free";
   }
 
-  const isActive = !data.expires_at || new Date(data.expires_at).getTime() > Date.now();
-  if (isActive) {
-    localStorage.setItem(SUBSCRIPTION_ACTIVE_KEY, "true");
-    const tier = data.plan === "daily" ? "pro" : "premium";
-    localStorage.setItem(SUBSCRIPTION_TIER_KEY, tier);
-    localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
-    return tier;
-  } else {
-    localStorage.removeItem(SUBSCRIPTION_ACTIVE_KEY);
-    localStorage.setItem(SUBSCRIPTION_TIER_KEY, "free");
-    localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
-    return "free";
-  }
+  const tier = (data.plan_type || "FREE").toLowerCase() as "free" | "premium" | "pro";
+  localStorage.setItem(SUBSCRIPTION_ACTIVE_KEY, tier !== "free" ? "true" : "false");
+  localStorage.setItem(SUBSCRIPTION_TIER_KEY, tier);
+  localStorage.setItem(SUBSCRIPTION_CHECKED_AT_KEY, String(Date.now()));
+  return tier;
 };
 
 export const hasActiveSubscription = async (userId: string): Promise<boolean> => {
