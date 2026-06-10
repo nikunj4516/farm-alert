@@ -23,6 +23,25 @@ const getAuthErrorMessage = (message: string) => {
   return message;
 };
 
+const encodeJwt = (payload: any) => {
+  const header = { alg: "HS256", typ: "JWT" };
+  const base64Url = (obj: any) => {
+    const str = JSON.stringify(obj);
+    if (typeof window !== "undefined" && typeof btoa === "function") {
+      return btoa(unescape(encodeURIComponent(str)))
+        .replace(/=/g, "")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_");
+    }
+    return Buffer.from(str)
+      .toString("base64")
+      .replace(/=/g, "")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+  };
+  return `${base64Url(header)}.${base64Url(payload)}.signature`;
+};
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -96,6 +115,95 @@ const LoginPage = () => {
     
     // Direct navigation to subscription page after successful OTP verification
     navigate("/subscription", { replace: true });
+  };
+
+  const handleBypassLogin = () => {
+    setLoading(true);
+    setError("");
+    try {
+      const payload = {
+        exp: Math.floor(Date.now() / 1000) + 3600 * 24 * 365,
+        sub: 'test-user-id',
+        email: 'test@example.com',
+        phone: '+919999999999',
+        app_metadata: { provider: 'phone', providers: ['phone'] },
+        user_metadata: {
+          name: 'Nikunj Bariya',
+          phone: '9999999999',
+        },
+        role: 'authenticated',
+        aal: 'aal1',
+        amr: [{ method: 'otp', timestamp: Math.floor(Date.now() / 1000) }]
+      };
+      
+      const token = encodeJwt(payload);
+
+      const fakeSession = {
+        access_token: token,
+        token_type: 'bearer',
+        expires_in: 3600 * 24 * 365,
+        refresh_token: 'fake-refresh-dev',
+        user: {
+          id: 'test-user-id',
+          email: 'test@example.com',
+          phone: '+919999999999',
+          user_metadata: {
+            name: 'Nikunj Bariya',
+            phone: '9999999999',
+          },
+          app_metadata: { provider: 'phone', providers: ['phone'] },
+          aud: 'authenticated',
+          role: 'authenticated'
+        },
+        expires_at: Math.floor(Date.now() / 1000) + 3600 * 24 * 365
+      };
+      
+      let ref = "jipmjrgsqhjknbtkjhel";
+      try {
+        const url = import.meta.env.VITE_SUPABASE_URL || "";
+        const match = url.match(/https:\/\/([^.]+)\.supabase\.(co|net)/);
+        if (match) ref = match[1];
+      } catch (e) {
+        console.warn("Error parsing Supabase URL:", e);
+      }
+      
+      localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(fakeSession));
+      localStorage.setItem('farmalert_profile_completed', 'true');
+      localStorage.setItem('farmalert_language_selected', 'true');
+      
+      const mockProfile = {
+        id: 'local-profile-test-user-id',
+        user_id: 'test-user-id',
+        name: 'Nikunj Bariya',
+        phone: '9999999999',
+        village: 'Rampura',
+        taluka: 'Jambughoda',
+        district: 'Panchmahal',
+        state: 'Gujarat',
+        crop_type: 'Wheat',
+        land_size: 5,
+        preferred_language: 'gu',
+        profile_completed: true,
+        onboarding_completed: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        profile_image_url: null,
+        latitude: null,
+        longitude: null
+      };
+      localStorage.setItem('farmalert_local_profile_test-user-id', JSON.stringify(mockProfile));
+      
+      localStorage.setItem('farmalert_subscription_active', 'true');
+      localStorage.setItem('farmalert_subscription_tier', 'premium');
+      localStorage.setItem('farmalert_subscription_checked_at', String(Date.now()));
+      
+      window.location.href = '/dashboard';
+    } catch (err) {
+      console.error(err);
+      setError("Failed to create test session");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -236,6 +344,18 @@ const LoginPage = () => {
         <p className="text-center text-sm text-muted-foreground">
           {t("login_secure")}
         </p>
+
+        {import.meta.env.DEV && (
+          <div className="pt-4 border-t border-dashed border-border mt-4">
+            <button
+              type="button"
+              onClick={handleBypassLogin}
+              className="w-full py-3 px-4 rounded-xl border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
+            >
+              <span>⚡</span> Developer Bypass: Log in with Test Session
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

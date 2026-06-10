@@ -133,47 +133,96 @@ export class ProfileService {
     );
   }
 
+  static getLocalProfile(userId: string): Profile | null {
+    if (typeof window === "undefined") return null;
+    const stored = localStorage.getItem(`farmalert_local_profile_${userId}`);
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return null;
+    }
+  }
+
+  static setLocalProfile(userId: string, profile: Partial<Profile>): Profile {
+    if (typeof window === "undefined") return profile as Profile;
+    const current = this.getLocalProfile(userId) || {
+      id: `local-profile-${userId}`,
+      user_id: userId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      name: "",
+      phone: "",
+      village: "",
+      taluka: "",
+      district: "",
+      state: "Gujarat",
+      crop_type: "",
+      land_size: 0,
+      preferred_language: "gu",
+      profile_completed: false,
+      onboarding_completed: false,
+      profile_image_url: null,
+      latitude: null,
+      longitude: null
+    };
+    const updated = {
+      ...current,
+      ...profile,
+      updated_at: new Date().toISOString()
+    };
+    localStorage.setItem(`farmalert_local_profile_${userId}`, JSON.stringify(updated));
+    return updated as Profile;
+  }
+
   /**
    * Fetches the user's profile and preferences
    */
   static async getProfile(userId: string): Promise<Profile | null> {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
 
-    if (error) {
-      console.error("Error fetching profile:", error);
-      throw error;
-    }
-
-    if (data) {
-      let imageUrl = data.profile_image_url;
-
-      // 1. Local Storage Fallback
-      if (!imageUrl && typeof window !== "undefined") {
-        imageUrl = localStorage.getItem(`farmalert_profile_image_url_${userId}`);
+      if (error) {
+        console.warn("Error fetching profile, trying localStorage:", error);
+        return this.getLocalProfile(userId);
       }
 
-      // 2. Auth Metadata Fallback
-      if (!imageUrl) {
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user && user.id === userId) {
-            imageUrl = user.user_metadata?.avatar_url || user.user_metadata?.profile_image_url || null;
-          }
-        } catch (authErr) {
-          console.warn("Could not fetch user metadata for profile image fallback:", authErr);
+      if (data) {
+        let imageUrl = data.profile_image_url;
+
+        // 1. Local Storage Fallback
+        if (!imageUrl && typeof window !== "undefined") {
+          imageUrl = localStorage.getItem(`farmalert_profile_image_url_${userId}`);
         }
-      }
 
-      if (imageUrl && !data.profile_image_url) {
-        data.profile_image_url = imageUrl;
+        // 2. Auth Metadata Fallback
+        if (!imageUrl) {
+          try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user && user.id === userId) {
+              imageUrl = user.user_metadata?.avatar_url || user.user_metadata?.profile_image_url || null;
+            }
+          } catch (authErr) {
+            console.warn("Could not fetch user metadata for profile image fallback:", authErr);
+          }
+        }
+
+        if (imageUrl && !data.profile_image_url) {
+          data.profile_image_url = imageUrl;
+        }
+
+        this.setLocalProfile(userId, data);
+        return data;
       }
+    } catch (err) {
+      console.warn("Exception fetching profile, trying localStorage:", err);
     }
 
-    return data;
+    return this.getLocalProfile(userId);
   }
 
   /**
@@ -188,35 +237,41 @@ export class ProfileService {
       localStorage.setItem(`farmalert_profile_image_url_${userId}`, updates.profile_image_url);
     }
 
-    for (let attempt = 0; attempt < 20; attempt += 1) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .update(payload)
-        .eq("user_id", userId)
-        .select()
-        .single();
+    try {
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .update(payload)
+          .eq("user_id", userId)
+          .select()
+          .single();
 
-      if (!error) return data;
+        if (!error) {
+          this.setLocalProfile(userId, data);
+          return data;
+        }
 
-      lastError = error;
+        lastError = error;
 
-      if (!isMissingProfileColumnError(error)) {
-        console.error("Error updating profile:", error);
-        throw new Error(getErrorMessage(error));
+        if (!isMissingProfileColumnError(error)) {
+          break;
+        }
+
+        const missingColumn = getMissingColumnName(error);
+        payload = missingColumn ? withoutColumn(payload, missingColumn) : toLegacyProfilePayload(payload);
+
+        if (Object.keys(payload).length === 0) {
+          const currentProfile = await this.getProfile(userId);
+          if (currentProfile) return currentProfile;
+          break;
+        }
       }
-
-      const missingColumn = getMissingColumnName(error);
-      payload = missingColumn ? withoutColumn(payload, missingColumn) : toLegacyProfilePayload(payload);
-
-      if (Object.keys(payload).length === 0) {
-        const currentProfile = await this.getProfile(userId);
-        if (currentProfile) return currentProfile;
-        break;
-      }
+    } catch (err) {
+      lastError = err;
     }
 
-    console.error("Error updating profile:", lastError);
-    throw new Error(getErrorMessage(lastError));
+    console.warn("Error updating profile in Supabase, falling back to local storage:", lastError);
+    return this.setLocalProfile(userId, updates);
   }
 
   /**
@@ -244,42 +299,56 @@ export class ProfileService {
       localStorage.setItem(`farmalert_profile_image_url_${userId}`, payload.profile_image_url);
     }
 
-    for (let attempt = 0; attempt < 20; attempt += 1) {
-      const { data, error } = await saveProfile(payload);
+    try {
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        const { data, error } = await saveProfile(payload);
 
-      if (!error) return data;
+        if (!error) {
+          this.setLocalProfile(userId, data);
+          return data;
+        }
 
-      lastError = error;
+        lastError = error;
 
-      if (!isMissingProfileColumnError(error)) {
-        console.error("Error saving profile:", error);
-        throw new Error(getErrorMessage(error));
+        if (!isMissingProfileColumnError(error)) {
+          break;
+        }
+
+        const missingColumn = getMissingColumnName(error);
+        payload = missingColumn ? withoutColumn(payload, missingColumn) : toLegacyProfilePayload(payload);
+
+        if (Object.keys(payload).length === 0) break;
       }
-
-      const missingColumn = getMissingColumnName(error);
-      payload = missingColumn ? withoutColumn(payload, missingColumn) : toLegacyProfilePayload(payload);
-
-      if (Object.keys(payload).length === 0) break;
+    } catch (err) {
+      lastError = err;
     }
 
-    console.error("Error saving profile:", lastError);
+    console.warn("Error saving profile in Supabase, falling back to local storage:", lastError);
+
     if (isMissingProfileColumnError(lastError)) {
       let minimalPayload = toMinimalProfilePayload(profile as Record<string, unknown>);
 
       for (let attempt = 0; attempt < 10 && Object.keys(minimalPayload).length > 0; attempt += 1) {
-        const { data, error } = await saveProfile(minimalPayload);
-        if (!error) return data;
+        try {
+          const { data, error } = await saveProfile(minimalPayload);
+          if (!error) {
+            this.setLocalProfile(userId, data);
+            return data;
+          }
+          lastError = error;
+          if (!isMissingProfileColumnError(error)) break;
 
-        lastError = error;
-        if (!isMissingProfileColumnError(error)) break;
-
-        const missingColumn = getMissingColumnName(error);
-        if (!missingColumn) break;
-        minimalPayload = withoutColumn(minimalPayload, missingColumn);
+          const missingColumn = getMissingColumnName(error);
+          if (!missingColumn) break;
+          minimalPayload = withoutColumn(minimalPayload, missingColumn);
+        } catch (err) {
+          lastError = err;
+          break;
+        }
       }
     }
 
-    throw new Error(getErrorMessage(lastError));
+    return this.setLocalProfile(userId, profile as Partial<Profile>);
   }
 
   static getErrorMessage(error: unknown) {
