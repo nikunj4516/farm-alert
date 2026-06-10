@@ -638,13 +638,17 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>(
-    () => (localStorage.getItem("farmalert_lang") as Language) || "gu"
-  );
+  const [language, setLanguage] = useState<Language>(() => {
+    const stored = localStorage.getItem("farmalert_lang");
+    if (stored === "gu" || stored === "hi" || stored === "en") return stored;
+    return "gu";
+  });
 
   const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem("farmalert_lang", lang);
+    if (lang === "gu" || lang === "hi" || lang === "en") {
+      setLanguage(lang);
+      localStorage.setItem("farmalert_lang", lang);
+    }
   };
 
   const t = (key: TranslationKey | string): string => {

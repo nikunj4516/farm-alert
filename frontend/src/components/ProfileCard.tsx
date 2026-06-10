@@ -18,6 +18,7 @@ import {
   Smartphone,
   Bell,
   Sparkles,
+  ShieldAlert,
 } from "lucide-react";
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import farmerAvatar from "@/assets/farmer-1.png";
@@ -299,7 +300,7 @@ const ProfileCard = ({
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState("");
-  const copy = profileCopy[language];
+  const copy = profileCopy[language] || profileCopy.gu;
   const savedAvatarUrl = 
     readExtra(profile, ["profile_image_url", "profile_image", "avatar_url", "image_url"]) || 
     (profile?.user_id ? localStorage.getItem(`farmalert_profile_image_url_${profile.user_id}`) : null) || 

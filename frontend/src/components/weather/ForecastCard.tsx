@@ -13,7 +13,7 @@ const ForecastCard = ({ weather }: ForecastCardProps) => {
     en: { temp: "Temperature graph", rain: "Rain graph", humidity: "Humidity graph", wind: "Wind graph" },
     hi: { temp: "तापमान ग्राफ", rain: "बारिश ग्राफ", humidity: "नमी ग्राफ", wind: "हवा ग्राफ" },
     gu: { temp: "તાપમાન ગ્રાફ", rain: "વરસાદ ગ્રાફ", humidity: "ભેજ ગ્રાફ", wind: "પવન ગ્રાફ" },
-  }[language];
+  }[language as "en" | "gu" | "hi"] || { temp: "Temperature graph", rain: "Rain graph", humidity: "Humidity graph", wind: "Wind graph" };
   const graphMetrics = [
     { label: graphCopy.temp, color: "bg-orange-500", values: hourly.map((hour) => hour.temperature ?? 0), suffix: "°" },
     { label: graphCopy.rain, color: "bg-blue-500", values: hourly.map((hour) => hour.precipitationProbability ?? 0), suffix: "%" },

@@ -74,7 +74,7 @@ const ProfileSetup = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { language, t, tArray } = useLanguage();
-  const copy = locationCopy[language];
+  const copy = locationCopy[language] || locationCopy.gu;
   const [loading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [error, setError] = useState("");
