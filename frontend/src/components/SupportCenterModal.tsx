@@ -5,7 +5,7 @@ import { MessageSquare, Star, LifeBuoy, AlertTriangle, ListTodo, ShieldAlert, Sp
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ComplaintService, Complaint, Feedback } from "@/services/complaintService";
 import { toast } from "@/components/ui/use-toast";
-import AdminPanel from "./AdminPanel";
+import { useNavigate } from "react-router-dom";
 
 interface SupportCenterModalProps {
   isOpen: boolean;
@@ -34,9 +34,9 @@ const SupportCenterModal = ({
   userPhone = "",
   userVillage = "Vasad",
 }: SupportCenterModalProps) => {
+  const navigate = useNavigate();
   const { language, t } = useLanguage();
   const [activeTab, setActiveTab] = useState<string>("feedback");
-  const [isAdminView, setIsAdminView] = useState<boolean>(false);
 
   // Feedback States
   const [rating, setRating] = useState<number>(0);
@@ -235,6 +235,11 @@ const SupportCenterModal = ({
     { value: "Other", label: language === "gu" ? "અન્ય" : language === "hi" ? "अन्य" : "Other Issue" },
   ];
 
+  const handleOpenAdminPortal = () => {
+    onOpenChange(false);
+    navigate("/admin");
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[580px] w-full max-h-[85vh] overflow-y-auto rounded-3xl p-6 bg-gradient-to-b from-card via-card to-background border-primary/10">
@@ -246,33 +251,26 @@ const SupportCenterModal = ({
               </div>
               <div className="text-left">
                 <DialogTitle className="text-xl font-bold text-foreground">
-                  {isAdminView ? copy.adminView : copy.title}
+                  {copy.title}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground font-semibold mt-0.5">
-                  {isAdminView ? "Review and respond to farmer grievances." : copy.desc}
+                  {copy.desc}
                 </DialogDescription>
               </div>
             </div>
             
-            {/* Developer/Admin Portal Toggle */}
+            {/* Developer/Admin Portal Button */}
             <button
-              onClick={() => setIsAdminView(!isAdminView)}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border transition-all ${
-                isAdminView 
-                  ? "bg-amber-100 text-amber-800 border-amber-300 shadow-sm"
-                  : "bg-muted text-muted-foreground border-border hover:bg-primary/10 hover:text-primary"
-              }`}
+              onClick={handleOpenAdminPortal}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border bg-muted text-muted-foreground border-border hover:bg-primary/10 hover:text-primary transition-all"
             >
               <ShieldAlert className="w-3.5 h-3.5" />
-              {isAdminView ? "Farmer Portal" : "Test Admin Panel"}
+              Open Admin Portal
             </button>
           </div>
         </DialogHeader>
 
-        {isAdminView ? (
-          <AdminPanel onBackToPortal={() => setIsAdminView(false)} />
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4 w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4 w-full">
             <TabsList className="grid grid-cols-3 w-full bg-muted/60 p-1 rounded-xl">
               <TabsTrigger value="feedback" className="rounded-lg text-xs font-black py-2">
                 <MessageSquare className="w-3.5 h-3.5 mr-1" />
@@ -582,7 +580,6 @@ const SupportCenterModal = ({
               )}
             </TabsContent>
           </Tabs>
-        )}
       </DialogContent>
     </Dialog>
   );
