@@ -9,7 +9,7 @@ interface BottomNavProps {
   profileImageUrl?: string | null;
 }
 
-const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
+const BottomNav = ({ activeTab, onTabChange, profileImageUrl }: BottomNavProps) => {
   const { t, language } = useLanguage();
 
   const tabs = [
@@ -26,6 +26,8 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
       <div className="max-w-[600px] mx-auto flex items-center justify-around h-16 sm:h-20 px-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
+          const isProfileTab = tab.id === "profile";
+
           return (
             <button
               key={tab.id}
@@ -44,17 +46,48 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                <span
-                  className="material-symbols-rounded relative z-10 select-none text-2xl sm:text-[26px] md:text-3xl transition-colors duration-200"
-                  style={{
-                    fontVariationSettings: isActive 
-                      ? "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" 
-                      : "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
-                    color: isActive ? "#065f46" : "#94a3b8"
-                  }}
-                >
-                  {tab.icon}
-                </span>
+                
+                {isProfileTab && profileImageUrl ? (
+                  <img
+                    src={profileImageUrl}
+                    alt="Profile"
+                    className={`relative z-10 w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border transition-all duration-200 ${
+                      isActive ? "border-emerald-600 ring-2 ring-emerald-500/20" : "border-slate-300"
+                    }`}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      const fallback = e.currentTarget.parentElement?.querySelector(".fallback-profile-icon");
+                      if (fallback) (fallback as HTMLElement).style.display = "inline-block";
+                    }}
+                  />
+                ) : null}
+
+                {(!isProfileTab || !profileImageUrl) ? (
+                  <span
+                    className="material-symbols-rounded relative z-10 select-none text-2xl sm:text-[26px] md:text-3xl transition-colors duration-200"
+                    style={{
+                      fontVariationSettings: isActive 
+                        ? "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" 
+                        : "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                      color: isActive ? "#065f46" : "#94a3b8"
+                    }}
+                  >
+                    {tab.icon}
+                  </span>
+                ) : (
+                  <span
+                    className="fallback-profile-icon material-symbols-rounded relative z-10 select-none text-2xl sm:text-[26px] md:text-3xl transition-colors duration-200"
+                    style={{
+                      display: "none",
+                      fontVariationSettings: isActive 
+                        ? "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" 
+                        : "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                      color: isActive ? "#065f46" : "#94a3b8"
+                    }}
+                  >
+                    account_circle
+                  </span>
+                )}
               </div>
 
               {/* Label */}
