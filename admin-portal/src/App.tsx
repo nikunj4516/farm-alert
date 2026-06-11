@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, CloudSun, Scan, ClipboardList, MessageSquare, 
   CreditCard, Bell, TrendingUp, Settings, LogOut, Download, Search, 
   RefreshCw, Star, CheckCircle, Clock, AlertTriangle, ShieldAlert, 
-  UserCheck, MapPin, CloudRain, Flame, AlertOctagon 
+  UserCheck, MapPin, CloudRain, Flame, AlertOctagon, Menu, X 
 } from "lucide-react";
 import { getDistrictLabel, getLocationLabel } from "./services/gujaratLocationService";
 
@@ -45,6 +45,7 @@ interface SubscriptionLog {
 
 const App = () => {
   const [activeSection, setActiveSection] = useState<SidebarTab>("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   
   // Data States
   const [complaints, setComplaints] = useState<Complaint[]>([]);
@@ -239,18 +240,40 @@ const App = () => {
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-sans text-slate-800">
       
+      {/* Mobile Sidebar Overlay Back-drop */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden backdrop-blur-sm transition-opacity" 
+          onClick={() => setIsSidebarOpen(false)} 
+        />
+      )}
+
       {/* LEFT SIDEBAR NAVIGATION */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+      <aside 
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 transition-transform duration-300 transform md:relative md:translate-x-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         
         {/* Portal Branding */}
-        <div className="p-5 border-b border-slate-800 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
-            <ShieldAlert className="w-5 h-5" />
+        <div className="p-5 border-b border-slate-800 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-sm font-black text-white tracking-wider uppercase">FarmAlert Enterprise</h1>
+              <p className="text-[10px] text-emerald-500 font-bold tracking-widest uppercase">Admin v2.0</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-sm font-black text-white tracking-wider uppercase">FarmAlert Enterprise</h1>
-            <p className="text-[10px] text-emerald-500 font-bold tracking-widest uppercase">Admin v2.0</p>
-          </div>
+          
+          {/* Close button for mobile */}
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="p-1 text-slate-400 hover:text-white md:hidden"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Navigation Menu Links */}
@@ -261,7 +284,10 @@ const App = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveSection(item.id)}
+                onClick={() => {
+                  setActiveSection(item.id);
+                  setIsSidebarOpen(false); // Close mobile sidebar on select
+                }}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-black transition-all text-left ${
                   isSelected 
                     ? "bg-emerald-600 text-white shadow-md"
@@ -291,9 +317,16 @@ const App = () => {
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         
         {/* Top Header bar */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0">
           <div className="flex items-center gap-3">
-            <h2 className="text-sm font-black uppercase text-slate-500 tracking-wider">
+            {/* Hamburger Menu toggle button for mobile */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 -ml-2 text-slate-500 hover:text-slate-800 md:hidden rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <h2 className="text-xs md:text-sm font-black uppercase text-slate-500 tracking-wider">
               Workspace / {activeSection.toUpperCase()}
             </h2>
           </div>
@@ -309,7 +342,7 @@ const App = () => {
             <div className="h-8 w-[1px] bg-slate-200" />
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-              <span className="text-xs font-black text-slate-600">DB Connected</span>
+              <span className="text-xs font-black text-slate-600 hidden sm:inline">DB Connected</span>
             </div>
           </div>
         </header>
@@ -547,7 +580,7 @@ const App = () => {
                         <p className="text-xs text-slate-400 font-bold py-6 text-center">No AI scans completed yet.</p>
                       ) : (
                         scans.map((scan) => (
-                          <div key={scan.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-start justify-between shadow-sm gap-2">
+                          <div key={scan.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-start justify-between shadow-sm gap-4">
                             <div className="flex items-start gap-3 min-w-0">
                               {scan.image_url ? (
                                 <img src={scan.image_url} alt="" className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0" />
@@ -564,11 +597,11 @@ const App = () => {
                                 </p>
                               </div>
                             </div>
-                            <div className="text-right shrink-0">
+                            <div className="text-left sm:text-right shrink-0 border-t sm:border-t-0 border-slate-200/60 pt-2 sm:pt-0 flex sm:flex-col justify-between sm:justify-start items-center sm:items-end gap-2">
                               <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md">
                                 {scan.confidence_score}% Accuracy
                               </span>
-                              <p className="text-[9px] text-slate-400 font-mono mt-2">{new Date(scan.created_at).toLocaleDateString()}</p>
+                              <p className="text-[9px] text-slate-400 font-mono mt-0 sm:mt-2">{new Date(scan.created_at).toLocaleDateString()}</p>
                             </div>
                           </div>
                         ))
