@@ -12,7 +12,6 @@ import SubscriptionPage from "./pages/SubscriptionPage.tsx";
 import SplashScreen from "./pages/SplashScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
-import AdminPortal from "./pages/AdminPortal.tsx";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +30,6 @@ const App = () => (
               <Route path="/subscription" element={<SubscriptionPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/dashboard" element={<Index />} />
-              <Route path="/admin" element={<AdminPortal />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

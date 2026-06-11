@@ -5,7 +5,6 @@ import { MessageSquare, Star, LifeBuoy, AlertTriangle, ListTodo, ShieldAlert, Sp
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ComplaintService, Complaint, Feedback } from "@/services/complaintService";
 import { toast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
 
 interface SupportCenterModalProps {
   isOpen: boolean;
@@ -34,7 +33,6 @@ const SupportCenterModal = ({
   userPhone = "",
   userVillage = "Vasad",
 }: SupportCenterModalProps) => {
-  const navigate = useNavigate();
   const { language, t } = useLanguage();
   const [activeTab, setActiveTab] = useState<string>("feedback");
 
@@ -235,38 +233,22 @@ const SupportCenterModal = ({
     { value: "Other", label: language === "gu" ? "અન્ય" : language === "hi" ? "अन्य" : "Other Issue" },
   ];
 
-  const handleOpenAdminPortal = () => {
-    onOpenChange(false);
-    navigate("/admin");
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[580px] w-full max-h-[85vh] overflow-y-auto rounded-3xl p-6 bg-gradient-to-b from-card via-card to-background border-primary/10">
         <DialogHeader className="pb-3 border-b border-border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <LifeBuoy className="w-5 h-5 animate-pulse" />
-              </div>
-              <div className="text-left">
-                <DialogTitle className="text-xl font-bold text-foreground">
-                  {copy.title}
-                </DialogTitle>
-                <DialogDescription className="text-xs text-muted-foreground font-semibold mt-0.5">
-                  {copy.desc}
-                </DialogDescription>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <LifeBuoy className="w-5 h-5 animate-pulse" />
             </div>
-            
-            {/* Developer/Admin Portal Button */}
-            <button
-              onClick={handleOpenAdminPortal}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border bg-muted text-muted-foreground border-border hover:bg-primary/10 hover:text-primary transition-all"
-            >
-              <ShieldAlert className="w-3.5 h-3.5" />
-              Open Admin Portal
-            </button>
+            <div className="text-left">
+              <DialogTitle className="text-xl font-bold text-foreground">
+                {copy.title}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground font-semibold mt-0.5">
+                {copy.desc}
+              </DialogDescription>
+            </div>
           </div>
         </DialogHeader>
 

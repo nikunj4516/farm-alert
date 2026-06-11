@@ -1,16 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ComplaintService, Complaint, Feedback } from "@/services/complaintService";
-import { ScanHistoryService, ScanHistory } from "@/services/scanHistoryService";
-import { supabase } from "@/integrations/supabase/client";
+import { ComplaintService, Complaint, Feedback } from "./services/complaintService";
+import { ScanHistoryService, ScanHistory } from "./services/scanHistoryService";
+import { supabase } from "./integrations/supabase/client";
 import { 
   LayoutDashboard, Users, CloudSun, Scan, ClipboardList, MessageSquare, 
   CreditCard, Bell, TrendingUp, Settings, LogOut, Download, Search, 
-  Filter, RefreshCw, Star, CheckCircle, Clock, AlertTriangle, ShieldAlert, 
-  ArrowRight, UserCheck, Smartphone, MapPin, Map, CloudRain, Flame, AlertOctagon 
+  RefreshCw, Star, CheckCircle, Clock, AlertTriangle, ShieldAlert, 
+  UserCheck, MapPin, CloudRain, Flame, AlertOctagon 
 } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-import { getDistrictLabel, getLocationLabel } from "@/services/gujaratLocationService";
+import { getDistrictLabel, getLocationLabel } from "./services/gujaratLocationService";
 
 type SidebarTab = 
   | "dashboard"
@@ -45,8 +43,7 @@ interface SubscriptionLog {
   updated_at: string;
 }
 
-const AdminPortal = () => {
-  const navigate = useNavigate();
+const App = () => {
   const [activeSection, setActiveSection] = useState<SidebarTab>("dashboard");
   
   // Data States
@@ -141,20 +138,13 @@ const AdminPortal = () => {
         replyText || null
       );
 
-      toast({
-        title: "Ticket Updated",
-        description: `Complaint ${selectedComplaint.id.substring(0, 8).toUpperCase()} updated.`,
-      });
-
       setSelectedComplaint(null);
       setReplyText("");
       void loadPortalData();
+      
+      alert(`Ticket FA-${selectedComplaint.id.substring(0, 8).toUpperCase()} updated successfully!`);
     } catch (err) {
-      toast({
-        title: "Update failed",
-        description: err instanceof Error ? err.message : "Error updating complaint",
-        variant: "destructive",
-      });
+      alert("Error updating complaint");
     } finally {
       setUpdating(false);
     }
@@ -162,11 +152,7 @@ const AdminPortal = () => {
 
   const handleDownloadCSV = () => {
     if (complaints.length === 0) {
-      toast({
-        title: "No data to export",
-        description: "There are no complaints available to download.",
-        variant: "destructive",
-      });
+      alert("There are no complaints available to download.");
       return;
     }
 
@@ -193,11 +179,6 @@ const AdminPortal = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    toast({
-      title: "Export Downloaded",
-      description: "Complaints CSV spreadsheet downloaded.",
-    });
   };
 
   // Filter complaints list
@@ -236,11 +217,10 @@ const AdminPortal = () => {
   };
 
   const handleLogout = () => {
-    toast({
-      title: "Logged Out",
-      description: "Successfully returned to standard farmer interface."
-    });
-    navigate("/dashboard");
+    const farmerAppUrl = window.location.hostname === "localhost" 
+      ? "http://localhost:5173/dashboard" 
+      : "https://farmalert.netlify.app/dashboard";
+    window.location.href = farmerAppUrl;
   };
 
   const sidebarItems = [
@@ -919,15 +899,14 @@ const AdminPortal = () => {
                     <div className="p-5 bg-white border border-slate-200 rounded-3xl shadow-sm space-y-4">
                       <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">SaaS Subscription Breakdown</h4>
                       <div className="h-40 flex items-center justify-center relative">
-                        {/* Mock donut chart graphic */}
                         <div className="w-28 h-28 rounded-full border-[14px] border-emerald-600 border-t-blue-500 border-r-slate-200 flex items-center justify-center">
                           <span className="text-[10px] font-black text-slate-500">Active</span>
                         </div>
                       </div>
                       <div className="flex justify-around text-[9px] text-slate-500 font-bold uppercase">
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-200" /> Free</span>
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-600" /> Premium</span>
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> Pro</span>
+                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-slate-200" /> Free</span>
+                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-600" /> Premium</span>
+                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> Pro</span>
                       </div>
                     </div>
                   </div>
@@ -976,11 +955,4 @@ const AdminPortal = () => {
   );
 };
 
-// Inline micro icon helper to avoid missing import errors
-const RefreshCwIcon = ({ className }: { className?: string }) => (
-  <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-  </svg>
-);
-
-export default AdminPortal;
+export default App;
