@@ -4,18 +4,15 @@
   "version": "0.0.0",
   "workspaces": [
     "frontend",
-    "backend",
-    "admin-portal"
+    "backend"
   ],
   "scripts": {
     "dev": "npm run dev -w frontend -- --port 5173",
-    "admin:dev": "npm run dev -w admin-portal -- --port 5174",
     "backend:dev": "npm run dev -w backend",
     "backend:start": "npm run start -w backend",
     "news:fetch": "npm run fetch:news -w backend",
     "news:cron": "npm run cron:news -w backend",
     "build": "npm run build -w frontend",
-    "admin:build": "npm run build -w admin-portal",
     "build:dev": "npm run build:dev -w frontend",
     "lint": "npm run lint -w frontend",
     "preview": "npm run preview -w frontend",
