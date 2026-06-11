@@ -1,6 +1,5 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
-import farmerAvatar from "@/assets/farmer-1.png";
 
 type Tab = "weather" | "tips" | "news" | "scanner" | "about" | "profile";
 
@@ -10,21 +9,21 @@ interface BottomNavProps {
   profileImageUrl?: string | null;
 }
 
-const BottomNav = ({ activeTab, onTabChange, profileImageUrl }: BottomNavProps) => {
+const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   const { t, language } = useLanguage();
 
   const tabs = [
-    { id: "weather" as Tab, label: t("nav_weather"), icon: <span className="text-3xl leading-none" aria-hidden="true">🌤️</span> },
-    { id: "tips" as Tab, label: t("nav_tips"), icon: <span className="text-3xl leading-none" aria-hidden="true">💡</span> },
-    { id: "news" as Tab, label: t("nav_news"), icon: <span className="text-3xl leading-none" aria-hidden="true">📰</span> },
-    { id: "scanner" as Tab, label: language === "gu" ? "સ્કેનર" : language === "hi" ? "स्कैनर" : "Scanner", icon: <span className="text-3xl leading-none" aria-hidden="true">📷</span> },
-    { id: "about" as Tab, label: t("nav_about"), icon: <span className="text-3xl leading-none" aria-hidden="true">🏢</span> },
-    { id: "profile" as Tab, label: t("nav_profile"), icon: <img src={profileImageUrl || farmerAvatar} onError={(e) => { e.currentTarget.src = farmerAvatar; }} alt="profile" className="w-7 h-7 drop-shadow-md rounded-full object-cover" /> },
+    { id: "weather" as Tab, label: t("nav_weather"), icon: "partly_cloudy_day" },
+    { id: "tips" as Tab, label: t("nav_tips"), icon: "tips_and_updates" },
+    { id: "news" as Tab, label: t("nav_news"), icon: "newspaper" },
+    { id: "scanner" as Tab, label: language === "gu" ? "સ્કેનર" : language === "hi" ? "स्कैनर" : "Scanner", icon: "center_focus_strong" },
+    { id: "about" as Tab, label: t("nav_about"), icon: "info" },
+    { id: "profile" as Tab, label: t("nav_profile"), icon: "account_circle" },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 shadow-[0_-2px_10px_0_hsl(0_0%_0%/0.04)]">
-      <div className="max-w-[600px] mx-auto flex">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 shadow-[0_-2px_12px_0_rgba(0,0,0,0.03)] pb-safe">
+      <div className="max-w-[600px] mx-auto flex items-center justify-around h-16 sm:h-20 px-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -34,21 +33,38 @@ const BottomNav = ({ activeTab, onTabChange, profileImageUrl }: BottomNavProps) 
               onClick={() => onTabChange(tab.id)}
               aria-label={tab.label}
               aria-current={isActive ? "page" : undefined}
-              className={`flex-1 flex flex-col items-center pt-4 pb-3 px-2 min-h-[72px] transition-colors touch-manipulation relative ${
-                isActive ? "text-primary" : "text-muted-foreground hover:text-primary/70"
-              }`}
+              className="flex-1 flex flex-col items-center justify-center h-full relative group touch-manipulation focus:outline-none"
             >
-              {isActive && (
-                <motion.div
-                  layoutId="bottomNavIndicator"
-                  className="absolute top-1 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full"
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              )}
-              <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? "bg-primary/10 scale-110" : ""}`}>
-                {tab.icon}
+              {/* Active Indicator Pill */}
+              <div className="relative flex items-center justify-center w-12 sm:w-16 h-8 rounded-full mb-1">
+                {isActive && (
+                  <motion.div
+                    layoutId="md3ActiveIndicatorPill"
+                    className="absolute inset-0 bg-emerald-100 rounded-full"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <span
+                  className="material-symbols-rounded relative z-10 select-none text-2xl sm:text-[26px] md:text-3xl transition-colors duration-200"
+                  style={{
+                    fontVariationSettings: isActive 
+                      ? "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" 
+                      : "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                    color: isActive ? "#065f46" : "#94a3b8"
+                  }}
+                >
+                  {tab.icon}
+                </span>
               </div>
-              <span className={`text-xs font-semibold mt-0.5 transition-colors ${isActive ? "text-primary" : ""}`}>{tab.label}</span>
+
+              {/* Label */}
+              <span
+                className={`text-[9px] sm:text-xs font-black tracking-wider transition-colors duration-200 select-none ${
+                  isActive ? "text-emerald-800" : "text-slate-400 group-hover:text-slate-600"
+                }`}
+              >
+                {tab.label}
+              </span>
             </button>
           );
         })}
