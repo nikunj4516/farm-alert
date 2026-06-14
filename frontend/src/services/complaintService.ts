@@ -27,15 +27,6 @@ export interface Feedback {
   created_at: string;
 }
 
-export interface AdminNotification {
-  id: string;
-  message: string;
-  complaint_id: string;
-  farmer_name: string;
-  created_at: string;
-  read: boolean;
-}
-
 const generateUUID = (): string => {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
@@ -70,47 +61,6 @@ export class ComplaintService {
     if (typeof window !== "undefined") {
       localStorage.setItem("farmalert_feedbacks_db", JSON.stringify(feedbacks));
     }
-  }
-
-  // Helper for admin notifications
-  static getAdminNotifications(): AdminNotification[] {
-    if (typeof window === "undefined") return [];
-    return JSON.parse(localStorage.getItem("farmalert_admin_notifications") || "[]");
-  }
-
-  static saveAdminNotifications(notifications: AdminNotification[]) {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("farmalert_admin_notifications", JSON.stringify(notifications));
-    }
-  }
-
-  static addAdminNotification(complaintId: string, farmerName: string, category: string) {
-    const notifications = this.getAdminNotifications();
-    const newNotif: AdminNotification = {
-      id: generateUUID(),
-      message: `New complaint filed by ${farmerName} under category "${category}".`,
-      complaint_id: complaintId,
-      farmer_name: farmerName,
-      created_at: new Date().toISOString(),
-      read: false,
-    };
-    notifications.unshift(newNotif);
-    this.saveAdminNotifications(notifications);
-
-    // Fire window event for active admins
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("farmalert_new_complaint", { detail: newNotif }));
-    }
-  }
-
-  static clearAdminNotification(id: string) {
-    const notifications = this.getAdminNotifications();
-    const updated = notifications.map(n => n.id === id ? { ...n, read: true } : n);
-    this.saveAdminNotifications(updated);
-  }
-
-  static clearAllAdminNotifications() {
-    this.saveAdminNotifications([]);
   }
 
   /**
@@ -149,7 +99,6 @@ export class ComplaintService {
 
       if (error) throw error;
       
-      this.addAdminNotification(id, newComplaint.name, newComplaint.category);
       return data as Complaint;
     } catch (err) {
       console.warn("Supabase complaint submission failed, falling back to local storage:", err);
@@ -157,7 +106,6 @@ export class ComplaintService {
       complaints.unshift(newComplaint);
       this.saveLocalComplaints(complaints);
       
-      this.addAdminNotification(id, newComplaint.name, newComplaint.category);
       return newComplaint;
     }
   }
@@ -179,74 +127,6 @@ export class ComplaintService {
       console.warn("Supabase getComplaints failed, falling back to local storage:", err);
       const complaints = this.getLocalComplaints();
       return complaints.filter(c => c.user_id === userId);
-    }
-  }
-
-  /**
-   * Admin: Get all complaints across all users
-   */
-  static async getAllComplaints(): Promise<Complaint[]> {
-    try {
-      const { data, error } = await supabase
-        .from("complaints")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as Complaint[];
-    } catch (err) {
-      console.warn("Supabase getAllComplaints failed, falling back to local storage:", err);
-      return this.getLocalComplaints();
-    }
-  }
-
-  /**
-   * Admin: Update the status and/or reply of a complaint
-   */
-  static async updateComplaintStatus(
-    complaintId: string, 
-    status: Complaint["status"], 
-    adminReply?: string | null
-  ): Promise<Complaint> {
-    const now = new Date().toISOString();
-
-    try {
-      const { data, error } = await supabase
-        .from("complaints")
-        .update({
-          status,
-          admin_reply: adminReply,
-          updated_at: now
-        })
-        .eq("id", complaintId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data as Complaint;
-    } catch (err) {
-      console.warn("Supabase updateComplaintStatus failed, falling back to local storage:", err);
-      const complaints = this.getLocalComplaints();
-      const index = complaints.findIndex(c => c.id === complaintId);
-      if (index === -1) {
-        throw new Error("Complaint not found in database.");
-      }
-      
-      const updatedComplaint: Complaint = {
-        ...complaints[index],
-        status,
-        admin_reply: adminReply,
-        updated_at: now
-      };
-      
-      complaints[index] = updatedComplaint;
-      this.saveLocalComplaints(complaints);
-      
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("farmalert_complaint_updated", { detail: updatedComplaint }));
-      }
-
-      return updatedComplaint;
     }
   }
 
@@ -282,24 +162,6 @@ export class ComplaintService {
       feedbacks.unshift(newFeedback);
       this.saveLocalFeedbacks(feedbacks);
       return newFeedback;
-    }
-  }
-
-  /**
-   * Admin: Get all feedback submissions
-   */
-  static async getAllFeedbacks(): Promise<Feedback[]> {
-    try {
-      const { data, error } = await supabase
-        .from("feedback")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as Feedback[];
-    } catch (err) {
-      console.warn("Supabase getAllFeedbacks failed, falling back to local storage:", err);
-      return this.getLocalFeedbacks();
     }
   }
 }

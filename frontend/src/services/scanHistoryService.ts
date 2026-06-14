@@ -103,21 +103,4 @@ export class ScanHistoryService {
     }
   }
 
-  /**
-   * Admin: Get all disease scans across all users
-   */
-  static async getAllScans(): Promise<ScanHistory[]> {
-    try {
-      const { data, error } = await supabase
-        .from("scan_history")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as ScanHistory[];
-    } catch (err) {
-      console.warn("Supabase getAllScans failed, returning local cache:", err);
-      return this.getLocalScans();
-    }
-  }
 }

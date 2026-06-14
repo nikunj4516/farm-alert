@@ -212,7 +212,7 @@ const SupportCenterModal = ({
     feedbackTab: language === "gu" ? "પ્રતિભાવ" : language === "hi" ? "फीडबैक" : "Feedback",
     complaintTab: language === "gu" ? "ફરિયાદ કરો" : language === "hi" ? "शिकायत दर्ज करें" : "File Complaint",
     myComplaints: language === "gu" ? "મારી ફરિયાદો" : language === "hi" ? "मेरी शिकायतें" : "My Complaints",
-    adminView: language === "gu" ? "એડમિન પેનલ" : language === "hi" ? "एडमिन पैनल" : "Admin Panel",
+
     fullName: language === "gu" ? "આખું નામ" : language === "hi" ? "पूरा नाम" : "Full Name",
     phone: language === "gu" ? "ફોન નંબર" : language === "hi" ? "फ़ोन नंबर" : "Phone Number",
     village: language === "gu" ? "ગામ" : language === "hi" ? "गाँव" : "Village/Location",

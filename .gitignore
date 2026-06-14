@@ -25,3 +25,8 @@ dist-ssr
 
 # Local Codex workspace state
 .codex/
+
+# Standalone repositories
+farmalert_admin/
+admin-portal/
+

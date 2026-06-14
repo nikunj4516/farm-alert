@@ -201,25 +201,7 @@ const Index = () => {
     });
   }, [weather, isWeatherLoading]);
 
-  // Admin notification listener
-  useEffect(() => {
-    const handleNewComplaint = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      const notif = customEvent.detail;
-      
-      toast({
-        title: "🚨 [Admin Notification]",
-        description: `New complaint received from ${notif.farmer_name} under category "${notif.message.split('"')[1] || ''}"!`,
-        variant: "destructive",
-        duration: 5000,
-      });
-    };
-    
-    window.addEventListener("farmalert_new_complaint", handleNewComplaint);
-    return () => {
-      window.removeEventListener("farmalert_new_complaint", handleNewComplaint);
-    };
-  }, []);
+
 
   const helplineNumber = "1800-180-1551";
   const helplineText = t("helpline").replace(/^📞\s*/, "");
