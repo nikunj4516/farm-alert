@@ -24,25 +24,89 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+    let isMounted = true;
+
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!isMounted) return;
+
+        if (session) {
+          // Verify JWT session integrity by requesting user details from the server
+          const { error } = await supabase.auth.getUser();
+          if (error) {
+            console.warn("Session verification failed:", error.message);
+            const isJwtError = error.status === 400 || 
+                               error.status === 401 || 
+                               error.status === 403 || 
+                               error.message.toLowerCase().includes("jwt") || 
+                               error.message.toLowerCase().includes("signature") ||
+                               error.message.toLowerCase().includes("decode");
+            
+            if (isJwtError) {
+              console.warn("Corrupted session token detected, clearing authentication state:", error.message);
+              
+              // Clean localStorage of any Supabase tokens to prevent infinite loops/broken states
+              for (const key of Object.keys(localStorage)) {
+                if (key.startsWith("sb-")) {
+                  localStorage.removeItem(key);
+                }
+              }
+              setSession(null);
+              setUser(null);
+              setLoading(false);
+              return;
+            }
+          }
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
+      } catch (err) {
+        console.error("Error during session check:", err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!isMounted) return;
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+        } else if (session) {
+          setSession(session);
+          setUser(session.user);
+        }
         setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn("Sign out network error, clearing local session:", err);
+    }
+    // Always clear localStorage tokens locally
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith("sb-")) {
+        localStorage.removeItem(key);
+      }
+    }
+    setSession(null);
+    setUser(null);
   };
 
   return (

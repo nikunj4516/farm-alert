@@ -140,6 +140,13 @@ const ProfileSetup = () => {
     };
   }, [user]);
 
+  const avatarUrl = form.profile_image_url || (user?.id ? localStorage.getItem(`farmalert_profile_image_url_${user.id}`) : null);
+  const [avatarLoadError, setAvatarLoadError] = useState(false);
+
+  useEffect(() => {
+    setAvatarLoadError(false);
+  }, [avatarUrl]);
+
   const crops = tArray("crops");
   const cropValues = ["Wheat", "Rice", "Cotton", "Groundnut", "Sugarcane", "Vegetables", "Other"];
   const talukaOptions = getTalukasForDistrict(form.district);
@@ -226,12 +233,6 @@ const ProfileSetup = () => {
   };
 
   const progress = ((step + 1) / STEPS) * 100;
-  const avatarUrl = form.profile_image_url || (user?.id ? localStorage.getItem(`farmalert_profile_image_url_${user.id}`) : null);
-  const [avatarLoadError, setAvatarLoadError] = useState(false);
-
-  useEffect(() => {
-    setAvatarLoadError(false);
-  }, [avatarUrl]);
 
   return (
     <div className="min-h-screen bg-background px-4 py-6">
