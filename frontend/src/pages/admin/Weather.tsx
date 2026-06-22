@@ -45,6 +45,40 @@ export const Weather: React.FC<WeatherProps> = ({
     e.preventDefault();
     setLoading(true);
 
+    const isMockSession = localStorage.getItem("sb-jipmjrgsqhjknbtkjhel-auth-token")?.includes("test-user-id");
+    if (isMockSession) {
+      const mockAlerts = JSON.parse(localStorage.getItem("farmalert_mock_weather_alerts") || "[]");
+      const newAlert = {
+        id: `alert-${Date.now()}`,
+        title,
+        description,
+        severity,
+        district: district || null,
+        state: "Gujarat",
+        temperature: temperature || null,
+        humidity: humidity || null,
+        wind_speed: windSpeed || null,
+        is_active: true,
+        starts_at: new Date().toISOString(),
+        ends_at: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days duration
+        created_at: new Date().toISOString()
+      };
+      mockAlerts.unshift(newAlert);
+      localStorage.setItem("farmalert_mock_weather_alerts", JSON.stringify(mockAlerts));
+      alert("Weather Alert broadcasted successfully to all targeted farmers.");
+      setShowAddModal(false);
+      setTitle("");
+      setDescription("");
+      setSeverity("yellow");
+      setDistrict("");
+      setTemperature("");
+      setHumidity("");
+      setWindSpeed("");
+      onRefresh();
+      setLoading(false);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("weather_alerts")
@@ -84,6 +118,14 @@ export const Weather: React.FC<WeatherProps> = ({
 
   const toggleAlertState = async (id: string, currentlyActive: boolean) => {
     if (!window.confirm(`Are you sure you want to ${currentlyActive ? "deactivate" : "activate"} this alert?`)) return;
+
+    if (id.startsWith("alert-")) {
+      const mockAlerts = JSON.parse(localStorage.getItem("farmalert_mock_weather_alerts") || "[]");
+      const updated = mockAlerts.map((a: any) => a.id === id ? { ...a, is_active: !currentlyActive } : a);
+      localStorage.setItem("farmalert_mock_weather_alerts", JSON.stringify(updated));
+      onRefresh();
+      return;
+    }
 
     try {
       const { error } = await supabase

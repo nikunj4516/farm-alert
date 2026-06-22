@@ -43,6 +43,15 @@ export const Farmers: React.FC<FarmersProps> = ({
     
     if (!window.confirm(confirmMsg)) return;
 
+    if (farmer.id.startsWith("farmer-") || farmer.id.startsWith("local-")) {
+      const mockUsers = JSON.parse(localStorage.getItem("farmalert_mock_users") || "[]");
+      const updated = mockUsers.map((u: any) => u.id === farmer.id ? { ...u, is_suspended: nextSuspended } : u);
+      localStorage.setItem("farmalert_mock_users", JSON.stringify(updated));
+      alert(`User status updated successfully.`);
+      onRefresh();
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("profiles")

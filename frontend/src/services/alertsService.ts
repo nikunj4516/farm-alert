@@ -8,6 +8,25 @@ export class AlertsService {
    * Fetch unread alerts for a specific user
    */
   static async getUnreadAlerts(userId: string): Promise<FarmerAlert[]> {
+    if (userId === "test-farmer-id" || userId === "test-user-id") {
+      const stored = localStorage.getItem(`farmalert_alerts_${userId}`);
+      if (stored) {
+        try { return JSON.parse(stored); } catch { }
+      }
+      const mockAlerts: FarmerAlert[] = [
+        {
+          id: "alert-1",
+          user_id: userId,
+          alert_type: "weather",
+          message: "Heavy rain expected. Ensure proper drainage for your crops.",
+          severity: "warning",
+          is_read: false,
+          created_at: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem(`farmalert_alerts_${userId}`, JSON.stringify(mockAlerts));
+      return mockAlerts;
+    }
     try {
       const { data, error } = await supabase
         .from("farmer_alerts")
@@ -28,6 +47,18 @@ export class AlertsService {
    * Mark an alert as read
    */
   static async markAsRead(alertId: string): Promise<void> {
+    if (alertId.startsWith("alert-")) {
+      const userId = localStorage.getItem("sb-jipmjrgsqhjknbtkjhel-auth-token")?.includes("test-user-id") ? "test-user-id" : "test-farmer-id";
+      const stored = localStorage.getItem(`farmalert_alerts_${userId}`);
+      if (stored) {
+        try {
+          const alerts: FarmerAlert[] = JSON.parse(stored);
+          const updated = alerts.filter(a => a.id !== alertId);
+          localStorage.setItem(`farmalert_alerts_${userId}`, JSON.stringify(updated));
+        } catch { }
+      }
+      return;
+    }
     try {
       const { error } = await supabase
         .from("farmer_alerts")
@@ -44,6 +75,9 @@ export class AlertsService {
    * Trigger dynamic system alerts (Usually a backend function, mocked here for scalable architecture)
    */
   static async generateSmartAlerts(userId: string, weatherCondition: string, cropType: string): Promise<void> {
+    if (userId === "test-farmer-id" || userId === "test-user-id") {
+      return;
+    }
     try {
       const alertsToCreate = [];
 

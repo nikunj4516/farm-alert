@@ -28,6 +28,23 @@ export const FarmerDetail: React.FC<FarmerDetailProps> = ({
   useEffect(() => {
     const fetchHistory = async () => {
       setLoading(true);
+      if (farmer.id.startsWith("farmer-") || farmer.id.startsWith("local-")) {
+        const allComps = JSON.parse(localStorage.getItem("farmalert_mock_complaints") || "[]");
+        const allFeeds = JSON.parse(localStorage.getItem("farmalert_mock_feedbacks") || "[]");
+        const allScans = JSON.parse(localStorage.getItem("farmalert_mock_scans") || "[]");
+        
+        setComplaints(allComps.filter((c: any) => c.user_id === farmer.user_id));
+        setFeedback(allFeeds.filter((f: any) => f.user_id === farmer.user_id));
+        setScans(allScans.filter((s: any) => s.user_id === farmer.user_id));
+        setPreferences({
+          weather_alerts_enabled: true,
+          farming_tips_enabled: true,
+          news_enabled: true,
+          preferred_language: farmer.preferred_language || "gu"
+        });
+        setLoading(false);
+        return;
+      }
       try {
         // 1. Fetch user complaints
         const { data: compData } = await supabase
@@ -78,6 +95,16 @@ export const FarmerDetail: React.FC<FarmerDetailProps> = ({
       : `Activate ${farmer.name || "this user"}?`;
     
     if (!window.confirm(confirmMsg)) return;
+
+    if (farmer.id.startsWith("farmer-") || farmer.id.startsWith("local-")) {
+      const mockUsers = JSON.parse(localStorage.getItem("farmalert_mock_users") || "[]");
+      const updated = mockUsers.map((u: any) => u.id === farmer.id ? { ...u, is_suspended: nextSuspended } : u);
+      localStorage.setItem("farmalert_mock_users", JSON.stringify(updated));
+      alert(`User status updated.`);
+      farmer.is_suspended = nextSuspended; // update local representation
+      onRefresh();
+      return;
+    }
 
     try {
       const { error } = await supabase

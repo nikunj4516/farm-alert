@@ -58,6 +58,226 @@ export const AdminPortalWrapper = () => {
     if (!user || (role !== "admin" && role !== "super_admin") || !supabase) return;
     setDataLoading(true);
 
+    if (user.id === "test-user-id") {
+      // 1. Initialize mock datasets in localStorage if they don't exist
+      if (!localStorage.getItem("farmalert_mock_users")) {
+        const initialUsers = [
+          {
+            id: "local-profile-test-farmer-id",
+            user_id: "test-farmer-id",
+            name: "Nikunj Bariya",
+            phone: "9999900000",
+            village: "Rampura",
+            taluka: "Jambughoda",
+            district: "Panchmahal",
+            state: "Gujarat",
+            crop_type: "Wheat",
+            land_size: 5,
+            preferred_language: "gu",
+            profile_completed: true,
+            onboarding_completed: true,
+            created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
+            updated_at: new Date().toISOString(),
+            profile_image_url: null,
+            role: "farmer",
+            is_suspended: false
+          },
+          {
+            id: "farmer-2",
+            user_id: "farmer-2-id",
+            name: "Ramesh Patel",
+            phone: "9876543210",
+            village: "Vasad",
+            taluka: "Anand",
+            district: "Anand",
+            state: "Gujarat",
+            crop_type: "Cotton",
+            land_size: 12,
+            preferred_language: "gu",
+            profile_completed: true,
+            onboarding_completed: true,
+            created_at: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString(),
+            updated_at: new Date().toISOString(),
+            profile_image_url: null,
+            role: "farmer",
+            is_suspended: false
+          },
+          {
+            id: "farmer-3",
+            user_id: "farmer-3-id",
+            name: "Sanjay Shah",
+            phone: "9123456789",
+            village: "Karamsad",
+            taluka: "Anand",
+            district: "Anand",
+            state: "Gujarat",
+            crop_type: "Rice",
+            land_size: 8,
+            preferred_language: "hi",
+            profile_completed: true,
+            onboarding_completed: true,
+            created_at: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString(),
+            updated_at: new Date().toISOString(),
+            profile_image_url: null,
+            role: "farmer",
+            is_suspended: false
+          },
+          {
+            id: "admin-1",
+            user_id: "test-user-id",
+            name: "FarmAlert Super Admin",
+            phone: "9999999999",
+            village: "Jambughoda",
+            taluka: "Jambughoda",
+            district: "Panchmahal",
+            state: "Gujarat",
+            crop_type: null,
+            land_size: null,
+            preferred_language: "en",
+            profile_completed: true,
+            onboarding_completed: true,
+            created_at: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString(),
+            updated_at: new Date().toISOString(),
+            profile_image_url: null,
+            role: "super_admin",
+            is_suspended: false
+          }
+        ];
+        localStorage.setItem("farmalert_mock_users", JSON.stringify(initialUsers));
+      }
+
+      if (!localStorage.getItem("farmalert_mock_subscriptions")) {
+        const initialSubscriptions = [
+          {
+            id: "sub-1",
+            user_id: "test-farmer-id",
+            plan_type: "PRO",
+            subscription_status: "active",
+            started_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          {
+            id: "sub-2",
+            user_id: "farmer-2-id",
+            plan_type: "PREMIUM",
+            subscription_status: "active",
+            started_at: new Date(Date.now() - 9 * 24 * 3600 * 1000).toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem("farmalert_mock_subscriptions", JSON.stringify(initialSubscriptions));
+      }
+
+      if (!localStorage.getItem("farmalert_mock_scans")) {
+        const initialScans = [
+          {
+            id: "scan-1",
+            user_id: "test-farmer-id",
+            image_url: "https://images.unsplash.com/photo-1592417817098-8f3d6eb19675",
+            crop_name: "Wheat",
+            disease_name: "Brown Rust",
+            confidence_score: 89,
+            recommendation: "Apply Propiconazole 25% EC fungicide and ensure good aeration between crop rows.",
+            created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString()
+          },
+          {
+            id: "scan-2",
+            user_id: "farmer-2-id",
+            image_url: "https://images.unsplash.com/photo-1598902108854-10e335adac99",
+            crop_name: "Cotton",
+            disease_name: "Aphids Infestation",
+            confidence_score: 92,
+            recommendation: "Spray Neem oil (1500 ppm) or consult local extension agent for imidacloprid application.",
+            created_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString()
+          }
+        ];
+        localStorage.setItem("farmalert_mock_scans", JSON.stringify(initialScans));
+      }
+
+      if (!localStorage.getItem("farmalert_mock_complaints")) {
+        const initialComplaints = [
+          {
+            id: "complaint-1",
+            user_id: "test-farmer-id",
+            name: "Nikunj Bariya",
+            phone: "9999900000",
+            village: "Rampura",
+            taluka: "Jambughoda",
+            district: "Panchmahal",
+            category: "Weather Issue",
+            subject: "Weather forecast not showing local village updates",
+            message: "The weather forecast page only shows Panchmahal district weather, not Jambughoda or Rampura village specifically.",
+            status: "Pending",
+            admin_reply: null,
+            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+            updated_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
+          }
+        ];
+        localStorage.setItem("farmalert_mock_complaints", JSON.stringify(initialComplaints));
+      }
+
+      if (!localStorage.getItem("farmalert_mock_feedbacks")) {
+        const initialFeedbacks = [
+          {
+            id: "feedback-1",
+            user_id: "farmer-3-id",
+            rating: 5,
+            feedback_message: "Farming tips in Gujarati are extremely helpful. Thank you!",
+            language: "gu",
+            created_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString()
+          }
+        ];
+        localStorage.setItem("farmalert_mock_feedbacks", JSON.stringify(initialFeedbacks));
+      }
+
+      if (!localStorage.getItem("farmalert_mock_weather_alerts")) {
+        const initialWeatherAlerts = [
+          {
+            id: "alert-1",
+            title: "Heavy Rainfall Warning",
+            description: "Very heavy rainfall expected over Panchmahal and adjoining talukas. Risk of waterlogging.",
+            severity: "orange",
+            district: "Panchmahal",
+            state: "Gujarat",
+            is_active: true,
+            created_at: new Date(Date.now() - 12 * 3600 * 1000).toISOString()
+          }
+        ];
+        localStorage.setItem("farmalert_mock_weather_alerts", JSON.stringify(initialWeatherAlerts));
+      }
+
+      if (!localStorage.getItem("farmalert_mock_farms")) {
+        const initialFarms = [
+          { id: "farm-1", user_id: "test-farmer-id", farm_name: "Rampura Main Farm", area_acres: 5, primary_crop: "Wheat", soil_type: "Black Soil", created_at: new Date(Date.now() - 20 * 24 * 3600 * 1000).toISOString() }
+        ];
+        localStorage.setItem("farmalert_mock_farms", JSON.stringify(initialFarms));
+      }
+
+      if (!localStorage.getItem("farmalert_mock_devices")) {
+        const initialDevices = [
+          { id: "device-1", device_uid: "SN-MOIST-001", farm_id: "farm-1", device_type: "soil_moisture", status: "online", battery_level: 84, last_communication: new Date().toISOString() }
+        ];
+        localStorage.setItem("farmalert_mock_devices", JSON.stringify(initialDevices));
+      }
+
+      // 2. Load from localStorage state
+      setUsers(JSON.parse(localStorage.getItem("farmalert_mock_users") || "[]"));
+      setSubscriptions(JSON.parse(localStorage.getItem("farmalert_mock_subscriptions") || "[]"));
+      setScans(JSON.parse(localStorage.getItem("farmalert_mock_scans") || "[]"));
+      setComplaints(JSON.parse(localStorage.getItem("farmalert_mock_complaints") || "[]"));
+      setFeedbacks(JSON.parse(localStorage.getItem("farmalert_mock_feedbacks") || "[]"));
+      setWeatherAlerts(JSON.parse(localStorage.getItem("farmalert_mock_weather_alerts") || "[]"));
+      setFarms(JSON.parse(localStorage.getItem("farmalert_mock_farms") || "[]"));
+      setDevices(JSON.parse(localStorage.getItem("farmalert_mock_devices") || "[]"));
+
+      setFarmsMissing(false);
+      setDevicesMissing(false);
+      setProfilesMissing(false);
+      setProfilesSchemaIncomplete(false);
+      setDataLoading(false);
+      return;
+    }
+
     // 1. Profiles (Farmers)
     try {
       const { data: profs, error: profsError } = await supabase
@@ -187,7 +407,7 @@ export const AdminPortalWrapper = () => {
 
   // Supabase Realtime Channels Event Listeners
   useEffect(() => {
-    if (!user || (role !== "admin" && role !== "super_admin") || !supabase) return;
+    if (!user || (role !== "admin" && role !== "super_admin") || !supabase || user.id === "test-user-id") return;
 
     // A. Listen to complaints updates
     const complaintsChannel = supabase

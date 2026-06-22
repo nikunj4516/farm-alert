@@ -179,6 +179,9 @@ export class ProfileService {
    * Fetches the user's profile and preferences
    */
   static async getProfile(userId: string): Promise<Profile | null> {
+    if (userId === "test-farmer-id" || userId === "test-user-id") {
+      return this.getLocalProfile(userId);
+    }
     try {
       const { data, error } = await supabase
         .from("profiles")
@@ -229,6 +232,9 @@ export class ProfileService {
    * Update the user's profile
    */
   static async updateProfile(userId: string, updates: ProfileUpdate): Promise<Profile> {
+    if (userId === "test-farmer-id" || userId === "test-user-id") {
+      return this.setLocalProfile(userId, updates);
+    }
     let payload = updates;
     let lastError: unknown = null;
 
@@ -278,6 +284,9 @@ export class ProfileService {
    * Create or update the user's profile using user_id as the stable key.
    */
   static async upsertProfile(userId: string, profile: ProfileUpdate | Record<string, unknown>): Promise<Profile> {
+    if (userId === "test-farmer-id" || userId === "test-user-id") {
+      return this.setLocalProfile(userId, profile as Partial<Profile>);
+    }
     const saveProfile = async (payload: ProfileUpdate) =>
       supabase
         .from("profiles")
@@ -365,6 +374,31 @@ export class ProfileService {
     }
 
     const compressedFile = await compressProfileImage(file);
+
+    if (userId === "test-farmer-id" || userId === "test-user-id") {
+      const base64Url = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            resolve(reader.result);
+          } else {
+            reject(new Error("Failed to read file as Data URL"));
+          }
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(compressedFile);
+      });
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`farmalert_profile_image_url_${userId}`, base64Url);
+        const localProfile = this.getLocalProfile(userId);
+        if (localProfile) {
+          localProfile.profile_image_url = base64Url;
+          this.setLocalProfile(userId, localProfile);
+        }
+      }
+      return base64Url;
+    }
     const extension = getImageExtension(compressedFile);
     const version = Date.now();
     const uniqueId = (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") 

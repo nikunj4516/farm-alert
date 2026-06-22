@@ -20,6 +20,14 @@ export const SettingsModule: React.FC = () => {
 
   const fetchAdmins = async () => {
     setLoadingAdmins(true);
+    const isMockSession = localStorage.getItem("sb-jipmjrgsqhjknbtkjhel-auth-token")?.includes("test-user-id");
+    if (isMockSession) {
+      const mockUsers = JSON.parse(localStorage.getItem("farmalert_mock_users") || "[]");
+      const mockAdmins = mockUsers.filter((u: any) => u.role === "admin" || u.role === "super_admin");
+      setAdminsList(mockAdmins);
+      setLoadingAdmins(false);
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from("profiles")
@@ -46,6 +54,23 @@ export const SettingsModule: React.FC = () => {
 
     if (role !== "super_admin") {
       alert("Only super admins can promote other accounts to administrator roles.");
+      return;
+    }
+
+    const isMockSession = localStorage.getItem("sb-jipmjrgsqhjknbtkjhel-auth-token")?.includes("test-user-id");
+    if (isMockSession) {
+      const mockUsers = JSON.parse(localStorage.getItem("farmalert_mock_users") || "[]");
+      const userToPromote = mockUsers.find((u: any) => u.phone === newAdminPhone.trim());
+      if (!userToPromote) {
+        alert("No user profile found with that phone number.");
+        return;
+      }
+      const updated = mockUsers.map((u: any) => u.id === userToPromote.id ? { ...u, role: newAdminRole } : u);
+      localStorage.setItem("farmalert_mock_users", JSON.stringify(updated));
+      alert(`Successfully promoted ${userToPromote.name || "user"} to ${newAdminRole}.`);
+      setNewAdminPhone("");
+      const mockAdmins = updated.filter((u: any) => u.role === "admin" || u.role === "super_admin");
+      setAdminsList(mockAdmins);
       return;
     }
 

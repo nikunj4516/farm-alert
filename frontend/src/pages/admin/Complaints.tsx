@@ -29,6 +29,18 @@ export const Complaints: React.FC<ComplaintsProps> = ({
     if (!selectedTicket) return;
     setUpdating(true);
 
+    if (selectedTicket.id.startsWith("complaint-")) {
+      const mockComplaints = JSON.parse(localStorage.getItem("farmalert_mock_complaints") || "[]");
+      const updated = mockComplaints.map((c: any) => c.id === selectedTicket.id ? { ...c, status: ticketStatus, admin_reply: replyText || null, updated_at: new Date().toISOString() } : c);
+      localStorage.setItem("farmalert_mock_complaints", JSON.stringify(updated));
+      alert("Ticket updated successfully.");
+      setSelectedTicket(null);
+      setReplyText("");
+      onRefresh();
+      setUpdating(false);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("complaints")
