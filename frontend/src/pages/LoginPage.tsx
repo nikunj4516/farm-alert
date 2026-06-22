@@ -51,6 +51,17 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cooldown, setCooldown] = useState(0);
+  const { user, role, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (role === "admin" || role === "super_admin") {
+        window.location.href = "/admin/dashboard";
+      } else {
+        window.location.href = "/home";
+      }
+    }
+  }, [user, role, authLoading]);
 
   useEffect(() => {
     if (cooldown > 0) {
@@ -97,46 +108,23 @@ const LoginPage = () => {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.verifyOtp({
-      phone: formattedPhone,
-      token: otp,
-      type: "sms",
-    });
-
-    if (error) {
-      setLoading(false);
-      setError(getAuthErrorMessage(error.message));
-      return;
-    }
-
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user?.id;
-      
-      if (userId) {
-        // Query the profile to see the user's role
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("user_id", userId)
-          .maybeSingle();
-        
-        if (profile?.role) {
-          const dbRole = profile.role.toLowerCase();
-          if (dbRole === "admin" || dbRole === "super_admin") {
-            setLoading(false);
-            window.location.href = "/admin/dashboard";
-            return;
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Error determining role after login:", err);
-    }
+      const { error } = await supabase.auth.verifyOtp({
+        phone: formattedPhone,
+        token: otp,
+        type: "sms",
+      });
 
-    setLoading(false);
-    // Direct navigation to home page for farmers
-    window.location.href = "/home";
+      if (error) {
+        setLoading(false);
+        setError(getAuthErrorMessage(error.message));
+        return;
+      }
+    } catch (err: any) {
+      console.error("Error verifying OTP:", err);
+      setError(err.message || "An error occurred during verification.");
+      setLoading(false);
+    }
   };
 
   const handleBypassLogin = (targetRole: "farmer" | "admin") => {

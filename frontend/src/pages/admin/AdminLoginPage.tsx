@@ -47,8 +47,13 @@ export const AdminLoginPage = () => {
   const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
-    if (!authLoading && user && (role === "admin" || role === "super_admin")) {
-      navigate("/admin/dashboard", { replace: true });
+    if (!authLoading && user) {
+      if (role === "admin" || role === "super_admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        setError("Access Denied: This account is not registered as an administrator.");
+        void supabase.auth.signOut();
+      }
     }
   }, [user, role, authLoading, navigate]);
 
@@ -101,45 +106,23 @@ export const AdminLoginPage = () => {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.verifyOtp({
-      phone: formattedPhone,
-      token: otp,
-      type: "sms",
-    });
-
-    if (error) {
-      setLoading(false);
-      setError(getAuthErrorMessage(error.message));
-      return;
-    }
-
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user?.id;
-      
-      if (userId) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("user_id", userId)
-          .maybeSingle();
-        
-        if (profile?.role) {
-          const dbRole = profile.role.toLowerCase();
-          if (dbRole === "admin" || dbRole === "super_admin") {
-            setLoading(false);
-            window.location.href = "/admin/dashboard";
-            return;
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Error verifying admin role:", err);
-    }
+      const { error } = await supabase.auth.verifyOtp({
+        phone: formattedPhone,
+        token: otp,
+        type: "sms",
+      });
 
-    setLoading(false);
-    setError("Access Denied: This account is not registered as an administrator.");
-    await supabase.auth.signOut();
+      if (error) {
+        setLoading(false);
+        setError(getAuthErrorMessage(error.message));
+        return;
+      }
+    } catch (err: any) {
+      console.error("Error verifying admin OTP:", err);
+      setError(err.message || "An error occurred during verification.");
+      setLoading(false);
+    }
   };
 
   const handleBypassAdminLogin = () => {

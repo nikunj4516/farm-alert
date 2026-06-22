@@ -20,11 +20,50 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+const getInitialSession = (): { session: Session | null; user: User | null; role: "farmer" | "admin" | "super_admin" | null } => {
+  if (typeof window === "undefined") {
+    return { session: null, user: null, role: null };
+  }
+  let ref = "jipmjrgsqhjknbtkjhel";
+  try {
+    const url = import.meta.env.VITE_SUPABASE_URL || "";
+    const match = url.match(/https:\/\/([^.]+)\.supabase\.(co|net)/);
+    if (match) ref = match[1];
+  } catch (e) {}
+
+  const stored = localStorage.getItem(`sb-${ref}-auth-token`);
+  if (!stored) return { session: null, user: null, role: null };
+  try {
+    const parsed = JSON.parse(stored);
+    if (parsed && parsed.access_token) {
+      const user = parsed.user;
+      let role: "farmer" | "admin" | "super_admin" | null = null;
+      if (user) {
+        if (user.id === "test-user-id") {
+          role = "super_admin";
+        } else if (user.id === "test-farmer-id") {
+          role = "farmer";
+        } else {
+          const cachedProfileStr = localStorage.getItem(`farmalert_local_profile_${user.id}`);
+          if (cachedProfileStr) {
+            const cachedProfile = JSON.parse(cachedProfileStr);
+            const dbRole = cachedProfile?.role?.toLowerCase();
+            role = (dbRole === "admin" || dbRole === "super_admin") ? dbRole : "farmer";
+          }
+        }
+      }
+      return { session: parsed, user, role };
+    }
+  } catch (e) {}
+  return { session: null, user: null, role: null };
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<"farmer" | "admin" | "super_admin" | null>(null);
-  const [loading, setLoading] = useState(true);
+  const initial = getInitialSession();
+  const [session, setSession] = useState<Session | null>(initial.session);
+  const [user, setUser] = useState<User | null>(initial.user);
+  const [role, setRole] = useState<"farmer" | "admin" | "super_admin" | null>(initial.role);
+  const [loading, setLoading] = useState(!initial.session);
 
   const checkUserRole = async (userId: string): Promise<"farmer" | "admin" | "super_admin"> => {
     if (userId === "test-user-id") {
