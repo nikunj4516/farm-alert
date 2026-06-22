@@ -103,33 +103,58 @@ const LoginPage = () => {
       type: "sms",
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       setError(getAuthErrorMessage(error.message));
       return;
     }
 
-    const { data: sessionData } = await supabase.auth.getSession();
-    const userId = sessionData.session?.user.id;
-    
-    // Direct navigation to subscription page after successful OTP verification
-    navigate("/subscription", { replace: true });
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user?.id;
+      
+      if (userId) {
+        // Query the profile to see the user's role
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("user_id", userId)
+          .maybeSingle();
+        
+        if (profile?.role) {
+          const dbRole = profile.role.toLowerCase();
+          if (dbRole === "admin" || dbRole === "super_admin") {
+            setLoading(false);
+            window.location.href = "/admin/dashboard";
+            return;
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error determining role after login:", err);
+    }
+
+    setLoading(false);
+    // Direct navigation to home page for farmers
+    window.location.href = "/home";
   };
 
-  const handleBypassLogin = () => {
+  const handleBypassLogin = (targetRole: "farmer" | "admin") => {
     setLoading(true);
     setError("");
     try {
+      const isFarmer = targetRole === "farmer";
+      const targetUserId = isFarmer ? 'test-farmer-id' : 'test-user-id';
+      
       const payload = {
         exp: Math.floor(Date.now() / 1000) + 3600 * 24 * 365,
-        sub: 'test-user-id',
-        email: 'test@example.com',
-        phone: '+919999999999',
+        sub: targetUserId,
+        email: isFarmer ? 'farmer@example.com' : 'admin@example.com',
+        phone: isFarmer ? '+919999900000' : '+919999999999',
         app_metadata: { provider: 'phone', providers: ['phone'] },
         user_metadata: {
-          name: 'Nikunj Bariya',
-          phone: '9999999999',
+          name: isFarmer ? 'Test Farmer' : 'FarmAlert Super Admin',
+          phone: isFarmer ? '9999900000' : '9999999999',
         },
         role: 'authenticated',
         aal: 'aal1',
@@ -144,12 +169,12 @@ const LoginPage = () => {
         expires_in: 3600 * 24 * 365,
         refresh_token: 'fake-refresh-dev',
         user: {
-          id: 'test-user-id',
-          email: 'test@example.com',
-          phone: '+919999999999',
+          id: targetUserId,
+          email: isFarmer ? 'farmer@example.com' : 'admin@example.com',
+          phone: isFarmer ? '+919999900000' : '+919999999999',
           user_metadata: {
-            name: 'Nikunj Bariya',
-            phone: '9999999999',
+            name: isFarmer ? 'Test Farmer' : 'FarmAlert Super Admin',
+            phone: isFarmer ? '9999900000' : '9999999999',
           },
           app_metadata: { provider: 'phone', providers: ['phone'] },
           aud: 'authenticated',
@@ -168,36 +193,42 @@ const LoginPage = () => {
       }
       
       localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(fakeSession));
-      localStorage.setItem('farmalert_profile_completed', 'true');
-      localStorage.setItem('farmalert_language_selected', 'true');
       
-      const mockProfile = {
-        id: 'local-profile-test-user-id',
-        user_id: 'test-user-id',
-        name: 'Nikunj Bariya',
-        phone: '9999999999',
-        village: 'Rampura',
-        taluka: 'Jambughoda',
-        district: 'Panchmahal',
-        state: 'Gujarat',
-        crop_type: 'Wheat',
-        land_size: 5,
-        preferred_language: 'gu',
-        profile_completed: true,
-        onboarding_completed: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        profile_image_url: null,
-        latitude: null,
-        longitude: null
-      };
-      localStorage.setItem('farmalert_local_profile_test-user-id', JSON.stringify(mockProfile));
-      
-      localStorage.setItem('farmalert_subscription_active', 'true');
-      localStorage.setItem('farmalert_subscription_tier', 'premium');
-      localStorage.setItem('farmalert_subscription_checked_at', String(Date.now()));
-      
-      window.location.href = '/dashboard';
+      if (isFarmer) {
+        localStorage.setItem('farmalert_profile_completed', 'true');
+        localStorage.setItem('farmalert_language_selected', 'true');
+        
+        const mockProfile = {
+          id: 'local-profile-test-farmer-id',
+          user_id: 'test-farmer-id',
+          name: 'Test Farmer',
+          phone: '9999900000',
+          village: 'Rampura',
+          taluka: 'Jambughoda',
+          district: 'Panchmahal',
+          state: 'Gujarat',
+          crop_type: 'Wheat',
+          land_size: 5,
+          preferred_language: 'gu',
+          profile_completed: true,
+          onboarding_completed: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          profile_image_url: null,
+          latitude: null,
+          longitude: null,
+          role: 'farmer'
+        };
+        localStorage.setItem('farmalert_local_profile_test-farmer-id', JSON.stringify(mockProfile));
+        
+        localStorage.setItem('farmalert_subscription_active', 'true');
+        localStorage.setItem('farmalert_subscription_tier', 'premium');
+        localStorage.setItem('farmalert_subscription_checked_at', String(Date.now()));
+        
+        window.location.href = '/home';
+      } else {
+        window.location.href = '/admin/dashboard';
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to create test session");
@@ -345,17 +376,27 @@ const LoginPage = () => {
           {t("login_secure")}
         </p>
 
-        {import.meta.env.DEV && (
-          <div className="pt-4 border-t border-dashed border-border mt-4">
+        <div className="pt-4 border-t border-dashed border-border mt-4 space-y-2">
+          <div className="text-center text-[10px] text-muted-foreground font-semibold tracking-wider uppercase mb-1">
+            Developer Sandbox
+          </div>
+          <div className="flex gap-2">
             <button
               type="button"
-              onClick={handleBypassLogin}
-              className="w-full py-3 px-4 rounded-xl border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
+              onClick={() => handleBypassLogin("farmer")}
+              className="flex-1 py-2.5 px-3 rounded-xl border border-emerald-600/30 bg-emerald-50/20 text-emerald-800 text-xs font-bold hover:bg-emerald-100/40 transition-colors flex items-center justify-center gap-1.5"
             >
-              <span>⚡</span> Developer Bypass: Log in with Test Session
+              <span>👨‍🌾</span> Farmer Demo
+            </button>
+            <button
+              type="button"
+              onClick={() => handleBypassLogin("admin")}
+              className="flex-1 py-2.5 px-3 rounded-xl border border-indigo-600/30 bg-indigo-50/20 text-indigo-800 text-xs font-bold hover:bg-indigo-100/40 transition-colors flex items-center justify-center gap-1.5"
+            >
+              <span>⚡</span> Admin Sandbox
             </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -100,9 +100,22 @@ const savePreferredLanguage = async (userId: string, lang: Language) => {
 
 const Index = () => {
   const location = useLocation();
-  const initialTab = (location.state as { activeTab?: Tab } | null)?.activeTab;
-  const [activeTab, setActiveTab] = useState<Tab>(initialTab || "weather");
+  const getActiveTabFromPath = (): Tab => {
+    const path = location.pathname.substring(1);
+    if (path === "home" || path === "dashboard" || !path) {
+      return "weather";
+    }
+    return path as Tab;
+  };
+  const activeTab = getActiveTabFromPath();
   const navigate = useNavigate();
+  const handleTabChange = (tab: Tab) => {
+    if (tab === "weather") {
+      navigate("/home");
+    } else {
+      navigate(`/${tab}`);
+    }
+  };
   const queryClient = useQueryClient();
   const { language, setLanguage, t, tArray } = useLanguage();
   const { user, loading } = useAuth();
@@ -230,7 +243,7 @@ const Index = () => {
       case "news":
       case "about":
       case "profile":
-        setActiveTab(command.action);
+        handleTabChange(command.action);
         break;
       case "helpline":
         window.location.href = "tel:18001801551";
@@ -453,7 +466,7 @@ const Index = () => {
 
       <BottomNav 
         activeTab={activeTab} 
-        onTabChange={setActiveTab} 
+        onTabChange={handleTabChange} 
         profileImageUrl={
           profileWithSavedLocation?.profile_image_url || 
           (user?.id ? localStorage.getItem(`farmalert_profile_image_url_${user.id}`) : null)

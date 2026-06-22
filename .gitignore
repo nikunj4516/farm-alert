@@ -29,4 +29,6 @@ dist-ssr
 # Standalone repositories
 farmalert_admin/
 admin-portal/
+test-unified.cjs
+
 
