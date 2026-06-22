@@ -31,6 +31,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setRole("super_admin");
       return "super_admin";
     }
+    if (userId === "test-farmer-id") {
+      setRole("farmer");
+      return "farmer";
+    }
     try {
       const { data, error } = await supabase
         .from("profiles")
@@ -68,10 +72,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (session) {
           // Skip verification for developer test session
-          if (session.user?.id === "test-user-id") {
+          if (session.user?.id === "test-user-id" || session.user?.id === "test-farmer-id") {
             setSession(session);
             setUser(session.user);
-            setRole("super_admin");
+            setRole(session.user?.id === "test-user-id" ? "super_admin" : "farmer");
             setLoading(false);
             return;
           }
