@@ -139,8 +139,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setSession(session);
           setUser(session.user);
           setLoading(true);
-          await checkUserRole(session.user.id);
-          setLoading(false);
+          try {
+            await checkUserRole(session.user.id);
+          } catch (err) {
+            console.error("Auth state change checkUserRole failed:", err);
+          } finally {
+            setLoading(false);
+          }
         } else {
           setLoading(false);
         }
@@ -152,6 +157,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => {
+        console.warn("Auth loading timed out. Forcing loading to false.");
+        setLoading(false);
+      }, 7000);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
 
   const signOut = async () => {
     try {

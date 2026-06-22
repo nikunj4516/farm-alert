@@ -380,22 +380,22 @@ const LoginPage = () => {
           <div className="text-center text-[10px] text-muted-foreground font-semibold tracking-wider uppercase mb-1">
             Developer Sandbox
           </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => handleBypassLogin("farmer")}
-              className="flex-1 py-2.5 px-3 rounded-xl border border-emerald-600/30 bg-emerald-50/20 text-emerald-800 text-xs font-bold hover:bg-emerald-100/40 transition-colors flex items-center justify-center gap-1.5"
-            >
-              <span>👨‍🌾</span> Farmer Demo
-            </button>
-            <button
-              type="button"
-              onClick={() => handleBypassLogin("admin")}
-              className="flex-1 py-2.5 px-3 rounded-xl border border-indigo-600/30 bg-indigo-50/20 text-indigo-800 text-xs font-bold hover:bg-indigo-100/40 transition-colors flex items-center justify-center gap-1.5"
-            >
-              <span>⚡</span> Admin Sandbox
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => handleBypassLogin("farmer")}
+            className="w-full py-2.5 px-3 rounded-xl border border-emerald-600/30 bg-emerald-50/20 text-emerald-800 text-xs font-bold hover:bg-emerald-100/40 transition-colors flex items-center justify-center gap-1.5"
+          >
+            <span>👨‍🌾</span> Farmer Demo
+          </button>
+        </div>
+
+        <div className="text-center pt-2">
+          <a
+            href="/admin/login"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors font-bold underline"
+          >
+            Access Admin Portal
+          </a>
         </div>
       </div>
     </div>

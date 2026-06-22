@@ -38,13 +38,18 @@ const SplashScreen = () => {
     }
 
     const routeUser = async () => {
+      if (role === "admin" || role === "super_admin") {
+        navigate("/admin/dashboard", { replace: true });
+        return;
+      }
+
       const profile = await ProfileService.getProfile(user.id);
       if (!ProfileService.isProfileComplete(profile)) {
         navigate("/profile-setup", { replace: true });
         return;
       }
 
-      navigate("/dashboard", { replace: true });
+      navigate("/home", { replace: true });
     };
 
     void routeUser();

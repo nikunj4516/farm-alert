@@ -13,12 +13,13 @@ import SplashScreen from "./pages/SplashScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
 import { AdminPortalWrapper } from "./pages/admin/AdminPortalWrapper";
+import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
+  const { user, role, loading } = useAuth();
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -28,6 +29,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+  // Enforce isolation: Admins are not allowed inside Farmer Portal routes
+  if (role === "admin" || role === "super_admin") {
+    return <Navigate to="/admin/dashboard" replace />;
   }
   return <>{children}</>;
 };
@@ -42,8 +47,9 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
+  // Enforce isolation: Farmers are not allowed inside Admin Portal routes
   if (role !== "admin" && role !== "super_admin") {
     return <Navigate to="/home" replace />;
   }
@@ -75,6 +81,7 @@ const App = () => (
               <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
 
               {/* Admin Portal Pages */}
+              <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="/admin/*" element={<AdminRoute><AdminPortalWrapper /></AdminRoute>} />
 
