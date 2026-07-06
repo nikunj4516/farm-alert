@@ -205,7 +205,8 @@ export class ProfileService {
         // 2. Auth Metadata Fallback
         if (!imageUrl) {
           try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { session } } = await supabase.auth.getSession();
+            const user = session?.user;
             if (user && user.id === userId) {
               imageUrl = user.user_metadata?.avatar_url || user.user_metadata?.profile_image_url || null;
             }

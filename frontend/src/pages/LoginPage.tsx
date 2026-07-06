@@ -4,6 +4,7 @@ import { ArrowRight, Loader2, ShieldCheck, Phone, AlertTriangle, Key } from "luc
 import FarmerEmojiImage from "@/components/FarmerEmojiImage";
 import logoWide from "@/assets/farmalert-logo-wide.png";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { hasActiveSubscription } from "@/services/subscriptionService";
 import { ProfileService } from "@/services/profileService";

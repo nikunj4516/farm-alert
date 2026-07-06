@@ -730,6 +730,8 @@ const ProfileCard = ({
           userName={profile.name || "Farmer"}
           userPhone={profile.phone || ""}
           userVillage={profile.village || ""}
+          userTaluka={profile.taluka || ""}
+          userDistrict={profile.district || ""}
         />
       )}
       <UpgradeModal 

@@ -459,6 +459,8 @@ const Index = () => {
             userName={profileWithSavedLocation?.name || "Farmer"}
             userPhone={profileWithSavedLocation?.phone || ""}
             userVillage={profileWithSavedLocation?.village || ""}
+            userTaluka={profileWithSavedLocation?.taluka || ""}
+            userDistrict={profileWithSavedLocation?.district || ""}
           />
         )}
 

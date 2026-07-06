@@ -13,6 +13,8 @@ interface SupportCenterModalProps {
   userName?: string;
   userPhone?: string;
   userVillage?: string;
+  userTaluka?: string;
+  userDistrict?: string;
 }
 
 const getErrorMessage = (err: unknown): string => {
@@ -32,6 +34,8 @@ const SupportCenterModal = ({
   userName = "Farmer",
   userPhone = "",
   userVillage = "Vasad",
+  userTaluka = "",
+  userDistrict = "",
 }: SupportCenterModalProps) => {
   const { language, t } = useLanguage();
   const [activeTab, setActiveTab] = useState<string>("feedback");
@@ -46,6 +50,8 @@ const SupportCenterModal = ({
   const [complaintName, setComplaintName] = useState<string>(userName);
   const [complaintPhone, setComplaintPhone] = useState<string>(userPhone);
   const [complaintVillage, setComplaintVillage] = useState<string>(userVillage);
+  const [complaintTaluka, setComplaintTaluka] = useState<string>(userTaluka);
+  const [complaintDistrict, setComplaintDistrict] = useState<string>(userDistrict);
   const [complaintCategory, setComplaintCategory] = useState<string>("Weather Issue");
   const [complaintMessage, setComplaintMessage] = useState<string>("");
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
@@ -75,9 +81,11 @@ const SupportCenterModal = ({
       setComplaintName(userName);
       setComplaintPhone(userPhone);
       setComplaintVillage(userVillage);
+      setComplaintTaluka(userTaluka);
+      setComplaintDistrict(userDistrict);
       fetchUserComplaints();
     }
-  }, [isOpen, userId, userName, userPhone, userVillage]);
+  }, [isOpen, userId, userName, userPhone, userVillage, userTaluka, userDistrict]);
 
   useEffect(() => {
     if (activeTab === "my-complaints") {
@@ -132,8 +140,8 @@ const SupportCenterModal = ({
       await ComplaintService.submitFeedback({
         user_id: userId,
         rating,
-        favorite_feature: favFeature || "None specified",
-        suggestions: suggestions || "None specified",
+        feedback_message: `Favorite: ${favFeature || "None"}. Suggestions: ${suggestions || "None"}`,
+        language: language,
       });
 
       toast({
@@ -180,7 +188,10 @@ const SupportCenterModal = ({
         name: complaintName,
         phone: complaintPhone,
         village: complaintVillage,
+        taluka: complaintTaluka || userTaluka || "Unknown",
+        district: complaintDistrict || userDistrict || "Unknown",
         category: complaintCategory,
+        subject: `Complaint about ${complaintCategory}`,
         message: complaintMessage,
         screenshot_url: mockScreenshotUrl,
       });

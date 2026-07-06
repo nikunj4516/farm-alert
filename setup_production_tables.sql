@@ -3,8 +3,18 @@
 
 -- 1. Profiles Table Extension
 ALTER TABLE public.profiles 
-ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin', 'super_admin')),
-ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT false;
+  ADD COLUMN IF NOT EXISTS state TEXT,
+  ADD COLUMN IF NOT EXISTS taluka TEXT,
+  ADD COLUMN IF NOT EXISTS preferred_language TEXT DEFAULT 'gu',
+  ADD COLUMN IF NOT EXISTS profile_image_url TEXT,
+  ADD COLUMN IF NOT EXISTS farming_type TEXT,
+  ADD COLUMN IF NOT EXISTS crop_name TEXT,
+  ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS profile_completed BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS onboarding_completed BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin', 'super_admin')),
+  ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT false;
 
 -- Create security definer function to check if the current user is an admin
 CREATE OR REPLACE FUNCTION public.is_admin()
